@@ -1,7 +1,7 @@
 {
   "id": "qutub-minar",
   "city": "Delhi",
-  "aspect": 0.75,
+  "aspect": 0.5,
   "hero": "/monuments/qutub-minar/hero.png",
   "depth": "/monuments/qutub-minar/depth.png",
   "credit": "Photograph: public domain. Depth map generated with Depth Anything V2.",

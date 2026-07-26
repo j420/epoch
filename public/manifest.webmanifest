@@ -1,0 +1,18 @@
+{
+  "name": "Bol — speak to a monument",
+  "short_name": "Bol",
+  "description": "Talk to a monument in your own language. It listens in 22.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0908",
+  "theme_color": "#0a0908",
+  "icons": [
+    {
+      "src": "/monuments/qutub-minar/hero.png",
+      "sizes": "1024x1365",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

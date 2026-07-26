@@ -65,6 +65,28 @@ export interface Cue extends Partial<VisualDirective> {
   t: number;
 }
 
+/**
+ * The imperative surface of the Living Photograph engine.
+ *
+ * Declared here rather than in the component so the director, the debug tools and
+ * the page shell can all depend on the contract without importing WebGL code.
+ * The engine's own handle is structurally identical and therefore assignable.
+ */
+export interface LivingPhotoHandle {
+  to(region: string, opts?: { duration?: number; ease?: string }): void;
+  driftIn(opts?: { amount?: number; duration?: number }): void;
+  orbitMicro(opts?: { amplitude?: number }): void;
+  grade(g: Grade, ms?: number): void;
+  era(year: string | null, ms?: number): void;
+  focus(region: string | null, radius?: number): void;
+  /** While the visitor speaks: pull back and desaturate, so the world listens. */
+  listening(on: boolean): void;
+  reset(): void;
+}
+
+/** What the voice loop is doing right now. The director maps this onto camera behaviour. */
+export type VoiceState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
+
 // ---------------------------------------------------------------------------
 // Voice loop
 // ---------------------------------------------------------------------------
