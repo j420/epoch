@@ -107,8 +107,8 @@ vec3 applyGrade(vec3 c) {
 
 void main() {
   // --- silhouette dissolve --------------------------------------------------
-  // `vDepth` is what the *geometry* believes, linearly interpolated across each
-  // grid cell. `uDepth` is what the photograph actually says at this exact
+  // vDepth is what the *geometry* believes, linearly interpolated across each
+  // grid cell. uDepth is what the photograph actually says at this exact
   // fragment. Over smooth stone the two agree. Over a cell that straddles the
   // tower's edge, the interpolation ramps gently while the truth jumps, and the
   // gap between them is precisely the smear.
@@ -140,7 +140,7 @@ void main() {
 
   if (uBackdrop > 0.5) {
     // The fill layer does two jobs: it shows through the silhouette dissolve,
-    // and with `contain` framing it is the surround the letterboxed photograph
+    // and with contain framing it is the surround the letterboxed photograph
     // sits in. Both want the same thing — the same picture, defocused. A mip
     // bias does the heavy lifting for one tap; the ring of four widens it into
     // something that reads as bokeh rather than as a low-res duplicate.
@@ -171,10 +171,13 @@ void main() {
   float vig = 1.0 - smoothstep(0.65, 1.45, length(q * 2.0));
   col *= mix(1.0, vig, uVignette);
 
-  // The fill layer is by definition in the shadow of the thing in front of it.
-  if (uBackdrop > 0.5) col *= 0.58;
+  // Hold the surround back so the eye goes to the monument, but not so far that
+  // the silhouette dissolve reads as a black outline around the tower.
+  if (uBackdrop > 0.5) col *= 0.72;
 
-  gl_FragColor = vec4(col, uOpacity);
+  // Fade, do not cut. edge is 0 over stone and ramps to 1 across the smear,
+  // so the mesh thins out into the backdrop exactly where it was tearing.
+  gl_FragColor = vec4(col, uOpacity * (1.0 - edge));
 
   #include <colorspace_fragment>
 }
