@@ -30,5 +30,5 @@ export const metadata: Metadata = {
 };
 
 export default function ScanPage() {
-  return <ScanClient configured={true} />;
+  return <ScanClient configured={isConfigured()} />;
 }
