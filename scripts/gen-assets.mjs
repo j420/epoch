@@ -19,8 +19,15 @@
  * needs to change — the filenames and the `aspect` in content/<id>.json are the only
  * contract. The aspect is derived from W/H here, so the two can never disagree.
  *
- *   node scripts/gen-assets.mjs              # all ten
+ * THAT SWAP HAS NOW HAPPENED for some of the ten. `scripts/fetch-photos.mjs` pulls
+ * real, licensed photographs and records them in public/monuments/photo-lock.json.
+ * This script refuses to overwrite a locked monument's hero and era plates, because
+ * doing so would silently replace a licensed photograph with a drawing and nobody
+ * would notice until the demo. Pass --force if that is genuinely what you want.
+ *
+ *   node scripts/gen-assets.mjs              # every monument still on placeholders
  *   node scripts/gen-assets.mjs taj-mahal    # just one
+ *   node scripts/gen-assets.mjs --force      # ignore the photo lock (destructive)
  */
 
 import zlib from 'node:zlib';

@@ -10,7 +10,7 @@
       "height": 1332,
       "aspect": 0.5,
       "heroSha256": "84abcdb36f98780d1235ee3f98e08cee986265c40f163eabd72de4700cf6857a",
-      "eraSha256": "4f7567e67df31a3f2a79d64dcdb7010539c4a19ad89c098d42a68687b3278f1d"
+      "eraSha256": "d41a1f1600ca5a2a7483a1108a375f610b18391a750d9b1f5e44d1756a56ec2e"
     },
     "taj-mahal": {
       "source": "https://raw.githubusercontent.com/Qwetsh/QuizzEleves/main/src/assets/places/taj-mahal.jpg",
@@ -22,7 +22,7 @@
       "height": 664,
       "aspect": 1.44578,
       "heroSha256": "f7bc32699d8e14991650670a9b220060717ac067be3146254cfc7f279ae59fbe",
-      "eraSha256": "2c5c5c33ab18416aa29abd3e7be09b244a3772b37bf270ded366ccb5f5a07831"
+      "eraSha256": "94a7ff1153e9bcef1a1a79a5ff32f975a65d4ae83a011940210ed5e88eafddd3"
     },
     "red-fort": {
       "source": "https://raw.githubusercontent.com/rish106-hub/ARTH/main/assets/images/india-heritage-landmark.jpg",
@@ -34,7 +34,7 @@
       "height": 847,
       "aspect": 0.7497,
       "heroSha256": "41afbca96b76e0d80ccfcd129e473be8fb35a051432ead66f2bc2e9025eacbf4",
-      "eraSha256": "bbc240996f2c6f50f305247e94815f6d4ab6b56299d78b3de06c6907118ddc4d"
+      "eraSha256": "eca8028e78ab5fac7266103c9a226892917e87276f0db489eba08344bf282db0"
     },
     "charminar": {
       "source": "https://raw.githubusercontent.com/ZhuChen12/AirLine/main/AirLine/Resources/CityLandmarks/HYD.jpg",
@@ -46,7 +46,7 @@
       "height": 1000,
       "aspect": 0.75,
       "heroSha256": "4f28d5c824cab5dad08d306cad2c63a7c299adc8b99e15436ae6876d24423057",
-      "eraSha256": "14ee1a60bf567f1a6e1eed6157c6ac7d2134fe2499cb775f8b821cd6e958d182"
+      "eraSha256": "4911c45ff426066f5210c85eaa9d1f919ad2dbc8d5cc6e9cd8a5d7ba29f31bfc"
     },
     "gateway-of-india": {
       "source": "https://raw.githubusercontent.com/Qwetsh/QuizzEleves/main/src/assets/places/mumbai.jpg",
@@ -58,7 +58,7 @@
       "height": 960,
       "aspect": 0.75,
       "heroSha256": "d8d47beea38d6ffd79c62f5bfb6284991e1c3b80d69613e0b771a3f273e5e91b",
-      "eraSha256": "b4714423faeaa74065e14576fafaee2d8cffb28c476d299b4969d1dff40efa9a"
+      "eraSha256": "984baad791021a45818cdd104371b42d64474bc6dd957e8edf8e4f27915d596f"
     }
   }
 }
