@@ -201,14 +201,14 @@ export default function PhotoDebugPage() {
               <button type="button" className={chip(focused === null)} onClick={() => applyFocus(null)}>
                 none
               </button>
-              {regions.map((id) => (
+              {regions.map((r) => (
                 <button
-                  key={id}
+                  key={r.id}
                   type="button"
-                  className={chip(focused === id)}
-                  onClick={() => applyFocus(id)}
+                  className={chip(focused === r.id)}
+                  onClick={() => applyFocus(r.id)}
                 >
-                  {id}
+                  {r.id}
                 </button>
               ))}
             </div>
@@ -327,7 +327,7 @@ function chip(active: boolean): string {
   ].join(' ');
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-4 border-t border-white/10 pt-3">
       <h2 className="mb-2 text-[10px] uppercase tracking-[0.18em] text-sandstone-200/60">{title}</h2>

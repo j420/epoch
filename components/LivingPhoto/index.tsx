@@ -2,20 +2,24 @@
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { Grade } from '@/lib/types';
+import type { DepthPhase } from '@/lib/depth';
 import { PhotoScene } from './scene';
-import type { LivingPhotoHandle, LivingPhotoProps, LivingPhotoStatus } from './types';
+import type { LivingPhotoHandle, LivingPhotoProps } from './types';
 
 export type { LivingPhotoHandle, LivingPhotoProps, LivingPhotoStatus } from './types';
+
+/** className values that already establish a containing block for the overlays. */
+const POSITIONED = /(^|\s)(absolute|fixed|relative|sticky)(\s|$)/;
 
 /**
  * A real photograph, given depth, motion, atmosphere and direction.
  *
  * This component is a thin shell. All the WebGL lives in `PhotoScene`, which is
- * constructed synchronously so every method on the handle is safe to call from
+ * constructed synchronously, so every method on the handle is safe to call from
  * the very first render — the director does not have to wait for `onReady`
  * before issuing `grade()` or `to()`.
  *
- * Failure ladder, and none of these is ever a blank screen:
+ * Failure ladder, and none of these rungs is a blank screen:
  *   WebGL + depth map      -> full 2.5D diorama
  *   WebGL, no depth map    -> flat plane, Ken Burns, atmosphere, grades  (+ onError)
  *   no WebGL               -> static <img> with a CSS Ken Burns          (+ onError)
@@ -40,8 +44,8 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
   const hostRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<PhotoScene | null>(null);
 
-  // Callbacks live in refs so that a parent re-render with new inline handlers
-  // never tears down and rebuilds the GL context.
+  // Callbacks live in refs so a parent re-render with fresh inline handlers can
+  // never tear down and rebuild the GL context.
   const onReadyRef = useRef(onReady);
   const onErrorRef = useRef(onError);
   const onStatusRef = useRef(onStatus);
@@ -50,7 +54,8 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
   onStatusRef.current = onStatus;
 
   const [fallback, setFallback] = useState<'none' | 'image' | 'text'>('none');
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [revealed, setRevealed] = useState(false);
+  const [phase, setPhase] = useState<DepthPhase | 'loading'>('loading');
 
   const report = useCallback((e: Error) => {
     onErrorRef.current?.(e);
@@ -70,22 +75,23 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
         initialGrade,
         allowDepthCompute,
         onReady: () => {
-          setShowPlaceholder(false);
+          setRevealed(true);
           onReadyRef.current?.();
         },
-        onError: (e) => report(e),
+        onPhase: setPhase,
+        onError: report,
         onFatal: () => {
           setFallback('image');
-          setShowPlaceholder(false);
+          setRevealed(true);
         },
       });
     } catch (err) {
-      // WebGLRenderer throws when the context cannot be created at all: an old
+      // WebGLRenderer throws when no context can be created at all: an old
       // WebView, a blocklisted driver, or too many live contexts on the page.
       const e = err instanceof Error ? err : new Error(String(err));
       report(new Error(`WebGL unavailable: ${e.message}`, { cause: e }));
       setFallback('image');
-      setShowPlaceholder(false);
+      setRevealed(true);
       return;
     }
 
@@ -97,8 +103,9 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
       sceneRef.current = null;
       scene?.dispose();
     };
-    // Rebuild only when the monument itself changes. Every other prop is applied
-    // live through the setters below.
+    // Rebuild only when the monument itself changes. Everything else is applied
+    // live through the setters below; `atmosphere` and `allowDepthCompute` are
+    // construction-time choices, so change them with a React `key` if you must.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monument, report]);
 
@@ -141,16 +148,22 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
   );
 
   const alt = monument.displayName['en-IN'] ?? monument.id;
+  const computing = phase === 'model-download' || phase === 'model-run';
+  const positioned = POSITIONED.test(className ?? '');
 
   return (
     <div
-      ref={hostRef}
       className={className ?? 'relative h-full w-full overflow-hidden bg-night-900'}
-      style={{ position: 'relative' }}
+      // Only forced when the caller's own classes do not already establish one —
+      // otherwise an `absolute inset-0` className would be silently overridden.
+      style={positioned ? undefined : { position: 'relative' }}
     >
-      {/* Ken Burns for the no-WebGL path. Scoped keyframes so this component
-          stays entirely inside its own lane and touches no global stylesheet. */}
+      {/* Scoped keyframes: this lane touches no global stylesheet. */}
       <style>{KEN_BURNS_CSS}</style>
+
+      {/* three.js owns every child of this node. Keeping it separate from the
+          React-rendered overlays means the two never fight over the DOM. */}
+      <div ref={hostRef} className="absolute inset-0" />
 
       {fallback === 'image' && (
         <img
@@ -171,11 +184,18 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
         </div>
       )}
 
-      {showPlaceholder && fallback === 'none' && (
+      {/* Before the photograph arrives: a full shimmer. */}
+      {!revealed && fallback === 'none' && (
+        <div className="bol-shimmer pointer-events-none absolute inset-0" aria-hidden="true" />
+      )}
+
+      {/* While depth is being inferred in the browser: a hairline shimmer at the
+          foot of the frame. The photograph is already moving, so covering it
+          would be a downgrade — this just admits that more is coming. */}
+      {revealed && computing && fallback === 'none' && (
         <div
-          className="bol-shimmer pointer-events-none absolute inset-0"
+          className="bol-shimmer pointer-events-none absolute inset-x-0 bottom-0 h-[2px]"
           aria-hidden="true"
-          role="presentation"
         />
       )}
     </div>
@@ -183,8 +203,8 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
 });
 
 /**
- * A slow push-in and drift, matched to the WebGL rig's `driftIn` defaults so the
- * fallback feels like the same film, just without the depth.
+ * A slow push and drift for the no-WebGL path, timed to match the rig's
+ * `driftIn` defaults so the fallback reads as the same film without the depth.
  */
 const KEN_BURNS_CSS = `
 @keyframes bol-kenburns {

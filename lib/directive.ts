@@ -223,15 +223,66 @@ export function validateEra(value: unknown, monument?: Monument | null): string 
  * opening ```json fence immediately before, a closing fence immediately after,
  * and a "Directive:" / "JSON:" label on the preceding line.
  */
-function stripSpan(raw: string, span: Span): string {
-  let before = raw.slice(0, span.start);
-  let after = raw.slice(span.end);
+function stripAround(rawBefore: string, rawAfter: string): string {
+  let before = rawBefore;
+  let after = rawAfter;
 
   before = before.replace(/```[a-zA-Z]*\s*$/, '');
-  before = before.replace(/(?:^|\n)[ \t]*(?:visual[ _-]?)?(?:directive|json|output)[ \t]*[:=]?[ \t]*$/i, '\n');
+  // The label may be followed by a newline before the JSON, so the anchor has to
+  // allow trailing whitespace — not just end-of-string.
+  before = before.replace(/(?:^|\n)[ \t]*(?:visual[ _-]?)?(?:directive|json|output)[ \t]*[:=]?[ \t\r\n]*$/i, '\n');
   after = after.replace(/^\s*```/, '');
 
   return cleanSpokenText(`${before.trimEnd()}\n${after.trimStart()}`);
+}
+
+function stripSpan(raw: string, span: Span): string {
+  return stripAround(raw.slice(0, span.start), raw.slice(span.end));
+}
+
+/**
+ * Index of a trailing `{` that never closes, or -1.
+ *
+ * This is the truncation case, and it is the most likely malformed directive in
+ * production: the model hits max_tokens partway through the JSON and we are
+ * handed `{"focus":"dome", "grade":`. There is no balanced span to find, so the
+ * ordinary scanner sees nothing and the fragment would otherwise survive into
+ * the spoken text and be read aloud, punctuation and all.
+ */
+function findUnterminatedBrace(text: string): number {
+  for (let i = text.length - 1; i >= 0; i--) {
+    if (text[i] !== '{') continue;
+
+    let depth = 0;
+    let quote: string | null = null;
+    let esc = false;
+
+    for (let j = i; j < text.length; j++) {
+      const c = text[j];
+      if (quote) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === quote) quote = null;
+        continue;
+      }
+      if (c === '"' || c === "'") {
+        quote = c;
+        continue;
+      }
+      if (c === '{') depth++;
+      else if (c === '}') {
+        depth--;
+        if (depth === 0) return -1; // the last object is closed; nothing dangling
+      }
+    }
+    return i;
+  }
+  return -1;
+}
+
+/** Does this fragment look like someone was trying to write a directive? */
+function looksLikeDirectiveText(fragment: string): boolean {
+  return /["'\s{,](focus|grade|era)["'\s]*:/i.test(fragment);
 }
 
 /**
@@ -266,6 +317,18 @@ export function parseDirective(raw: string, monument?: Monument | null): ParsedD
     return { text: '', directive: { ...EMPTY_DIRECTIVE }, ok: false, raw: null };
   }
 
+  // Truncated JSON first: it sits at the very end by definition, and it is the
+  // one shape the balanced-span scanner cannot see.
+  const dangling = findUnterminatedBrace(source);
+  if (dangling >= 0 && looksLikeDirectiveText(source.slice(dangling))) {
+    return {
+      text: stripAround(source.slice(0, dangling), ''),
+      directive: { ...EMPTY_DIRECTIVE },
+      ok: false,
+      raw: source.slice(dangling),
+    };
+  }
+
   const spans = findJsonSpans(source);
   if (spans.length === 0) {
     return { text: cleanSpokenText(source), directive: { ...EMPTY_DIRECTIVE }, ok: false, raw: null };
@@ -290,7 +353,7 @@ export function parseDirective(raw: string, monument?: Monument | null): ParsedD
   // directive attempt, drop it from the spoken text so the monument does not
   // recite braces; otherwise leave the text completely alone.
   const last = spans[spans.length - 1];
-  const looksLikeAttempt = /["'\s{,](focus|grade|era)["'\s]*:/i.test(last.body);
+  const looksLikeAttempt = looksLikeDirectiveText(last.body);
 
   return {
     text: looksLikeAttempt ? stripSpan(source, last) : cleanSpokenText(source),

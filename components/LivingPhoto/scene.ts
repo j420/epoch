@@ -93,6 +93,7 @@ export class PhotoScene {
   private camera: THREE.PerspectiveCamera;
 
   private geometry: THREE.PlaneGeometry;
+  private backdropGeometry: THREE.PlaneGeometry;
   private material: THREE.ShaderMaterial;
   private backdropMaterial: THREE.ShaderMaterial;
   private mesh: THREE.Mesh;
@@ -266,7 +267,10 @@ export class PhotoScene {
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 1;
 
-    this.backdrop = new THREE.Mesh(this.geometry, this.backdropMaterial);
+    // Two triangles, not 131 000. The fill layer is never displaced, so paying
+    // the 66k-vertex depth-tap cost twice per frame would be pure waste.
+    this.backdropGeometry = new THREE.PlaneGeometry(this.planeWidth, this.planeHeight, 1, 1);
+    this.backdrop = new THREE.Mesh(this.backdropGeometry, this.backdropMaterial);
     this.backdrop.frustumCulled = false;
     this.backdrop.renderOrder = 0;
 
@@ -860,6 +864,7 @@ export class PhotoScene {
     this.atmosphere?.dispose();
 
     this.geometry.dispose();
+    this.backdropGeometry.dispose();
     this.material.dispose();
     this.backdropMaterial.dispose();
     this.placeholderPhoto.dispose();

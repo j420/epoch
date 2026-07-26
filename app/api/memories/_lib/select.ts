@@ -51,6 +51,8 @@ export function pickMemories(
   const listener = normalizeLang(listenerLang);
   const queries = [query, ...translatedQueries].map((q) => q?.trim()).filter((q): q is string => Boolean(q));
 
+  const picks: Pick[] = [];
+
   if (queries.length > 0) {
     const index = new TextIndex(memories, textOf);
     const best = new Map<string, number>();
@@ -60,30 +62,47 @@ export function pickMemories(
         if (hit.score > prev) best.set(hit.item.id, hit.score);
       }
     }
-    if (best.size > 0) {
-      const byId = new Map(memories.map((m) => [m.id, m]));
-      const topical = [...best.entries()]
-        .map(([id, score]) => ({ memory: byId.get(id)!, score, match: 'topical' as const }))
-        // A memory the listener can hear in the original voice is worth a nudge.
-        .sort((a, b) => {
-          const bump = (p: Pick) => p.score + (normalizeLang(p.memory.lang) === listener ? 0.02 : 0);
-          return bump(b) - bump(a);
-        })
-        .slice(0, limit);
-      if (topical.length > 0) return topical;
+    const byId = new Map(memories.map((m) => [m.id, m]));
+    for (const p of [...best.entries()]
+      .map(([id, score]) => ({ memory: byId.get(id)!, score, match: 'topical' as const }))
+      // A memory the listener can hear in the original voice is worth a nudge.
+      .sort((a, b) => {
+        const bump = (x: Pick) => x.score + (normalizeLang(x.memory.lang) === listener ? 0.02 : 0);
+        return bump(b) - bump(a);
+      })
+      .slice(0, limit)) {
+      picks.push(p);
     }
   }
 
-  const resonant = [...memories]
-    .sort((a, b) => {
-      const same = (m: Memory) => (normalizeLang(m.lang) === listener ? 1 : 0);
-      if (same(b) !== same(a)) return same(b) - same(a);
-      return Date.parse(b.created_at) - Date.parse(a.created_at);
-    })
-    .slice(0, limit)
-    .map((memory) => ({ memory, score: 0, match: 'resonant' as const }));
+  if (picks.length >= limit) return picks;
 
-  return resonant;
+  /**
+   * Top up to two. Deliberately preferring a language we have not used yet: a
+   * listener who hears one memory in their own voice and one carried across from
+   * another language has seen the whole product in a single answer. Same-language
+   * first when nothing has been picked at all, because the original recording is
+   * always the better artefact.
+   */
+  const taken = new Set(picks.map((p) => p.memory.id));
+  const usedLangs = new Set(picks.map((p) => normalizeLang(p.memory.lang)));
+
+  const rest = memories
+    .filter((m) => !taken.has(m.id))
+    .sort((a, b) => {
+      const fresh = (m: Memory) => (usedLangs.has(normalizeLang(m.lang)) ? 0 : 1);
+      const same = (m: Memory) => (normalizeLang(m.lang) === listener ? 1 : 0);
+      if (picks.length > 0 && fresh(b) !== fresh(a)) return fresh(b) - fresh(a);
+      if (picks.length === 0 && same(b) !== same(a)) return same(b) - same(a);
+      return Date.parse(b.created_at) - Date.parse(a.created_at);
+    });
+
+  for (const memory of rest) {
+    if (picks.length >= limit) break;
+    picks.push({ memory, score: 0, match: 'resonant' });
+  }
+
+  return picks;
 }
 
 /**
