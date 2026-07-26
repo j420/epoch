@@ -3,10 +3,16 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { Grade } from '@/lib/types';
 import type { DepthPhase } from '@/lib/depth';
-import { PhotoScene } from './scene';
+import {
+  PhotoScene,
+  DEFAULT_DEPTH_SCALE,
+  DEFAULT_EDGE_THRESHOLD,
+  DEFAULT_VIGNETTE,
+} from './scene';
 import type { LivingPhotoHandle, LivingPhotoProps } from './types';
 
 export type { LivingPhotoHandle, LivingPhotoProps, LivingPhotoStatus } from './types';
+export { DEFAULT_DEPTH_SCALE, DEFAULT_EDGE_THRESHOLD, DEFAULT_VIGNETTE } from './scene';
 
 /** className values that already establish a containing block for the overlays. */
 const POSITIONED = /(^|\s)(absolute|fixed|relative|sticky)(\s|$)/;
@@ -29,11 +35,11 @@ const LivingPhoto = forwardRef<LivingPhotoHandle, LivingPhotoProps>(function Liv
   {
     monument,
     className,
-    depthScale = 0.35,
+    depthScale = DEFAULT_DEPTH_SCALE,
     onReady,
     onError,
-    vignette = 0.35,
-    edgeThreshold = 0.06,
+    vignette = DEFAULT_VIGNETTE,
+    edgeThreshold = DEFAULT_EDGE_THRESHOLD,
     atmosphere = true,
     initialGrade = 'noon',
     allowDepthCompute = true,

@@ -69,11 +69,11 @@ export function gradeLuminance(g: Grade | null | undefined): number {
 export function gradeShimmer(g: Grade | null | undefined): number {
   switch (g) {
     case 'noon':
-      return 1.0;
+      return 0.6;
     case 'dusk':
-      return 0.45;
+      return 0.26;
     case 'dawn':
-      return 0.2;
+      return 0.12;
     default:
       // No shimmer at night, none on archival stock.
       return 0.0;

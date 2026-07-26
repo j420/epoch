@@ -34,9 +34,9 @@ import type { LivingPhotoStatus } from './types';
 const SEGMENTS = 256;
 const FOV_DEG = 32;
 
-const DEFAULT_DEPTH_SCALE = 0.35;
-const DEFAULT_VIGNETTE = 0.35;
-const DEFAULT_EDGE_THRESHOLD = 0.06;
+export const DEFAULT_DEPTH_SCALE = 0.35;
+export const DEFAULT_VIGNETTE = 0.35;
+export const DEFAULT_EDGE_THRESHOLD = 0.06;
 const DEFAULT_FOCUS_RADIUS = 0.26;
 
 const GRADE_MS = 1400;
@@ -259,6 +259,9 @@ export class PhotoScene {
       },
       transparent: true,
       depthWrite: false,
+      // Pure background fill. It sits a unit in front of the lens, so it must
+      // neither test nor write depth or it would occlude the entire scene.
+      depthTest: false,
     });
 
     this.geometry = new THREE.PlaneGeometry(this.planeWidth, this.planeHeight, SEGMENTS, SEGMENTS);
@@ -273,9 +276,15 @@ export class PhotoScene {
     this.backdropGeometry = new THREE.PlaneGeometry(this.planeWidth, this.planeHeight, 1, 1);
     this.backdrop = new THREE.Mesh(this.backdropGeometry, this.backdropMaterial);
     this.backdrop.frustumCulled = false;
-    this.backdrop.renderOrder = 0;
+    this.backdrop.renderOrder = -1;
 
-    this.scene.add(this.backdrop);
+    // Parented to the camera, not to the world. A world-space fill has to be
+    // sized for the worst-case camera position, which magnified the photograph
+    // four-fold and turned the surround into an unreadable smear. Locked to the
+    // lens it is always exactly one screen of defocused photograph, and it costs
+    // no matrix work when the rig moves.
+    this.camera.add(this.backdrop);
+    this.scene.add(this.camera);
     this.scene.add(this.mesh);
 
     this.rig = new CameraRig(this.planeWidth, this.planeHeight, FOV_DEG);
@@ -430,8 +439,9 @@ export class PhotoScene {
     return this.depthSamples[py * this.depthSampleW + px];
   }
 
+  /** World z of the displaced surface under a region. Matches the vertex shader. */
   private surfaceZ(r: Region): number {
-    return (this.depthAt(r.x, r.y) - 0.5) * this.depthScale;
+    return (this.depthAt(r.x, r.y) - 1.0) * this.depthScale;
   }
 
   // -------------------------------------------------------------------------
@@ -657,24 +667,20 @@ export class PhotoScene {
    * scale it to cover the frame from there, so a receding sky can never expose
    * the clear colour at the corners.
    */
+  /**
+   * Size the camera-locked fill so one screen of defocused photograph exactly
+   * covers the frame. Uniform scale, so the photograph's proportions survive
+   * into the blur — a stretched surround reads as a mistake even at this level
+   * of defocus.
+   */
   private placeBackdrop(): void {
-    const z = -(this.depthScale * 0.5 + 0.3);
-    this.backdrop.position.z = z;
-
-    // Worst case: the camera at its furthest framing distance *and* at the far
-    // end of its excursion budget. Size for that once and the fill can never be
-    // caught short mid-move, which would flash the clear colour at an edge.
-    const dist = this.rig.maxDistance - z;
+    const dist = 1;
+    this.backdrop.position.set(0, 0, -dist);
     const tanHalf = Math.tan((FOV_DEG * Math.PI) / 180 / 2);
     const halfVisH = dist * tanHalf;
     const halfVisW = halfVisH * (this.camera.aspect || 1);
-    const reach = this.rig.excursion;
     const scale =
-      Math.max(
-        ((halfVisH + reach.y) * 2) / this.planeHeight,
-        ((halfVisW + reach.x) * 2) / this.planeWidth,
-        1,
-      ) * 1.06;
+      Math.max((halfVisH * 2) / this.planeHeight, (halfVisW * 2) / this.planeWidth) * 1.02;
     this.backdrop.scale.set(scale, scale, 1);
   }
 

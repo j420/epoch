@@ -61,11 +61,20 @@ void main() {
   // and fade out the entire tower.
   vDepth = d;
 
+  // Feather the displacement to nothing at the sheet's border, so the rectangle
+  // of the photograph stays crisp and does not pincushion where the sky recedes.
+  float ex = smoothstep(0.0, 0.06, uv.x) * (1.0 - smoothstep(0.94, 1.0, uv.x));
+  float ey = smoothstep(0.0, 0.06, uv.y) * (1.0 - smoothstep(0.94, 1.0, uv.y));
+  float rim = ex * ey;
+
   vec3 p = position;
-  // Depth Anything emits inverse depth: 1.0 is nearest. Centring on 0.5 means
-  // raising depthScale opens the diorama out around the mid-plane instead of
-  // also dollying the entire photograph toward the lens.
-  p.z += (dDisp - 0.5) * uDepthScale;
+  // Depth Anything emits inverse depth: 1.0 is nearest. Anchoring the *nearest*
+  // sample at z = 0 and letting everything else recede means no part of the
+  // sheet is ever in front of the picture plane — so nothing can project
+  // outside the frame. Centring on 0.5 instead pushed the near ground toward
+  // the lens, where perspective flared it past the photograph's own edges and
+  // the whole thing read as a pop-up book rather than as a window.
+  p.z += (dDisp - 1.0) * uDepthScale * rim;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
 }
@@ -132,11 +141,20 @@ void main() {
 
   // Heat shimmer, lower third only, and weighted toward the *far* samples:
   // rising air distorts what is across the courtyard, not the stone underfoot.
-  float band = 1.0 - smoothstep(0.05, 0.34, uv.y);
+  float band = 1.0 - smoothstep(0.06, 0.36, uv.y);
   float shimmer = band * uShimmer * (1.0 - vDepth * 0.55);
   if (shimmer > 0.001) {
-    uv.x += sin(uv.y * 130.0 + uTime * 2.3) * 0.0020 * shimmer;
-    uv.y += cos(uv.x * 96.0 + uTime * 1.7) * 0.0012 * shimmer;
+    // Two octaves at high spatial frequency. Heat haze is fine-grained and
+    // fast; one low-frequency sine reads as water, not as air.
+    //
+    // The vertical term is deliberately sub-pixel. A horizon is a razor-straight
+    // high-contrast line, and displacing it by even two pixels turns the whole
+    // skyline into a visible wave — which is exactly what it did before.
+    float t = uTime;
+    uv.x += (sin(uv.y * 310.0 + t * 3.1) * 0.62 + sin(uv.y * 137.0 - t * 1.9) * 0.38)
+            * 0.0011 * shimmer;
+    uv.y += (cos(uv.x * 264.0 + t * 2.4) * 0.62 + cos(uv.x * 411.0 - t * 3.3) * 0.38)
+            * 0.00026 * shimmer;
   }
 
   vec3 col = texture2D(uPhotoA, uv).rgb;
@@ -151,12 +169,12 @@ void main() {
     // sits in. Both want the same thing — the same picture, defocused. A mip
     // bias does the heavy lifting for one tap; the ring of four widens it into
     // something that reads as bokeh rather than as a low-res duplicate.
-    vec2 o = vec2(0.016, 0.016 / uAspect);
-    vec3 blur = texture2D(uPhotoA, uv, 4.0).rgb * 2.0;
-    blur += texture2D(uPhotoA, uv + vec2(o.x, 0.0), 4.0).rgb;
-    blur += texture2D(uPhotoA, uv - vec2(o.x, 0.0), 4.0).rgb;
-    blur += texture2D(uPhotoA, uv + vec2(0.0, o.y), 4.0).rgb;
-    blur += texture2D(uPhotoA, uv - vec2(0.0, o.y), 4.0).rgb;
+    vec2 o = vec2(0.03, 0.03 / uAspect);
+    vec3 blur = texture2D(uPhotoA, uv, 5.5).rgb * 2.0;
+    blur += texture2D(uPhotoA, uv + vec2(o.x, 0.0), 5.5).rgb;
+    blur += texture2D(uPhotoA, uv - vec2(o.x, 0.0), 5.5).rgb;
+    blur += texture2D(uPhotoA, uv + vec2(0.0, o.y), 5.5).rgb;
+    blur += texture2D(uPhotoA, uv - vec2(0.0, o.y), 5.5).rgb;
     col = blur / 6.0;
   }
 

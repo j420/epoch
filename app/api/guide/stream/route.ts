@@ -58,10 +58,19 @@ export async function GET(req: NextRequest) {
 
     const lang: LangCode | '*' = rawLang === '*' ? '*' : normalizeLang(rawLang);
 
-    // Resume point: an explicit ?since= wins, else the browser's Last-Event-ID.
+    /*
+     * Resume point, in order of freshness:
+     *  1. Last-Event-ID — set by the browser on an automatic reconnect, and always the
+     *     last event it actually received. It must outrank the query string: the URL
+     *     was fixed when the listener joined, so after a stream rollover a stale
+     *     ?since= would replay the entire history on every single reconnect.
+     *  2. ?since= — used by the polling fallback and by a deliberate manual resume.
+     *  3. The room's current position — a brand-new listener starts from now, not from
+     *     forty replayed sentences.
+     */
     const lastEventId = Number(req.headers.get('last-event-id') ?? NaN);
     const sinceParam = Number(params.get('since') ?? NaN);
-    const since = Number.isFinite(sinceParam) ? sinceParam : Number.isFinite(lastEventId) ? lastEventId : room.seq;
+    const since = Number.isFinite(lastEventId) ? lastEventId : Number.isFinite(sinceParam) ? sinceParam : room.seq;
 
     const encoder = new TextEncoder();
 

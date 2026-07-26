@@ -120,8 +120,18 @@ export interface GuideRoom {
 
 /** Keep-alive comment interval. Proxies drop an idle response well before 60s. */
 export const SSE_PING_MS = 15_000;
-/** Bound each SSE connection; EventSource reconnects and Last-Event-ID replays. */
-export const GUIDE_SSE_MAX_MS = Number(process.env.GUIDE_SSE_MAX_MS ?? 9 * 60_000);
+/**
+ * Bound each SSE connection so WE close it cleanly rather than having the platform
+ * sever it mid-frame. EventSource reconnects on its own and Last-Event-ID replays
+ * whatever was missed, so a rollover is invisible to the listener.
+ *
+ * The default sits just under a 300s Vercel `maxDuration`. If you deploy with a lower
+ * maxDuration — 10s on Hobby, 15s by default on Pro — either raise it in vercel.json
+ * or lower GUIDE_SSE_MAX_MS to match. Getting it wrong is survivable rather than
+ * fatal: the client tolerates reconnects and falls back to polling if they stop
+ * succeeding, but a value under the platform limit keeps the churn down.
+ */
+export const GUIDE_SSE_MAX_MS = Number(process.env.GUIDE_SSE_MAX_MS ?? 240_000);
 /** A listener that has neither polled nor held a stream for this long has walked off. */
 const LISTENER_TTL_MS = 90_000;
 /** Chunks retained per room. Enough for a reconnect to catch up, bounded in memory. */

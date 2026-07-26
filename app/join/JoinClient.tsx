@@ -65,18 +65,27 @@ export default function JoinClient({
   const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSeqRef = useRef(0);
 
-  // One queue for the life of the page.
-  if (audioRef.current === null && typeof window !== 'undefined') {
-    audioRef.current = new UnlockedAudioQueue({
-      onPlay: (seq) => setNowPlaying(seq),
-      onIdle: () => setNowPlaying(null),
-      onDepth: (d) => setQueueDepth(d),
-    });
-  }
+  /**
+   * Created on demand rather than during render. React StrictMode mounts, unmounts
+   * and remounts in development; a queue built in the render body would be disposed
+   * by that first unmount and every later chunk would play into a dead element.
+   */
+  const getAudio = useCallback((): UnlockedAudioQueue | null => {
+    if (typeof window === 'undefined') return null;
+    if (!audioRef.current) {
+      audioRef.current = new UnlockedAudioQueue({
+        onPlay: (seq) => setNowPlaying(seq),
+        onIdle: () => setNowPlaying(null),
+        onDepth: (d) => setQueueDepth(d),
+      });
+    }
+    return audioRef.current;
+  }, []);
 
   useEffect(
     () => () => {
       audioRef.current?.dispose();
+      audioRef.current = null;
       streamRef.current?.getTracks().forEach((t) => t.stop());
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
     },
@@ -93,7 +102,12 @@ export default function JoinClient({
 
   // --- step 2: one sentence. THIS TAP IS THE AUDIO UNLOCK. -------------------
 
-  const toggleRecording = useCallback(() => {
+  /*
+   * Deliberately NOT memoised. It closes over `code` and `listenerId`, and a stale
+   * memo here would post the tour's first code after the listener had corrected it.
+   * It is a click handler on one button; there is nothing to gain by memoising it.
+   */
+  function toggleRecording() {
     if (recording) {
       const rec = recorderRef.current;
       if (rec && rec.state !== 'inactive') rec.stop();
@@ -101,17 +115,15 @@ export default function JoinClient({
     }
 
     /*
-     * Synchronous, first thing, no await in front of it: this call has to still be
-     * inside the browser's user-gesture window or the element is never unlocked and
-     * the whole tour plays silently. Everything asynchronous happens after it.
+     * Synchronous, first thing, nothing awaited in front of it: this call has to still
+     * be inside the browser's user-gesture window or the audio element is never
+     * unlocked and the entire tour plays silently. Everything async happens after it.
      */
-    void audioRef.current?.unlock().then((ok) => setAudioReady(ok));
+    void getAudio()?.unlock().then((ok) => setAudioReady(ok));
 
     setError(null);
     void beginRecording();
-    // beginRecording is defined below and closes over stable refs only.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recording]);
+  }
 
   async function beginRecording() {
     try {
@@ -169,6 +181,10 @@ export default function JoinClient({
       const body = await res.json();
       if (!res.ok) throw new Error(body?.error ?? 'Could not join the tour.');
 
+      // Start the stream from where the room is now. A listener joining mid-tour wants
+      // what the guide says next, not a replayed backlog and forty queued audio clips.
+      lastSeqRef.current = typeof body.seq === 'number' ? body.seq : 0;
+
       setLang(body.lang);
       setChip(body.chip);
       setListenerId(body.listenerId);
@@ -219,7 +235,7 @@ export default function JoinClient({
           ...prev,
         ].slice(0, 40),
       );
-      if (chunk.audio) audioRef.current?.enqueue({ seq: chunk.seq, url: chunk.audio });
+      if (chunk.audio) getAudio()?.enqueue({ seq: chunk.seq, url: chunk.audio });
     };
 
     const finish = () => {
@@ -316,7 +332,7 @@ export default function JoinClient({
       if (pollTimer) clearInterval(pollTimer);
       if (readyTimer) clearTimeout(readyTimer);
     };
-  }, [phase, lang, code, listenerId]);
+  }, [phase, lang, code, listenerId, getAudio]);
 
   // -------------------------------------------------------------------------
 
@@ -362,7 +378,7 @@ export default function JoinClient({
             audioReady={audioReady}
             nowPlaying={nowPlaying}
             queueDepth={queueDepth}
-            onRetryAudio={() => void audioRef.current?.retryUnlock().then(setAudioReady)}
+            onRetryAudio={() => void getAudio()?.retryUnlock().then(setAudioReady)}
           />
         )}
       </div>

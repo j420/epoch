@@ -178,7 +178,8 @@ export default function GuideClient({
     } catch (err) {
       setError(`Microphone unavailable: ${(err as Error).message}`);
     }
-    // submitConsent is stable for the lifetime of a session; see the ref below.
+    // submitConsent reads the session through sessionRef, so it never goes stale and
+    // does not belong in the dependency list.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

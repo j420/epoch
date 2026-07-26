@@ -6,9 +6,9 @@ import { clamp, lerp, resolveEase, type EaseFn } from './easing';
  *
  * Everything here is deliberately small. This is a shallow diorama built from
  * one photograph — the moment the camera travels far enough to expect real
- * occlusion data, the illusion dies. So: gentle lateral moves, a dolly range of
- * roughly 60-100% of the framing distance, and offsets measured in hundredths
- * of a world unit.
+ * occlusion data, the illusion dies. So: gentle lateral moves, a push that
+ * never frames less than about half the picture, and idle offsets measured in
+ * hundredths of a world unit.
  *
  * Final camera position is
  *
@@ -65,14 +65,32 @@ const DEFAULT_ORBIT_AMPLITUDE = 0.03;
 const DEFAULT_TO_DURATION = 2400;
 
 /**
- * Zoom multiplier applied at region.z = 0 and at region.z = 1 respectively.
+ * What fraction of the photograph's height a region move frames, from
+ * `region.z = 0` to `region.z = 1`.
  *
- * The floor is deliberately not lower. The hero is 1024x1365; on a phone the
- * cover framing already upscales it ~1.3x, and pushing past roughly 0.55 turns
- * sandstone into mush. A soft photograph stops being a photograph.
+ * Expressed against the picture rather than against the viewport on purpose: a
+ * zoom *multiplier* gives a phone and a desktop wildly different shots for the
+ * same region, because their opening framings differ by 40%. A fraction of the
+ * photograph is the same shot everywhere.
+ *
+ * The floor is not lower because the hero is 1024x1365. Framing less than about
+ * half its height means upscaling past 2.5x on a phone, and soft sandstone
+ * stops reading as a photograph.
  */
-const REGION_ZOOM_WIDE = 0.92;
-const REGION_ZOOM_TIGHT = 0.55;
+const REGION_VIEW_WIDE = 0.92;
+const REGION_VIEW_TIGHT = 0.48;
+
+/**
+ * How far the view window may hang off the photograph, as a fraction of its own
+ * half-size.
+ *
+ * Zero would mean the frame can never leave the plane — which, under `contain`
+ * framing, means it can never move at all, because the plane already fits. The
+ * blurred surround is a designed surface, not a void, so letting a close framing
+ * carry a little of it at the edge is fine; letting it carry half the frame is
+ * not.
+ */
+const OVERHANG = 0.45;
 
 /** While the visitor is speaking we pull back this much and hold. */
 const LISTENING_PULL = 1.075;
@@ -153,25 +171,18 @@ export class CameraRig {
   }
 
   /**
-   * How far the camera is ever allowed to stray from the plane's centre.
-   *
-   * The old rule — never let the view window leave the photograph — is
-   * meaningless once the framing contains the whole plane, and it silently
-   * clamped every region move to nothing on a tall viewport. The backdrop is
-   * sized against this budget instead, so the only job left here is to stop
-   * absurd excursions.
+   * How far the camera may stray from the plane's centre at a given distance,
+   * such that the frame keeps at least `1 - OVERHANG` of itself on the
+   * photograph. Closer framings get more room, which is exactly right: the
+   * tighter the shot, the further it can travel before it runs out of picture.
    */
-  private maxExcursion(): { x: number; y: number } {
-    return { x: this.halfW * 0.95, y: this.halfH * 0.95 };
-  }
-
-  /** Largest distance the camera can sit at, for sizing the backdrop. */
-  get maxDistance(): number {
-    return this.framingDistance * LISTENING_PULL;
-  }
-
-  get excursion(): { x: number; y: number } {
-    return this.maxExcursion();
+  private limitAt(dist: number): { x: number; y: number } {
+    const halfVisH = dist * this.tanHalfFov;
+    const halfVisW = halfVisH * this.viewportAspect;
+    return {
+      x: Math.max(0, this.halfW - halfVisW * (1 - OVERHANG)),
+      y: Math.max(0, this.halfH - halfVisH * (1 - OVERHANG)),
+    };
   }
 
   get distance(): number {
@@ -193,8 +204,22 @@ export class CameraRig {
    */
   to(r: Region, surfaceZ: number, opts: ToOptions = {}): void {
     const pt = this.regionPoint(r);
-    const zoom = lerp(REGION_ZOOM_WIDE, REGION_ZOOM_TIGHT, clamp(r.z, 0, 1));
-    this.startMove(pt.x, pt.y, zoom, surfaceZ, opts.duration ?? DEFAULT_TO_DURATION, opts.ease);
+    const viewH = lerp(REGION_VIEW_WIDE, REGION_VIEW_TIGHT, clamp(r.z, 0, 1));
+    // Never wider than the opening frame: `to` is always a push in, never out.
+    const dist = Math.min(this.framingDistance, (viewH * this.halfH) / this.tanHalfFov);
+    const zoom = dist / this.framingDistance;
+    // Clamp the *destination*, not just each frame along the way. Tweening
+    // toward an unreachable point and clipping it per frame makes the move
+    // appear to stall; easing into a reachable one lands cleanly.
+    const limit = this.limitAt(dist);
+    this.startMove(
+      clamp(pt.x, -limit.x, limit.x),
+      clamp(pt.y, -limit.y, limit.y),
+      zoom,
+      surfaceZ,
+      opts.duration ?? DEFAULT_TO_DURATION,
+      opts.ease,
+    );
   }
 
   /** Return to the full frame. */
@@ -328,7 +353,8 @@ export class CameraRig {
     let camX = this.baseX + orbitX + this.parallaxX;
     let camY = this.baseY + orbitY + this.parallaxY;
 
-    const limit = this.maxExcursion();
+    // Final safety net for drift, orbit and parallax stacked on top of the base.
+    const limit = this.limitAt(dist);
     camX = clamp(camX, -limit.x, limit.x);
     camY = clamp(camY, -limit.y, limit.y);
 

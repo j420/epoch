@@ -69,6 +69,13 @@ export async function POST(req: NextRequest) {
       lang: listener.lang,
       listenerId: listener.id,
       listeners: snapshot.listeners,
+      /*
+       * Where this listener's stream should start. Someone joining twenty minutes into
+       * a tour wants what the guide says next, not forty replayed sentences and forty
+       * queued audio clips. The client seeds its resume cursor from this, so a later
+       * reconnect still replays exactly what it missed and nothing more.
+       */
+      seq: room.seq,
       chip: detectedChip(listener.lang),
       languages: snapshot.languages,
       transcript: heard.transcript,

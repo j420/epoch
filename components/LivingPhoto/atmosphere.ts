@@ -105,7 +105,7 @@ export class Atmosphere {
   private elapsed = 0;
 
   /** Half the displacement amplitude — i.e. how far back the sky sits. */
-  private skyZ = -0.175;
+  private skyZ = -0.35;
 
   /** Number of motes actually allocated, after the device-class trim. */
   readonly count: number;
@@ -199,7 +199,7 @@ export class Atmosphere {
    * cross — a bird that is always in front reads as a sticker on the lens.
    */
   setDepthScale(depthScale: number): void {
-    this.skyZ = -depthScale * 0.5;
+    this.skyZ = -depthScale;
   }
 
   /**

@@ -1,7 +1,11 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
-import LivingPhoto from '@/components/LivingPhoto';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import LivingPhoto, {
+  DEFAULT_DEPTH_SCALE,
+  DEFAULT_EDGE_THRESHOLD,
+  DEFAULT_VIGNETTE,
+} from '@/components/LivingPhoto';
 import type { LivingPhotoHandle, LivingPhotoStatus } from '@/components/LivingPhoto/types';
 import { getMonument, regionLabel } from '@/lib/monuments';
 import { GRADES, GRADE_IDS, GRADE_SATURATION } from '@/lib/grades';
@@ -28,12 +32,9 @@ export default function PhotoDebugPage() {
   const photo = useRef<LivingPhotoHandle>(null);
   const params = useMemo(readParams, []);
 
-  const [depthScale, setDepthScale] = useState(() => {
-    const v = Number(params.get('depth'));
-    return Number.isFinite(v) && v > 0 ? v : 0.35;
-  });
-  const [vignette, setVignette] = useState(0.35);
-  const [edgeThreshold, setEdgeThreshold] = useState(0.06);
+  const [depthScale, setDepthScale] = useState(DEFAULT_DEPTH_SCALE);
+  const [vignette, setVignette] = useState(DEFAULT_VIGNETTE);
+  const [edgeThreshold, setEdgeThreshold] = useState(DEFAULT_EDGE_THRESHOLD);
   const [focusRadius, setFocusRadius] = useState(0.26);
   const [grade, setGrade] = useState<Grade>('noon');
   const [focused, setFocused] = useState<string | null>(null);
@@ -43,7 +44,19 @@ export default function PhotoDebugPage() {
   const [allowCompute, setAllowCompute] = useState(true);
   const [status, setStatus] = useState<LivingPhotoStatus | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
-  const [panelOpen, setPanelOpen] = useState(() => params.get('bare') !== '1');
+  const [panelOpen, setPanelOpen] = useState(true);
+
+  // Query params are read *after* mount, never during render: the server has no
+  // location, so seeding state from the URL would be a hydration mismatch.
+  useEffect(() => {
+    if (params.get('bare') === '1') setPanelOpen(false);
+    const d = Number(params.get('depth'));
+    if (params.has('depth') && Number.isFinite(d) && d >= 0) setDepthScale(d);
+    const e = Number(params.get('edge'));
+    if (params.has('edge') && Number.isFinite(e) && e > 0) setEdgeThreshold(e);
+    const v = Number(params.get('vignette'));
+    if (params.has('vignette') && Number.isFinite(v) && v >= 0) setVignette(v);
+  }, [params]);
 
   const presetApplied = useRef(false);
 

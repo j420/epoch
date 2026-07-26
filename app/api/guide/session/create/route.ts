@@ -68,12 +68,16 @@ export async function POST(req: NextRequest) {
 /**
  * Prefer the origin the request actually arrived on, so a phone scanning the QR gets
  * the LAN address the laptop is being served from rather than a baked-in localhost.
- * NEXT_PUBLIC_BASE_URL is the fallback for deployments behind a rewrite.
+ * Getting this wrong is a QR that resolves to nothing on the listener's phone.
+ *
+ * Order: the proxy's own headers (Vercel always sets these), then the protocol the
+ * request really used, then NEXT_PUBLIC_BASE_URL for deployments behind a rewrite.
  */
 function resolveOrigin(req: NextRequest): string {
-  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
+  const host = (req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? '').split(',')[0].trim();
   if (host) {
-    const proto = req.headers.get('x-forwarded-proto') ?? (host.startsWith('localhost') || host.startsWith('127.') || host.startsWith('192.168.') ? 'http' : 'https');
+    const forwarded = req.headers.get('x-forwarded-proto')?.split(',')[0].trim();
+    const proto = forwarded || req.nextUrl.protocol.replace(':', '') || 'http';
     return `${proto}://${host}`;
   }
   return (process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
