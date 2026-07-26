@@ -693,7 +693,15 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
         res = await fetch('/api/speak?raw=1', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ text, lang: speakLang ?? undefined, sessionId: sessionIdRef.current ?? undefined }),
+          // monumentId drives per-monument voice casting in lib/voices.ts. Without
+          // it every monument falls back to the language default and they all sound
+          // like the same person — which defeats the point of casting them at all.
+          body: JSON.stringify({
+            text,
+            lang: speakLang ?? undefined,
+            monumentId,
+            sessionId: sessionIdRef.current ?? undefined,
+          }),
           signal,
         });
       } catch (err) {

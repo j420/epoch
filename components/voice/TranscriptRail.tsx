@@ -59,11 +59,13 @@ export function TranscriptRail({
             <p
               lang={turn.lang ?? undefined}
               className={[
-                'indic-text max-w-[85%] rounded-2xl px-3.5 py-2',
+                'indic-text animate-fade-in max-w-[85%] px-4 py-2.5',
+                // Asymmetric corners so the thread reads as a conversation at a
+                // glance without either side needing a label.
                 visitor
-                  ? 'bg-sandstone-500/20 text-sandstone-100/90'
-                  : 'bol-glass text-sandstone-100',
-                big ? 'text-xl leading-snug sm:text-2xl' : 'text-sm',
+                  ? 'rounded-[1.25rem] rounded-br-md border border-sandstone-300/20 bg-sandstone-700/45 text-sandstone-50 backdrop-blur-md'
+                  : 'bol-glass rounded-[1.25rem] rounded-bl-md text-sandstone-50',
+                big ? 'text-xl leading-snug sm:text-2xl' : 'text-[0.9rem]',
               ].join(' ')}
             >
               {turn.text}

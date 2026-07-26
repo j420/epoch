@@ -1,10 +1,10 @@
 {
   "id": "gateway-of-india",
   "city": "Mumbai",
-  "aspect": 0.5,
+  "aspect": 0.75,
   "hero": "/monuments/gateway-of-india/hero.png",
-  "depth": "/monuments/gateway-of-india/depth.png",
-  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "depth": "",
+  "credit": "Photograph: A.Savin, Wikimedia Commons (Free Art License 1.3), cropped. Depth inferred in-browser. Full chain: public/monuments/CREDITS.md.",
   "displayName": {
     "en-IN": "Gateway of India",
     "hi-IN": "गेटवे ऑफ़ इंडिया",

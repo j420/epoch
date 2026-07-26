@@ -1,10 +1,10 @@
 {
   "id": "taj-mahal",
   "city": "Agra",
-  "aspect": 0.5,
+  "aspect": 1.44578,
   "hero": "/monuments/taj-mahal/hero.png",
-  "depth": "/monuments/taj-mahal/depth.png",
-  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "depth": "",
+  "credit": "Photograph: Yann, edited by King of Hearts and Jbarta, Wikimedia Commons (CC BY-SA 3.0). Depth inferred in-browser. Full chain: public/monuments/CREDITS.md.",
   "displayName": {
     "en-IN": "Taj Mahal",
     "hi-IN": "ताज महल",

@@ -1,0 +1,64 @@
+{
+  "plates": {
+    "qutub-minar": {
+      "source": "https://raw.githubusercontent.com/funksoup/Architects_Apprentice/main/images/Qutub_minar%2CDelhi.JPG",
+      "sourceSha256": "a772a5bc5cf1b02f828ec7533b3f58045beee232a5c170bdc2a00ba93c472629",
+      "commonsFile": "Qutub_minar,Delhi.JPG",
+      "author": "Ramesam",
+      "licence": "CC BY-SA 3.0",
+      "width": 666,
+      "height": 1332,
+      "aspect": 0.5,
+      "heroSha256": "84abcdb36f98780d1235ee3f98e08cee986265c40f163eabd72de4700cf6857a",
+      "eraSha256": "4f7567e67df31a3f2a79d64dcdb7010539c4a19ad89c098d42a68687b3278f1d"
+    },
+    "taj-mahal": {
+      "source": "https://raw.githubusercontent.com/Qwetsh/QuizzEleves/main/src/assets/places/taj-mahal.jpg",
+      "sourceSha256": "0c401d91364a2ca981e57f7670605b340a549cb2c12052bdf2af3b8830407723",
+      "commonsFile": "Taj_Mahal,_Agra,_India_edit3.jpg",
+      "author": "Yann; edited by King of Hearts; derivative work by Jbarta",
+      "licence": "CC BY-SA 3.0",
+      "width": 960,
+      "height": 664,
+      "aspect": 1.44578,
+      "heroSha256": "f7bc32699d8e14991650670a9b220060717ac067be3146254cfc7f279ae59fbe",
+      "eraSha256": "2c5c5c33ab18416aa29abd3e7be09b244a3772b37bf270ded366ccb5f5a07831"
+    },
+    "red-fort": {
+      "source": "https://raw.githubusercontent.com/rish106-hub/ARTH/main/assets/images/india-heritage-landmark.jpg",
+      "sourceSha256": "0f29cf778f4cfbac5479366edb9eedd8a0db3626e70e9b92bb7f897b3ad0ff3a",
+      "commonsFile": "Red_Fort_Delhi,_India.jpg",
+      "author": "Vibhor97",
+      "licence": "CC BY-SA 3.0",
+      "width": 635,
+      "height": 847,
+      "aspect": 0.7497,
+      "heroSha256": "41afbca96b76e0d80ccfcd129e473be8fb35a051432ead66f2bc2e9025eacbf4",
+      "eraSha256": "bbc240996f2c6f50f305247e94815f6d4ab6b56299d78b3de06c6907118ddc4d"
+    },
+    "charminar": {
+      "source": "https://raw.githubusercontent.com/ZhuChen12/AirLine/main/AirLine/Resources/CityLandmarks/HYD.jpg",
+      "sourceSha256": "8c2cc6e9cbe51370acaa5f48f03e98d06047ea83fa783036c118f1a5f6e1725f",
+      "commonsFile": "CHARMINAR,_Hyderabad_01.jpg",
+      "author": "Original: Nagalakshmikavuri; derivative work: UnpetitproleX",
+      "licence": "CC BY-SA 3.0",
+      "width": 750,
+      "height": 1000,
+      "aspect": 0.75,
+      "heroSha256": "4f28d5c824cab5dad08d306cad2c63a7c299adc8b99e15436ae6876d24423057",
+      "eraSha256": "14ee1a60bf567f1a6e1eed6157c6ac7d2134fe2499cb775f8b821cd6e958d182"
+    },
+    "gateway-of-india": {
+      "source": "https://raw.githubusercontent.com/Qwetsh/QuizzEleves/main/src/assets/places/mumbai.jpg",
+      "sourceSha256": "9f741ec7f6ea13fc115b2e3eb595aeec54a4e6a879323a5f780052cdbae5af34",
+      "commonsFile": "Mumbai_03-2016_30_Gateway_of_India.jpg",
+      "author": "A.Savin",
+      "licence": "FAL 1.3 (Free Art License)",
+      "width": 720,
+      "height": 960,
+      "aspect": 0.75,
+      "heroSha256": "d8d47beea38d6ffd79c62f5bfb6284991e1c3b80d69613e0b771a3f273e5e91b",
+      "eraSha256": "b4714423faeaa74065e14576fafaee2d8cffb28c476d299b4969d1dff40efa9a"
+    }
+  }
+}

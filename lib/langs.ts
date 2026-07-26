@@ -22,8 +22,27 @@ export interface LangInfo {
   speakable: boolean;
   /** If not speakable, the closest language Bulbul can voice. */
   voiceFallback?: LangCode;
-  /** Default Bulbul speaker for this language. */
+  /**
+   * Default **bulbul:v2** speaker for this language.
+   *
+   * Left at 'anushka' because that is v2's own default and is a name v2
+   * accepts. It is NOT a valid bulbul:v3 name — the two catalogues are
+   * disjoint — so nothing on the v3 path may use this field. Real speaker
+   * selection lives in lib/voices.ts, which is model-aware; this stays as the
+   * last-resort value for `resolveVoice()` callers that predate it.
+   */
   speaker?: string;
+  /**
+   * Default **bulbul:v3** speaker for this language.
+   *
+   * Every entry is v3's own default, `shubh`, and deliberately so: we have no
+   * evidence that any particular v3 voice is more native to one of the eleven
+   * languages than another, and guessing here would be unfalsifiable. The field
+   * exists so that when someone with a live key does the listening, there is a
+   * per-language slot to write the answer into. See LANGUAGE_DEFAULT_SPEAKER in
+   * lib/voices.ts, which is what actually reads it.
+   */
+  speakerV3?: string;
 }
 
 /** The 11 languages Bulbul v3 can voice. */
@@ -33,17 +52,17 @@ export const SPEAKABLE: LangCode[] = [
 
 export const LANGS: Record<LangCode, LangInfo> = {
   // ---- Bulbul-speakable ----
-  'en-IN': { code: 'en-IN', native: 'English', english: 'English', script: 'Latin', speakable: true, speaker: 'anushka' },
-  'hi-IN': { code: 'hi-IN', native: 'हिन्दी', english: 'Hindi', script: 'Devanagari', speakable: true, speaker: 'anushka' },
-  'bn-IN': { code: 'bn-IN', native: 'বাংলা', english: 'Bengali', script: 'Bengali', speakable: true, speaker: 'anushka' },
-  'gu-IN': { code: 'gu-IN', native: 'ગુજરાતી', english: 'Gujarati', script: 'Gujarati', speakable: true, speaker: 'anushka' },
-  'kn-IN': { code: 'kn-IN', native: 'ಕನ್ನಡ', english: 'Kannada', script: 'Kannada', speakable: true, speaker: 'anushka' },
-  'ml-IN': { code: 'ml-IN', native: 'മലയാളം', english: 'Malayalam', script: 'Malayalam', speakable: true, speaker: 'anushka' },
-  'mr-IN': { code: 'mr-IN', native: 'मराठी', english: 'Marathi', script: 'Devanagari', speakable: true, speaker: 'anushka' },
-  'od-IN': { code: 'od-IN', native: 'ଓଡ଼ିଆ', english: 'Odia', script: 'Odia', speakable: true, speaker: 'anushka' },
-  'pa-IN': { code: 'pa-IN', native: 'ਪੰਜਾਬੀ', english: 'Punjabi', script: 'Gurmukhi', speakable: true, speaker: 'anushka' },
-  'ta-IN': { code: 'ta-IN', native: 'தமிழ்', english: 'Tamil', script: 'Tamil', speakable: true, speaker: 'anushka' },
-  'te-IN': { code: 'te-IN', native: 'తెలుగు', english: 'Telugu', script: 'Telugu', speakable: true, speaker: 'anushka' },
+  'en-IN': { code: 'en-IN', native: 'English', english: 'English', script: 'Latin', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'hi-IN': { code: 'hi-IN', native: 'हिन्दी', english: 'Hindi', script: 'Devanagari', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'bn-IN': { code: 'bn-IN', native: 'বাংলা', english: 'Bengali', script: 'Bengali', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'gu-IN': { code: 'gu-IN', native: 'ગુજરાતી', english: 'Gujarati', script: 'Gujarati', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'kn-IN': { code: 'kn-IN', native: 'ಕನ್ನಡ', english: 'Kannada', script: 'Kannada', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'ml-IN': { code: 'ml-IN', native: 'മലയാളം', english: 'Malayalam', script: 'Malayalam', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'mr-IN': { code: 'mr-IN', native: 'मराठी', english: 'Marathi', script: 'Devanagari', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'od-IN': { code: 'od-IN', native: 'ଓଡ଼ିଆ', english: 'Odia', script: 'Odia', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'pa-IN': { code: 'pa-IN', native: 'ਪੰਜਾਬੀ', english: 'Punjabi', script: 'Gurmukhi', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'ta-IN': { code: 'ta-IN', native: 'தமிழ்', english: 'Tamil', script: 'Tamil', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'te-IN': { code: 'te-IN', native: 'తెలుగు', english: 'Telugu', script: 'Telugu', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
 
   // ---- Saaras understands, Bulbul cannot voice. Honest degradation. ----
   'as-IN':  { code: 'as-IN',  native: 'অসমীয়া',   english: 'Assamese',  script: 'Bengali-Assamese', speakable: false, voiceFallback: 'bn-IN' },

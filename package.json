@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "smoke": "tsx scripts/smoke.ts",
     "seed": "tsx scripts/seed.ts",
-    "verify:language": "tsx scripts/verify-language.ts"
+    "verify:language": "tsx scripts/verify-language.ts",
+    "verify:guardrails": "tsx scripts/verify-guardrails.ts",
+    "verify": "npm run verify:language && npm run verify:guardrails"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.3.1",

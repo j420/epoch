@@ -3,6 +3,7 @@ import 'server-only';
 import { LRU } from './lru';
 import { SarvamAuth, SarvamBadResponse, SarvamError, SarvamNotConfigured, SarvamRateLimit, isRetryable } from './errors';
 import { normalizeLang, resolveVoice, type LangCode } from './langs';
+import { castVoice, isSpeakerRejection, safeDefaultSpeaker } from './voices';
 import { b64ToBytes, bytesToB64, concatAudio } from './wav';
 
 /**
@@ -54,6 +55,14 @@ export interface SpeakResult {
   requestedLang: LangCode;
   degraded: boolean;
   speaker: string;
+  /** Bulbul's speaking rate actually sent, after clamping to the model's window. */
+  pace: number;
+  /**
+   * Set when Bulbul rejected the speaker we cast and we retried with the model's
+   * own default. Non-null means a casting choice in lib/voices.ts is wrong and
+   * someone needs to see it — the route logs it as a `speaker_fallback` event.
+   */
+  speakerFallback: { from: string; to: string; reason: string } | null;
   chunks: number;
   latencyMs: number;
   cached: boolean;
@@ -357,10 +366,34 @@ export async function speak(
   text: string,
   lang: string,
   speaker?: string,
-  opts: { pace?: number; enablePreprocessing?: boolean; signal?: AbortSignal; bypassCache?: boolean } = {},
+  opts: {
+    pace?: number;
+    enablePreprocessing?: boolean;
+    signal?: AbortSignal;
+    bypassCache?: boolean;
+    /** Casts the monument's own voice. Unknown or absent falls back to the language default. */
+    monumentId?: string | null;
+  } = {},
 ): Promise<SpeakResult> {
   const started = Date.now();
-  const target = resolveVoice(lang, speaker);
+
+  /**
+   * SPEAKER SELECTION LIVES IN lib/voices.ts, NOT HERE.
+   *
+   * It has to, because the answer is model-dependent: bulbul:v2 and bulbul:v3
+   * have completely disjoint speaker catalogues, and the v2 name every language
+   * in lib/langs.ts used to carry ('anushka') is rejected outright by the v3
+   * model this file requests by default. castVoice() applies the resolution
+   * order — env force, caller, monument, language, model default — and then
+   * guarantees the name it returns is one the configured model actually holds.
+   */
+  const cast = castVoice({
+    lang: resolveVoice(lang).voiceLang,
+    monumentId: opts.monumentId ?? null,
+    speaker,
+    pace: opts.pace ?? null,
+  });
+  const target = resolveVoice(lang, cast.speaker);
   const clean = text.trim();
   if (!clean) throw new SarvamBadResponse('speak() called with empty text');
 
@@ -375,35 +408,67 @@ export async function speak(
    * voice-gap notice. Not hypothetical — didNotCatch('sa-IN') resolves to the exact
    * same Hindi string, so a demo hits this by simply mishearing two visitors.
    */
-  const cacheKey = JSON.stringify([clean, target.voiceLang, target.textLang, target.speaker, opts.pace ?? 1]);
+  const cacheKey = JSON.stringify([clean, target.voiceLang, target.textLang, target.speaker, cast.pace]);
   if (!opts.bypassCache) {
     const hit = ttsCache.get(cacheKey);
     if (hit) return { ...hit, cached: true, latencyMs: Date.now() - started };
   }
 
   const chunks = chunkForTts(clean);
-  const buffers: Uint8Array[] = [];
 
-  for (const chunk of chunks) {
-    const body = await sarvamFetch<any>('/text-to-speech', {
-      json: {
-        text: chunk,
-        target_language_code: target.voiceLang,
-        model: MODELS.tts,
-        speaker: target.speaker,
-        pace: opts.pace ?? 1.0,
-        enable_preprocessing: opts.enablePreprocessing ?? true,
-      },
-      signal: opts.signal,
-    });
-    const b64s = readAudioB64(body);
-    if (b64s.length === 0) {
-      throw new SarvamBadResponse('Bulbul returned no audio field (checked audios/audio/data.*)', {
-        endpoint: '/text-to-speech',
-        body: Object.keys(body ?? {}),
+  const synthesize = async (voice: string): Promise<Uint8Array[]> => {
+    const buffers: Uint8Array[] = [];
+    for (const chunk of chunks) {
+      const body = await sarvamFetch<any>('/text-to-speech', {
+        json: {
+          text: chunk,
+          target_language_code: target.voiceLang,
+          model: MODELS.tts,
+          speaker: voice,
+          pace: cast.pace,
+          enable_preprocessing: opts.enablePreprocessing ?? true,
+        },
+        signal: opts.signal,
       });
+      const b64s = readAudioB64(body);
+      if (b64s.length === 0) {
+        throw new SarvamBadResponse('Bulbul returned no audio field (checked audios/audio/data.*)', {
+          endpoint: '/text-to-speech',
+          body: Object.keys(body ?? {}),
+        });
+      }
+      for (const b of b64s) buffers.push(b64ToBytes(b));
     }
-    for (const b of b64s) buffers.push(b64ToBytes(b));
+    return buffers;
+  };
+
+  /**
+   * SILENCE IS THE WORST OUTCOME.
+   *
+   * Every casting choice in lib/voices.ts was made without hearing the voice,
+   * against a catalogue we could only read about. If Bulbul refuses the name we
+   * sent, retrying once with the model's own default costs ~200ms and keeps the
+   * monument talking; giving up loses the visitor's turn entirely. Only a 4xx
+   * that actually looks like a speaker complaint is retried — a 5xx or a
+   * timeout is a real outage and must surface as one rather than be disguised
+   * as a different voice.
+   */
+  const fallbackSpeaker = safeDefaultSpeaker(cast.model);
+  let speakerFallback: SpeakResult['speakerFallback'] = null;
+  let usedSpeaker = target.speaker;
+  let buffers: Uint8Array[];
+  try {
+    buffers = await synthesize(usedSpeaker);
+  } catch (err) {
+    if (usedSpeaker === fallbackSpeaker || !isSpeakerRejection(err, usedSpeaker)) throw err;
+    const reason = (err as Error).message;
+    console.warn(
+      `[sarvam] Bulbul rejected speaker "${usedSpeaker}" for ${MODELS.tts}; retrying with "${fallbackSpeaker}". ` +
+        `Fix the casting in lib/voices.ts. (${reason})`,
+    );
+    buffers = await synthesize(fallbackSpeaker);
+    speakerFallback = { from: usedSpeaker, to: fallbackSpeaker, reason: reason.slice(0, 200) };
+    usedSpeaker = fallbackSpeaker;
   }
 
   const { bytes, mime } = concatAudio(buffers);
@@ -417,7 +482,9 @@ export async function speak(
     voiceLang: target.voiceLang,
     requestedLang: target.textLang,
     degraded: target.degraded,
-    speaker: target.speaker,
+    speaker: usedSpeaker,
+    pace: cast.pace,
+    speakerFallback,
     chunks: chunks.length,
     latencyMs: Date.now() - started,
     cached: false,

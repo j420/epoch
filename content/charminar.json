@@ -1,10 +1,10 @@
 {
   "id": "charminar",
   "city": "Hyderabad",
-  "aspect": 0.5,
+  "aspect": 0.75,
   "hero": "/monuments/charminar/hero.png",
-  "depth": "/monuments/charminar/depth.png",
-  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "depth": "",
+  "credit": "Photograph: Nagalakshmikavuri, derivative by UnpetitproleX, Wikimedia Commons (CC BY-SA 3.0), cropped. Depth inferred in-browser. Full chain: public/monuments/CREDITS.md.",
   "displayName": {
     "en-IN": "Charminar",
     "te-IN": "చార్మినార్",
