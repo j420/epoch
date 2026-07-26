@@ -178,7 +178,9 @@ async function runOnce(run: number) {
     });
     const c = classify(res, body);
     if (c) return { status: c };
-    sessionId = body.id ?? body.session_id ?? null;
+    // The voice lane's route returns `sessionId`; accept the snake/short variants
+    // too rather than pinning the smoke test to one lane's spelling.
+    sessionId = body.sessionId ?? body.session_id ?? body.id ?? null;
     return { status: sessionId ? 'PASS' : 'FAIL', detail: sessionId ? undefined : 'no session id returned' };
   });
 

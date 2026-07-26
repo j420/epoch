@@ -99,6 +99,12 @@ export interface AnswerPromptOptions {
   intent?: Intent;
   /** Extra instruction appended to the rules block (used by the VISUAL branch). */
   extraRule?: string;
+  /**
+   * How the SOURCES block was assembled. In 'full-context' mode the model is
+   * handed the entire corpus rather than a pre-filtered top 3, so relevance is
+   * now its judgement to make — and the refusal rule has to be spelled out.
+   */
+  retrievalMode?: 'full-context' | 'ranked';
 }
 
 /**
@@ -129,15 +135,30 @@ export function answerSystemPrompt(
     '- Answer ONLY from the SOURCES below. If the answer is not there, say you do not remember it.',
     '- Maximum two sentences. Warm, plain, a little poetic. Never list. Never lecture.',
     `- Reply in ${li.english} (${li.native}), written in the ${li.script} script.`,
+  ];
+
+  // The whole corpus is in front of the model, so "I was given this source,
+  // therefore it is relevant" is no longer a safe inference for it to make.
+  if (opts.retrievalMode === 'full-context') {
+    rules.push(
+      '- The SOURCES below are EVERYTHING I hold — they were not selected for this question, and most of them will have nothing to do with it. Use only the ones that genuinely answer what was asked.',
+      '- If none of them answer the question, say you do not remember. Do not stretch an unrelated source to cover it, and never answer from your own knowledge of the world.',
+    );
+  }
+
+  rules.push(
     '- After your reply, on a new line, emit a JSON directive:',
-    '  {"focus":"<region id or null>","grade":"<dawn|noon|dusk|night|null>","era":"<year or null>"}',
+    '  {"remembered":<true|false>,"focus":"<region id or null>","grade":"<dawn|noon|dusk|night|null>","era":"<year or null>"}',
+    '  Set "remembered" to true when the SOURCES answered the question, and false when you had to say you do not remember. Always include it.',
     '  Choose focus only if your answer is about a specific visible part of me.',
+  );
+  rules.push(
     `  focus must be exactly one of: ${regionList} — or null.`,
     eraList
       ? `  era must be exactly one of: ${eraList} — or null. Use it only if the visitor asks about the past.`
       : '  era must be null; I have no other eras to show.',
     '- Emit nothing after the JSON. No explanation, no code fences.',
-  ];
+  );
   if (opts.extraRule) rules.push(`- ${opts.extraRule}`);
 
   return [

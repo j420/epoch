@@ -107,6 +107,17 @@ export interface VoiceLoop {
   directive: VisualDirective;
   intent: Intent | null;
   sources: SourceChunk[];
+  /**
+   * 'full-context' means `sources` is the monument's ENTIRE corpus, not a
+   * relevance-filtered set — do not render it as "the sources for this answer".
+   * 'ranked' means it was scored and thresholded.
+   */
+  retrievalMode: 'full-context' | 'ranked' | null;
+  /**
+   * The monument said it does not remember. On the ranked path this comes from
+   * retrieval returning nothing; on the full-context path it is the model's own
+   * `remembered:false` marker in the directive. Either way: no invented history.
+   */
   admittedIgnorance: boolean;
   /** Bulbul could not voice the detected language; this is the honest line. */
   voiceNotice: string | null;
@@ -259,6 +270,7 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
   const [directive, setDirective] = useState<VisualDirective>({ ...EMPTY_DIRECTIVE });
   const [intent, setIntent] = useState<Intent | null>(null);
   const [sources, setSources] = useState<SourceChunk[]>([]);
+  const [retrievalMode, setRetrievalMode] = useState<'full-context' | 'ranked' | null>(null);
   const [admittedIgnorance, setAdmittedIgnorance] = useState(false);
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
   const [level, setLevel] = useState(0);
@@ -760,6 +772,7 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
       setAnswer(data.text ?? '');
       setIntent((data.intent ?? null) as Intent | null);
       setSources(Array.isArray(data.sources) ? data.sources : []);
+      setRetrievalMode(data.retrievalMode ?? null);
       setAdmittedIgnorance(Boolean(data.admittedIgnorance));
       setDirective(nextDirective);
       setLang(replyLang || null);
@@ -1076,6 +1089,7 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
     setDirective({ ...EMPTY_DIRECTIVE });
     setIntent(null);
     setSources([]);
+    setRetrievalMode(null);
     setAdmittedIgnorance(false);
     setTimings({});
     setErrorState(null);
@@ -1143,6 +1157,7 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
     directive,
     intent,
     sources,
+    retrievalMode,
     admittedIgnorance,
     voiceNotice,
     level,

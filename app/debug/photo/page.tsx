@@ -13,12 +13,25 @@ import type { Grade } from '@/lib/types';
  *
  * Everything the shader and the rig expose, on one screen, so the look can be
  * tuned against the real photograph instead of against a guess.
+ *
+ * Query-param presets, so any state can be screenshotted headlessly:
+ *   /debug/photo?bare=1&grade=dusk&era=1900&focus=dome&to=dome&depth=0.5
+ * `bare=1` hides the panel, which is the only way to judge the actual frame.
  */
+function readParams(): URLSearchParams {
+  if (typeof window === 'undefined') return new URLSearchParams();
+  return new URLSearchParams(window.location.search);
+}
+
 export default function PhotoDebugPage() {
   const monument = useMemo(() => getMonument(), []);
   const photo = useRef<LivingPhotoHandle>(null);
+  const params = useMemo(readParams, []);
 
-  const [depthScale, setDepthScale] = useState(0.35);
+  const [depthScale, setDepthScale] = useState(() => {
+    const v = Number(params.get('depth'));
+    return Number.isFinite(v) && v > 0 ? v : 0.35;
+  });
   const [vignette, setVignette] = useState(0.35);
   const [edgeThreshold, setEdgeThreshold] = useState(0.06);
   const [focusRadius, setFocusRadius] = useState(0.26);
@@ -30,9 +43,49 @@ export default function PhotoDebugPage() {
   const [allowCompute, setAllowCompute] = useState(true);
   const [status, setStatus] = useState<LivingPhotoStatus | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(() => params.get('bare') !== '1');
 
-  const onStatus = useCallback((s: LivingPhotoStatus) => setStatus(s), []);
+  const presetApplied = useRef(false);
+
+  // Wait for the depth map, not just the photograph: `to()` aims at the real
+  // displaced surface, and firing it before the depth lands would frame the
+  // flat plane instead.
+  const applyPreset = useCallback(() => {
+    if (presetApplied.current) return;
+    presetApplied.current = true;
+    const g = params.get('grade');
+    if (g && (GRADE_IDS as string[]).includes(g)) {
+      setGrade(g as Grade);
+      photo.current?.grade(g as Grade, 0);
+    }
+    const e = params.get('era');
+    if (e) {
+      setEra(e);
+      photo.current?.era(e, 0);
+    }
+    const f = params.get('focus');
+    if (f) {
+      setFocused(f);
+      photo.current?.focus(f, focusRadius);
+    }
+    const t = params.get('to');
+    if (t) photo.current?.to(t, { duration: 0 });
+    if (params.get('listening') === '1') {
+      setListening(true);
+      photo.current?.listening(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+
+  const onStatus = useCallback(
+    (s: LivingPhotoStatus) => {
+      setStatus(s);
+      if (s.ready && (s.depthPhase === 'done' || s.depthPhase === 'unavailable')) applyPreset();
+    },
+    // applyPreset is stable and self-guarding.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   const onError = useCallback((e: Error) => {
     setErrors((prev) => (prev.includes(e.message) ? prev : [...prev.slice(-4), e.message]));
   }, []);

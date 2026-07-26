@@ -127,16 +127,31 @@ export default function VoiceDebugPage() {
               <dd className={loop.admittedIgnorance ? 'text-amber-300' : 'text-sandstone-100'}>
                 {String(loop.admittedIgnorance)}
               </dd>
+              <dt>retrieval mode</dt>
+              <dd className="text-sandstone-100">{loop.retrievalMode ?? '—'}</dd>
               <dt>lang</dt>
               <dd className="text-sandstone-100">{loop.lang ?? '—'}</dd>
             </dl>
           </Panel>
 
-          <Panel title="retrieved sources">
+          <Panel
+            title={
+              loop.retrievalMode === 'full-context'
+                ? 'sources — FULL CORPUS (model judges relevance)'
+                : 'retrieved sources'
+            }
+          >
+            {loop.retrievalMode === 'full-context' ? (
+              <p className="mb-2 text-[10px] leading-relaxed text-amber-200/70">
+                Small corpus: every chunk was sent unfiltered, so this list is NOT evidence that any of it answered
+                the question. Rule 4 is enforced by the monument&apos;s own <code>remembered</code> marker instead —
+                watch <b>admitted ignorance</b> on the left.
+              </p>
+            ) : null}
             {loop.sources.length === 0 ? (
               <p className="text-[11px] text-sandstone-200/45">
-                Nothing retrieved yet. When retrieval returns nothing at all, the monument says it does not remember
-                and no model call is made.
+                Nothing retrieved yet. On the ranked path, when retrieval returns nothing at all the monument says it
+                does not remember and no model call is made.
               </p>
             ) : (
               <ol className="space-y-2 text-[11px] leading-relaxed text-sandstone-200/75">

@@ -37,28 +37,35 @@ void main() {
   float db = texture2D(uDepth, uv - vec2(0.0, uGradStep)).r;
   float dt = texture2D(uDepth, uv + vec2(0.0, uGradStep)).r;
 
-  float far = min(min(dl, dr), min(db, dt));
-  float near = max(max(dl, dr), max(db, dt));
+  // Named dFar/dNear rather than far/near: those are HLSL reserved words and
+  // ANGLE's D3D backend has historically choked on them.
+  float dFar = min(min(dl, dr), min(db, dt));
+  float dNear = max(max(dl, dr), max(db, dt));
 
   // Damp the displacement across discontinuities. A vertex that straddles the
   // tower's edge cannot be in two places at once; left alone it rubber-bands
   // between the stone and the sky and that stretched triangle is the artifact.
   // Collapsing it onto the far side means the gap opens where the backdrop can
   // fill it, instead of a sheet of smeared sandstone spanning the hole.
-  float span = (near - far) * uHasDepth;
-  float discontinuity = smoothstep(uEdgeThreshold * 0.5, uEdgeThreshold * 2.5, span);
-  d = mix(d, far, discontinuity * 0.85);
+  float span = (dNear - dFar) * uHasDepth;
+  float discontinuity = smoothstep(uEdgeThreshold * 1.5, uEdgeThreshold * 5.0, span);
+  float dDisp = mix(d, dFar, discontinuity * 0.8);
 
   // Flat plane when there is no depth map at all.
   d = d * uHasDepth + (1.0 - uHasDepth) * 0.5;
+  dDisp = dDisp * uHasDepth + (1.0 - uHasDepth) * 0.5;
 
+  // Carry the *undamped* depth to the fragment shader. The dissolve downstream
+  // measures how far the interpolated surface has drifted from the photograph,
+  // and if it saw the damping it would read our own correction as an artifact
+  // and fade out the entire tower.
   vDepth = d;
 
   vec3 p = position;
   // Depth Anything emits inverse depth: 1.0 is nearest. Centring on 0.5 means
   // raising depthScale opens the diorama out around the mid-plane instead of
   // also dollying the entire photograph toward the lens.
-  p.z += (d - 0.5) * uDepthScale;
+  p.z += (dDisp - 0.5) * uDepthScale;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
 }

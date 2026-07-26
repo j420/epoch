@@ -40,6 +40,9 @@ interface AnswerBody {
   lang?: string;
   monumentId?: string;
   sessionId?: string;
+  /** scripts/smoke.ts posts snake_case; both spellings are accepted. */
+  monument_id?: string;
+  session_id?: string;
   /** Skip the routing call — used by the debug page to force a branch. */
   intent?: Intent;
   /** Client's total elapsed ms so far (STT included), for honest end-to-end logging. */
@@ -63,13 +66,14 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json().catch(() => ({}))) as AnswerBody;
     const transcript = (body.transcript ?? '').trim();
-    sessionId = body.sessionId ?? null;
+    sessionId = body.sessionId ?? body.session_id ?? null;
+    const monumentId = body.monumentId ?? body.monument_id;
 
     if (!transcript) {
       return NextResponse.json({ error: 'transcript is required', kind: 'bad_request' }, { status: 400 });
     }
 
-    const monument = getMonument(body.monumentId);
+    const monument = getMonument(monumentId);
     // Language always comes from upstream (Saaras). The script guess is only a
     // last resort for the typed fallback, where there is no detection to use.
     const lang: LangCode = body.lang ? normalizeLang(body.lang) : normalizeLang(guessLangFromScript(transcript) ?? undefined);
@@ -148,6 +152,10 @@ export async function POST(req: NextRequest) {
     const retrieval = await retrieveSources(monument.id, monument.sources, transcript, retrievalDepth(intent));
     timings.retrieve = (timings.retrieve ?? 0) + (Date.now() - tRetrieve);
 
+    // Still correct, and still reachable: the ranked path (a corpus above
+    // SMALL_CORPUS_MAX, or a registered embedder) can genuinely retrieve nothing.
+    // On the small-corpus full-context path this is only true for an empty corpus,
+    // and rule 4 is enforced at generation instead — see `remembered` below.
     if (retrieval.empty) {
       // Never call the model with no sources. This is the whole of constraint 4.
       const text = doNotRemember(lang);
@@ -160,6 +168,7 @@ export async function POST(req: NextRequest) {
         intent,
         lang,
         sources: [],
+        retrievalMode: retrieval.mode,
         model: 'none',
         timings,
         admittedIgnorance: true,
@@ -173,6 +182,7 @@ export async function POST(req: NextRequest) {
     const raw = await chat(
       answerMessages(monument, lang, retrieval.chunks, transcript, {
         intent,
+        retrievalMode: retrieval.mode,
         extraRule: intent === 'VISUAL' ? VISUAL_EXTRA_RULE : undefined,
       }),
       {
@@ -196,9 +206,30 @@ export async function POST(req: NextRequest) {
       await logEvent('directive_unparsed', { raw: raw.slice(0, 300), monumentId: monument.id }, sessionId);
     }
 
+    /**
+     * RULE 4's ENFORCEMENT POINT.
+     *
+     * Retrieval no longer filters on the demo corpus, so "we had sources" proves
+     * nothing about relevance — the monument itself is now the one that decides
+     * whether it remembered, and reports it in the directive JSON. `null` means
+     * it did not say, which we must read as "not a refusal": defaulting the other
+     * way would brand every reply with a missing directive as an admission of
+     * ignorance.
+     */
+    const refused = parsed.remembered === false;
+    if (parsed.remembered === null) {
+      await logEvent('remembered_missing', { raw: raw.slice(0, 200), mode: retrieval.mode }, sessionId);
+    }
+
     // A VISUAL turn without a focus leaves the camera doing nothing while the
-    // visitor points at something. Infer it from the words they used.
-    if (intent === 'VISUAL' && !directive.focus) {
+    // visitor points at something. Infer it from the words they used — but never
+    // when refusing: panning to a carving while saying "I do not remember" reads
+    // as the monument contradicting itself.
+    if (refused) {
+      directive.focus = null;
+      directive.grade = null;
+      directive.era = null;
+    } else if (intent === 'VISUAL' && !directive.focus) {
       directive.focus = inferFocus(monument, transcript, lang);
     }
 
@@ -213,20 +244,29 @@ export async function POST(req: NextRequest) {
     await record(sessionId, text, lang, timings, intent, model, retrieval.chunks, {
       scores: retrieval.scores,
       directive,
+      retrievalMode: retrieval.mode,
+      admittedIgnorance: refused,
       clientElapsedMs: body.elapsedMs ?? null,
     });
+    if (refused) {
+      await logEvent('admitted_ignorance', { transcript, monumentId: monument.id, intent, at: 'generation' }, sessionId);
+    }
 
     return NextResponse.json({
       text,
       directive,
       intent,
       lang,
+      // In full-context mode these are the whole corpus, NOT a relevance-filtered
+      // set. `retrievalMode` is what tells a caller which of the two it is holding.
       sources: retrieval.chunks,
+      retrievalMode: retrieval.mode,
       model,
       timings,
-      admittedIgnorance: false,
+      admittedIgnorance: refused,
       scores: retrieval.scores,
       directiveOk: parsed.ok,
+      remembered: parsed.remembered,
       ...(memoryHandoff ? { handoff: memoryHandoff } : {}),
     });
   } catch (err) {

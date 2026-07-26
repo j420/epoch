@@ -35,12 +35,30 @@ import { EMPTY_DIRECTIVE, type Grade, type Monument, type VisualDirective } from
 /** The five grades the visual engine understands (BUILD-CONTRACT.md). */
 export const GRADES: readonly Grade[] = ['dawn', 'noon', 'dusk', 'night', 'sepia'] as const;
 
-const DIRECTIVE_KEYS = ['focus', 'grade', 'era'] as const;
+const DIRECTIVE_KEYS = ['remembered', 'focus', 'grade', 'era'] as const;
 
 export interface ParsedDirective {
   /** The reply with the directive (and any code fences) removed. Safe to hand to TTS. */
   text: string;
   directive: VisualDirective;
+  /**
+   * The monument's own report of whether the SOURCES actually covered the
+   * question — the enforcement point for rule 4 (never invent history).
+   *
+   *   true   the model says it answered from the sources
+   *   false  the model says it does not remember  -> admittedIgnorance
+   *   null   the model did not say (older reply, or the directive was malformed)
+   *
+   * It rides in the directive JSON rather than in the prose because the prose is
+   * in one of 22 languages and cannot be pattern-matched. This channel is already
+   * parsed and already stripped from the spoken text, so the marker costs one
+   * extra key and no extra failure modes.
+   *
+   * Callers MUST treat null as "not a refusal". Defaulting the other way would
+   * mark every reply whose directive went missing as an admission of ignorance,
+   * which is a far more damaging error than missing the occasional real refusal.
+   */
+  remembered: boolean | null;
   /** False when no well-formed directive was found — the caller may want to log it. */
   ok: boolean;
   /** The exact substring that was removed from the text, for debugging. */
@@ -196,6 +214,22 @@ export function validateFocus(value: unknown, monument?: Monument | null): strin
   return hit ? hit.id : null;
 }
 
+/**
+ * Tolerant boolean read. Models emit true, "true", "yes", 1 — and, when they are
+ * refusing, sometimes the string "false" rather than the literal. Anything not
+ * recognisably boolean returns null, which the caller reads as "not stated".
+ */
+export function validateRemembered(value: unknown): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value !== 0;
+  if (typeof value !== 'string') return null;
+  const t = value.trim().toLowerCase();
+  if (t.startsWith('<')) return null; // prompt placeholder echoed back
+  if (['true', 'yes', 'y', '1'].includes(t)) return true;
+  if (['false', 'no', 'n', '0'].includes(t)) return false;
+  return null;
+}
+
 export function validateGrade(value: unknown): Grade | null {
   const raw = str(value);
   if (!raw) return null;
@@ -282,7 +316,7 @@ function findUnterminatedBrace(text: string): number {
 
 /** Does this fragment look like someone was trying to write a directive? */
 function looksLikeDirectiveText(fragment: string): boolean {
-  return /["'\s{,](focus|grade|era)["'\s]*:/i.test(fragment);
+  return /["'\s{,](remembered|focus|grade|era)["'\s]*:/i.test(fragment);
 }
 
 /**
@@ -314,7 +348,7 @@ export function cleanSpokenText(text: string): string {
 export function parseDirective(raw: string, monument?: Monument | null): ParsedDirective {
   const source = typeof raw === 'string' ? raw : '';
   if (!source.trim()) {
-    return { text: '', directive: { ...EMPTY_DIRECTIVE }, ok: false, raw: null };
+    return { text: '', directive: { ...EMPTY_DIRECTIVE }, remembered: null, ok: false, raw: null };
   }
 
   // Truncated JSON first: it sits at the very end by definition, and it is the
@@ -324,6 +358,11 @@ export function parseDirective(raw: string, monument?: Monument | null): ParsedD
     return {
       text: stripAround(source.slice(0, dangling), ''),
       directive: { ...EMPTY_DIRECTIVE },
+      // A truncated directive may still have got its first key out intact, and
+      // `remembered` is emitted first precisely so a refusal survives truncation.
+      remembered: validateRemembered(
+        source.slice(dangling).match(/["']?remembered["']?\s*:\s*("?[A-Za-z01]+"?)/i)?.[1]?.replace(/"/g, ''),
+      ),
       ok: false,
       raw: source.slice(dangling),
     };
@@ -331,7 +370,7 @@ export function parseDirective(raw: string, monument?: Monument | null): ParsedD
 
   const spans = findJsonSpans(source);
   if (spans.length === 0) {
-    return { text: cleanSpokenText(source), directive: { ...EMPTY_DIRECTIVE }, ok: false, raw: null };
+    return { text: cleanSpokenText(source), directive: { ...EMPTY_DIRECTIVE }, remembered: null, ok: false, raw: null };
   }
 
   // Search from the end: the directive is specified to come AFTER the reply, and
@@ -346,7 +385,13 @@ export function parseDirective(raw: string, monument?: Monument | null): ParsedD
       grade: validateGrade(obj.grade),
       era: validateEra(obj.era, monument),
     };
-    return { text: stripSpan(source, span), directive, ok: true, raw: span.body };
+    return {
+      text: stripSpan(source, span),
+      directive,
+      remembered: validateRemembered(obj.remembered),
+      ok: true,
+      raw: span.body,
+    };
   }
 
   // No span parsed into a directive. If the last one at least LOOKS like a
@@ -358,6 +403,7 @@ export function parseDirective(raw: string, monument?: Monument | null): ParsedD
   return {
     text: looksLikeAttempt ? stripSpan(source, last) : cleanSpokenText(source),
     directive: { ...EMPTY_DIRECTIVE },
+    remembered: null,
     ok: false,
     raw: looksLikeAttempt ? last.body : null,
   };
