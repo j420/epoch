@@ -104,6 +104,9 @@ export class Atmosphere {
   private reducedMotion = false;
   private elapsed = 0;
 
+  /** Half the displacement amplitude — i.e. how far back the sky sits. */
+  private skyZ = -0.175;
+
   /** Number of motes actually allocated, after the device-class trim. */
   readonly count: number;
 
@@ -191,6 +194,15 @@ export class Atmosphere {
   }
 
   /**
+   * Tell the layer how deep the diorama currently is, so birds can be flown just
+   * in front of the sky plane. That is what lets the tower occlude them as they
+   * cross — a bird that is always in front reads as a sticker on the lens.
+   */
+  setDepthScale(depthScale: number): void {
+    this.skyZ = -depthScale * 0.5;
+  }
+
+  /**
    * Atmosphere presence, driven by the grade's luminance: moonlight has almost
    * no visible dust, midday has plenty. Called by the scene on every grade change.
    */
@@ -231,7 +243,9 @@ export class Atmosphere {
         to: leftToRight ? span : -span,
         // Upper half only — a bird at the base of the tower reads as a bug.
         y: this.planeHeight * (0.08 + Math.random() * 0.34),
-        z: 0.18 + Math.random() * 0.22,
+        // Just off the sky plane: far enough back that the monument occludes it,
+        // near enough that it is never clipped through the sky itself.
+        z: this.skyZ + 0.02 + Math.random() * 0.05,
         arc: (Math.random() * 2 - 1) * 0.05,
         duration: 7 + Math.random() * 4,
         elapsed: 0,

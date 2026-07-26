@@ -64,9 +64,15 @@ const DEFAULT_DRIFT_DURATION = 8000;
 const DEFAULT_ORBIT_AMPLITUDE = 0.03;
 const DEFAULT_TO_DURATION = 2400;
 
-/** Zoom multiplier applied at region.z = 0 and at region.z = 1 respectively. */
-const REGION_ZOOM_WIDE = 0.98;
-const REGION_ZOOM_TIGHT = 0.62;
+/**
+ * Zoom multiplier applied at region.z = 0 and at region.z = 1 respectively.
+ *
+ * The floor is deliberately not lower. The hero is 1024x1365; on a phone the
+ * cover framing already upscales it ~1.3x, and pushing past roughly 0.55 turns
+ * sandstone into mush. A soft photograph stops being a photograph.
+ */
+const REGION_ZOOM_WIDE = 0.92;
+const REGION_ZOOM_TIGHT = 0.55;
 
 /** While the visitor is speaking we pull back this much and hold. */
 const LISTENING_PULL = 1.075;
@@ -128,17 +134,44 @@ export class CameraRig {
   }
 
   /**
-   * Recompute the distance at which the plane covers the viewport.
+   * Recompute the opening framing distance.
    *
-   * `cover`, not `contain`: the photograph is the interface and must never show
-   * a letterbox. The 0.94 factor leaves a sliver of headroom so that drift and
-   * parallax have somewhere to move before `clampToPlane` starts fighting them.
+   * `contain`, not `cover`. A visitor scans a QR code and must see the whole
+   * monument before the camera goes anywhere — cover framing on a 0.75-aspect
+   * photograph puts a landscape viewport inside the tower's midsection, which
+   * reads as a crop accident rather than as direction. Whatever falls outside
+   * the plane is filled by the blurred backdrop layer, so letterboxing never
+   * shows the clear colour.
+   *
+   * The 1.06 is breathing room: the monument should not touch the frame edge.
    */
   resize(viewportAspect: number): void {
     this.viewportAspect = viewportAspect;
     const byHeight = this.halfH / this.tanHalfFov;
     const byWidth = this.halfW / (this.tanHalfFov * viewportAspect);
-    this.framingDistance = Math.min(byHeight, byWidth) * 0.94;
+    this.framingDistance = Math.max(byHeight, byWidth) * 1.06;
+  }
+
+  /**
+   * How far the camera is ever allowed to stray from the plane's centre.
+   *
+   * The old rule — never let the view window leave the photograph — is
+   * meaningless once the framing contains the whole plane, and it silently
+   * clamped every region move to nothing on a tall viewport. The backdrop is
+   * sized against this budget instead, so the only job left here is to stop
+   * absurd excursions.
+   */
+  private maxExcursion(): { x: number; y: number } {
+    return { x: this.halfW * 0.95, y: this.halfH * 0.95 };
+  }
+
+  /** Largest distance the camera can sit at, for sizing the backdrop. */
+  get maxDistance(): number {
+    return this.framingDistance * LISTENING_PULL;
+  }
+
+  get excursion(): { x: number; y: number } {
+    return this.maxExcursion();
   }
 
   get distance(): number {
@@ -295,14 +328,9 @@ export class CameraRig {
     let camX = this.baseX + orbitX + this.parallaxX;
     let camY = this.baseY + orbitY + this.parallaxY;
 
-    // Never let the view window slide off the photograph. Cheaper and kinder
-    // than shrinking the framing for the worst case.
-    const halfVisH = dist * this.tanHalfFov;
-    const halfVisW = halfVisH * this.viewportAspect;
-    const maxX = Math.max(0, this.halfW - halfVisW);
-    const maxY = Math.max(0, this.halfH - halfVisH);
-    camX = clamp(camX, -maxX, maxX);
-    camY = clamp(camY, -maxY, maxY);
+    const limit = this.maxExcursion();
+    camX = clamp(camX, -limit.x, limit.x);
+    camY = clamp(camY, -limit.y, limit.y);
 
     return {
       x: camX,

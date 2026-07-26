@@ -17,30 +17,42 @@ uniform sampler2D uDepth;
 uniform float uDepthScale;
 uniform float uHasDepth;
 uniform float uGradStep;
+uniform float uEdgeThreshold;
 
 varying vec2 vUv;
 varying float vDepth;
-varying float vSlope;
 
 void main() {
   vUv = uv;
 
-  float d = texture2D(uDepth, uv).r * uHasDepth + (1.0 - uHasDepth) * 0.5;
+  float d = texture2D(uDepth, uv).r;
 
   // Neighbour taps at *vertex* spacing (uGradStep = 1 / segments), not texel
   // spacing. A triangle can only smear as far as its own edge length, so that
   // is the scale at which a depth discontinuity actually produces a stretched
-  // silhouette. Sampling at texel spacing would flag fine texture detail that
-  // the mesh never sees.
+  // silhouette. Sampling at texel spacing would flag fine texture detail the
+  // mesh never sees.
   float dl = texture2D(uDepth, uv - vec2(uGradStep, 0.0)).r;
   float dr = texture2D(uDepth, uv + vec2(uGradStep, 0.0)).r;
   float db = texture2D(uDepth, uv - vec2(0.0, uGradStep)).r;
   float dt = texture2D(uDepth, uv + vec2(0.0, uGradStep)).r;
 
+  float far = min(min(dl, dr), min(db, dt));
+  float near = max(max(dl, dr), max(db, dt));
+
+  // Damp the displacement across discontinuities. A vertex that straddles the
+  // tower's edge cannot be in two places at once; left alone it rubber-bands
+  // between the stone and the sky and that stretched triangle is the artifact.
+  // Collapsing it onto the far side means the gap opens where the backdrop can
+  // fill it, instead of a sheet of smeared sandstone spanning the hole.
+  float span = (near - far) * uHasDepth;
+  float discontinuity = smoothstep(uEdgeThreshold * 0.5, uEdgeThreshold * 2.5, span);
+  d = mix(d, far, discontinuity * 0.85);
+
+  // Flat plane when there is no depth map at all.
+  d = d * uHasDepth + (1.0 - uHasDepth) * 0.5;
+
   vDepth = d;
-  // Central differences flag the vertices on *both* sides of a jump, so the
-  // whole stretched triangle fails the test rather than half of it.
-  vSlope = max(abs(dr - dl), abs(dt - db)) * uHasDepth;
 
   vec3 p = position;
   // Depth Anything emits inverse depth: 1.0 is nearest. Centring on 0.5 means
@@ -55,6 +67,8 @@ void main() {
 export const PHOTO_FRAG = /* glsl */ `
 uniform sampler2D uPhotoA;
 uniform sampler2D uPhotoB;
+uniform sampler2D uDepth;
+uniform float uHasDepth;
 uniform float uEraMix;
 
 uniform vec3 uTint;
@@ -69,6 +83,7 @@ uniform float uFocusStrength;
 
 uniform float uEdgeThreshold;
 uniform float uAspect;
+uniform vec2 uResolution;
 uniform float uTime;
 uniform float uShimmer;
 uniform float uOpacity;
@@ -76,7 +91,6 @@ uniform float uBackdrop;
 
 varying vec2 vUv;
 varying float vDepth;
-varying float vSlope;
 
 const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 
@@ -92,10 +106,20 @@ vec3 applyGrade(vec3 c) {
 }
 
 void main() {
-  // Discard the smeared silhouette fragments. The blurred backdrop layer shows
-  // through the resulting sliver, so an edge reads as a soft depth gap instead
-  // of as rubber sheeting.
-  if (vSlope > uEdgeThreshold) discard;
+  // --- silhouette dissolve --------------------------------------------------
+  // `vDepth` is what the *geometry* believes, linearly interpolated across each
+  // grid cell. `uDepth` is what the photograph actually says at this exact
+  // fragment. Over smooth stone the two agree. Over a cell that straddles the
+  // tower's edge, the interpolation ramps gently while the truth jumps, and the
+  // gap between them is precisely the smear.
+  //
+  // Testing that per fragment rather than per vertex is what removes the
+  // staircase: the old test was a contour of a value sampled at 256 points, so
+  // its boundary was faceted to the grid. This one follows the real edge in the
+  // photograph and fades instead of cutting, so the silhouette dissolves.
+  float mismatch = abs(texture2D(uDepth, vUv).r - vDepth) * uHasDepth;
+  float edge = smoothstep(uEdgeThreshold, uEdgeThreshold * 2.6, mismatch);
+  if (edge > 0.995) discard;
 
   vec2 uv = vUv;
 
@@ -115,15 +139,18 @@ void main() {
   }
 
   if (uBackdrop > 0.5) {
-    // Four extra taps at ~0.4% of the frame. The fill layer only ever shows
-    // through discard slivers, and a sharp duplicate there would read as a
-    // double exposure; slightly out of focus reads as depth.
-    vec2 o = vec2(0.0045, 0.0045 * uAspect);
-    col += texture2D(uPhotoA, uv + vec2(o.x, 0.0)).rgb;
-    col += texture2D(uPhotoA, uv - vec2(o.x, 0.0)).rgb;
-    col += texture2D(uPhotoA, uv + vec2(0.0, o.y)).rgb;
-    col += texture2D(uPhotoA, uv - vec2(0.0, o.y)).rgb;
-    col *= 0.2;
+    // The fill layer does two jobs: it shows through the silhouette dissolve,
+    // and with `contain` framing it is the surround the letterboxed photograph
+    // sits in. Both want the same thing — the same picture, defocused. A mip
+    // bias does the heavy lifting for one tap; the ring of four widens it into
+    // something that reads as bokeh rather than as a low-res duplicate.
+    vec2 o = vec2(0.016, 0.016 / uAspect);
+    vec3 blur = texture2D(uPhotoA, uv, 4.0).rgb * 2.0;
+    blur += texture2D(uPhotoA, uv + vec2(o.x, 0.0), 4.0).rgb;
+    blur += texture2D(uPhotoA, uv - vec2(o.x, 0.0), 4.0).rgb;
+    blur += texture2D(uPhotoA, uv + vec2(0.0, o.y), 4.0).rgb;
+    blur += texture2D(uPhotoA, uv - vec2(0.0, o.y), 4.0).rgb;
+    col = blur / 6.0;
   }
 
   // Focus spotlight. Distance is measured in plane units (x scaled by the photo
@@ -137,7 +164,11 @@ void main() {
 
   col = applyGrade(col);
 
-  float vig = 1.0 - smoothstep(0.34, 0.95, length((vUv - 0.5) * vec2(uAspect, 1.0)) * 1.5);
+  // Screen space, not UV space: a vignette is a property of the lens, so it must
+  // stay pinned to the frame while the camera drifts across the photograph.
+  // Painting it into the image would make it slide around like a printed border.
+  vec2 q = (gl_FragCoord.xy / uResolution) - 0.5;
+  float vig = 1.0 - smoothstep(0.65, 1.45, length(q * 2.0));
   col *= mix(1.0, vig, uVignette);
 
   // The fill layer is by definition in the shadow of the thing in front of it.

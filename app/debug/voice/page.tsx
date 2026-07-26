@@ -34,10 +34,12 @@ export default function VoiceDebugPage() {
   });
 
   const [dbg, setDbg] = useState<VoiceDebug | null>(null);
+  // getDebug is stable; depending on `loop` would rebuild the interval every render.
+  const getDebug = loop.getDebug;
   useEffect(() => {
-    const id = setInterval(() => setDbg(loop.getDebug()), 200);
+    const id = setInterval(() => setDbg(getDebug()), 200);
     return () => clearInterval(id);
-  }, [loop]);
+  }, [getDebug]);
 
   const micUsable = loop.capabilities.mic && loop.capabilities.stt;
 

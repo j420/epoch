@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
     }
 
     // --- 2b. MEMORY: ask the echo wall ---------------------------------------
+    let memoryUnavailable = false;
     if (intent === 'MEMORY') {
       const tMem = Date.now();
       const memories = await fetchMemories(req.nextUrl.origin, monument.id, transcript, lang);
@@ -131,9 +132,16 @@ export async function POST(req: NextRequest) {
         });
       }
       // The echo lane has not shipped its retrieval route yet. Answering the
-      // question normally is a far better failure than silence, but we say so.
+      // question normally is a far better failure than silence, but the client
+      // is told, so no UI can imply that memories were found.
+      memoryUnavailable = true;
       await logEvent('memory_lane_unavailable', { monumentId: monument.id }, sessionId);
     }
+
+    /** Present on every response from here down, so the fallback is never invisible. */
+    const memoryHandoff = memoryUnavailable
+      ? ({ kind: 'memory', endpoint: '/api/memories/retrieve', available: false } satisfies AnswerHandoff)
+      : undefined;
 
     // --- 3. Retrieve ----------------------------------------------------------
     const tRetrieve = Date.now();
@@ -155,9 +163,7 @@ export async function POST(req: NextRequest) {
         model: 'none',
         timings,
         admittedIgnorance: true,
-        ...(intent === 'MEMORY'
-          ? { handoff: { kind: 'memory', endpoint: '/api/memories/retrieve', available: false } satisfies AnswerHandoff }
-          : {}),
+        ...(memoryHandoff ? { handoff: memoryHandoff } : {}),
       });
     }
 
@@ -221,6 +227,7 @@ export async function POST(req: NextRequest) {
       admittedIgnorance: false,
       scores: retrieval.scores,
       directiveOk: parsed.ok,
+      ...(memoryHandoff ? { handoff: memoryHandoff } : {}),
     });
   } catch (err) {
     const payload = toErrorPayload(err);

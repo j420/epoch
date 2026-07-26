@@ -222,6 +222,7 @@ export class PhotoScene {
       uFocusStrength: { value: 0 },
       uEdgeThreshold: { value: opts.edgeThreshold ?? DEFAULT_EDGE_THRESHOLD },
       uAspect: { value: this.planeWidth / this.planeHeight },
+      uResolution: { value: new THREE.Vector2(1, 1) },
       uTime: { value: 0 },
       uShimmer: { value: this.gradeNow.shimmer },
       // Starts fully transparent and fades up when the photograph arrives.
@@ -287,6 +288,7 @@ export class PhotoScene {
         pixelRatio: this.pixelRatio,
       });
       this.moteCount = this.atmosphere.count;
+      this.atmosphere.setDepthScale(this.depthScale);
       this.scene.add(this.atmosphere.group);
       this.applyAtmosphereGrade();
     }
@@ -590,6 +592,7 @@ export class PhotoScene {
   setDepthScale(v: number): void {
     this.depthScale = clamp(v, 0, 1.2);
     this.material.uniforms.uDepthScale.value = this.depthScale;
+    this.atmosphere?.setDepthScale(this.depthScale);
     this.placeBackdrop();
   }
 
@@ -657,15 +660,21 @@ export class PhotoScene {
   private placeBackdrop(): void {
     const z = -(this.depthScale * 0.5 + 0.3);
     this.backdrop.position.z = z;
-    const dist = this.rig.distance * 1.12 - z;
+
+    // Worst case: the camera at its furthest framing distance *and* at the far
+    // end of its excursion budget. Size for that once and the fill can never be
+    // caught short mid-move, which would flash the clear colour at an edge.
+    const dist = this.rig.maxDistance - z;
     const tanHalf = Math.tan((FOV_DEG * Math.PI) / 180 / 2);
-    const halfH = dist * tanHalf;
-    const halfW = halfH * (this.camera.aspect || 1);
-    const scale = Math.max(
-      (halfH * 2) / this.planeHeight,
-      (halfW * 2) / this.planeWidth,
-      1,
-    ) * 1.04;
+    const halfVisH = dist * tanHalf;
+    const halfVisW = halfVisH * (this.camera.aspect || 1);
+    const reach = this.rig.excursion;
+    const scale =
+      Math.max(
+        ((halfVisH + reach.y) * 2) / this.planeHeight,
+        ((halfVisW + reach.x) * 2) / this.planeWidth,
+        1,
+      ) * 1.06;
     this.backdrop.scale.set(scale, scale, 1);
   }
 
@@ -677,6 +686,11 @@ export class PhotoScene {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.rig.resize(w / h);
+    // gl_FragCoord is in drawing-buffer pixels, so the vignette needs the size
+    // *after* the pixel ratio, not the CSS size.
+    this.renderer.getDrawingBufferSize(
+      this.material.uniforms.uResolution.value as THREE.Vector2,
+    );
     this.placeBackdrop();
   }
 

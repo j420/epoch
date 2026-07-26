@@ -7,15 +7,21 @@
  * returns its top 3 no matter how bad the match will make the monument
  * hallucinate confidently, so we score, then threshold.
  *
- * The scorer is a character-n-gram TF-IDF cosine. Character n-grams rather than
- * words because the corpus is English while queries arrive in 22 languages and
- * a dozen scripts — word tokenisation would be useless and we would need a
- * different tokenizer per script. N-grams also survive transliteration and
- * code-mixing ("Qutub kitna purana hai"), which is exactly what Saaras hands us
- * in codemix mode.
+ * HOW that refusal happens depends on corpus size, and the reasoning is worth
+ * reading before changing anything here — see SMALL_CORPUS_MAX below.
  *
- * `embed` is pluggable: swap in a real embedding model by calling
- * setEmbedder() and rank() will use it instead, with the same thresholding.
+ *   - Small corpus (the demo, and any single monument): hand the model every
+ *     chunk and let IT decide relevance and refusal. Lexical ranking was measured
+ *     on this corpus and was worse than useless — it rejected "how tall are you"
+ *     and accepted "where is the toilet", and scored exactly zero for every
+ *     non-English query, which is to say it failed hardest in the 21 languages
+ *     that are the entire point of this product.
+ *
+ *   - Large corpus: fall back to scoring and thresholding, because eventually the
+ *     sources will not fit in a prompt. That path is character-n-gram TF-IDF and
+ *     carries the same cross-script weakness, so wire a multilingual embedder via
+ *     setEmbedder() before relying on it. `retrieveSources` prefers an embedder
+ *     over the small-corpus bypass whenever one is registered.
  */
 
 import type { SourceChunk } from './types';
@@ -165,7 +171,44 @@ export interface RetrievalResult {
   scores: number[];
   /** True when nothing cleared the threshold — the monument must admit ignorance. */
   empty: boolean;
+  /**
+   * 'full-context' — the whole corpus was handed over and the MODEL decides relevance.
+   * 'ranked'       — chunks were scored and thresholded here.
+   * Callers must not treat `empty:false` as proof of relevance in full-context mode.
+   */
+  mode: 'full-context' | 'ranked';
 }
+
+/**
+ * Below this many chunks we stop ranking and hand the model everything.
+ *
+ * WHY: lexical ranking was measurably worse than useless on this corpus. Measured
+ * against the real Qutub Minar chunks, "how tall are you" scored BELOW threshold
+ * (the sources say "standing 72.5 metres high" — zero shared vocabulary with the
+ * question) while "where is the toilet" scored 0.098 and sailed through on
+ * stopword trigrams. Every non-English query scored exactly zero, because the
+ * corpus is English and Tamil shares no character n-grams with it. So the ranker
+ * was simultaneously too strict to answer real questions and too loose to reject
+ * nonsense — and it failed hardest in exactly the 21 languages that are the point
+ * of this product.
+ *
+ * Neither escape hatch was available: huggingface.co is blocked in this
+ * environment so a multilingual embedder cannot be fetched, and translating the
+ * query first costs a 200-400ms Sarvam round trip against a 50ms budget.
+ *
+ * With ten short chunks the whole corpus is roughly a thousand tokens. Handing all
+ * of it to the model is cheaper than a translate call, needs no network, and works
+ * natively in all 22 languages, because the model reads Tamil and the ranker never
+ * could. Relevance is a judgement the model is simply better at than cosine
+ * similarity over trigrams.
+ *
+ * This does NOT weaken the no-invention rule. It moves the refusal from retrieval
+ * to generation: the answering prompt requires the monument to say it does not
+ * remember when the sources do not cover the question, and that refusal is
+ * detected and reported as admittedIgnorance. The rule is still enforced, just at
+ * the layer that can actually read the question.
+ */
+export const SMALL_CORPUS_MAX = 16;
 
 export async function retrieveSources(
   monumentId: string,
@@ -174,6 +217,11 @@ export async function retrieveSources(
   topK = 3,
   minScore = 0.06,
 ): Promise<RetrievalResult> {
+  // Small corpus: skip ranking entirely. See SMALL_CORPUS_MAX above.
+  if (sources.length <= SMALL_CORPUS_MAX && !embedder) {
+    return { chunks: sources, scores: sources.map(() => 1), empty: sources.length === 0, mode: 'full-context' };
+  }
+
   if (embedder) {
     try {
       const [qv, ...svs] = await embedder([query, ...sources.map((s) => s.text)]);
@@ -182,14 +230,14 @@ export async function retrieveSources(
         .filter((r) => r.score >= 0.25)
         .sort((a, b) => b.score - a.score)
         .slice(0, topK);
-      return { chunks: ranked.map((r) => r.item), scores: ranked.map((r) => r.score), empty: ranked.length === 0 };
+      return { chunks: ranked.map((r) => r.item), scores: ranked.map((r) => r.score), empty: ranked.length === 0, mode: 'ranked' };
     } catch (err) {
       console.warn('[retrieval] embedder failed, falling back to lexical:', (err as Error).message);
     }
   }
 
   const ranked = sourceIndex(monumentId, sources).search(query, topK, minScore);
-  return { chunks: ranked.map((r) => r.item), scores: ranked.map((r) => r.score), empty: ranked.length === 0 };
+  return { chunks: ranked.map((r) => r.item), scores: ranked.map((r) => r.score), empty: ranked.length === 0, mode: 'ranked' };
 }
 
 /** Renders retrieved chunks into the numbered SOURCES block the system prompt expects. */
