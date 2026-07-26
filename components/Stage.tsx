@@ -9,14 +9,14 @@ import {
   IconChevron,
   IconClose,
   IconCrack,
+  IconInfo,
   IconMore,
-  IconPlaque,
   IconPostcard,
   IconTongues,
   IconTranscript,
   IconTranscriptOff,
+  IconViewfinder,
 } from '@/components/ui/icons';
-import PlaqueReader from '@/components/vision/PlaqueReader';
 import ReportDamage from '@/components/vision/ReportDamage';
 import { LanguageChip, LatencyHUD, MicButton, TextFallback, TranscriptRail } from '@/components/voice';
 import useVoiceLoop from '@/hooks/useVoiceLoop';
@@ -59,10 +59,15 @@ const MEMORY_AFTER_TURNS = 3;
 const POSTCARD_AFTER_TURNS = 5;
 const INVITATION_MS = 2600;
 
-type Sheet = 'plaque' | 'report' | 'languages';
+/**
+ * Only two sheets remain. The plaque reader's trigger was removed from the
+ * Stage on the product owner's call — one fewer thing competing with the mic —
+ * so `components/vision/PlaqueReader.tsx` stays in the repo for other surfaces
+ * but has no entry point here, and no dead sheet state can reach it.
+ */
+type Sheet = 'report' | 'languages';
 
 const SHEET_TITLE: Record<Sheet, string> = {
-  plaque: 'Read a plaque',
   report: 'Report damage',
   languages: 'The languages I speak',
 };
@@ -382,8 +387,12 @@ export default function Stage({ monument }: StageProps) {
                              border border-white/[0.14] bg-night-950/92 p-1.5 backdrop-blur-2xl
                              shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_26px_60px_-24px_rgba(0,0,0,1)]"
                 >
-                  <ToolRow icon={<IconPlaque />} onClick={() => openSheet('plaque')}>
-                    Read a plaque
+                  {/* The live camera way in. It is a route, not a sheet: /scan
+                      takes over the camera and then hands off to whichever
+                      monument it recognised, so keeping it inside this overlay
+                      would strand the visitor on the wrong photograph. */}
+                  <ToolRow icon={<IconViewfinder />} href="/scan">
+                    Point my camera at a monument
                   </ToolRow>
                   <ToolRow icon={<IconCrack />} onClick={() => openSheet('report')}>
                     Report damage
@@ -487,13 +496,6 @@ export default function Stage({ monument }: StageProps) {
             >
               {sheet === 'languages' ? (
                 <LanguageCoverage detected={voice.lang} />
-              ) : sheet === 'plaque' ? (
-                <PlaqueReader
-                  lang={voice.lang ?? undefined}
-                  monumentId={monument.id}
-                  sessionId={voice.sessionId ?? undefined}
-                  className="mx-auto max-w-lg"
-                />
               ) : (
                 <ReportDamage
                   lang={voice.lang ?? undefined}
@@ -511,18 +513,24 @@ export default function Stage({ monument }: StageProps) {
   );
 }
 
-/** One line in the ⋯ disclosure. Glyph, words, chevron — a list, not a pill. */
+/**
+ * One line in the ⋯ disclosure. Glyph, words, chevron — a list, not a pill.
+ * Renders an anchor when the destination is a route so it behaves like a link
+ * (middle-click, long-press, "open in new tab") rather than a fake button.
+ */
 function ToolRow({
   icon,
   onClick,
+  href,
   children,
 }: {
   icon: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
+  href?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <button type="button" role="menuitem" onClick={onClick} className="bol-row">
+  const inner = (
+    <>
       <span aria-hidden className="text-sandstone-300">
         {icon}
       </span>
@@ -530,6 +538,19 @@ function ToolRow({
       <span aria-hidden className="text-sandstone-200/35">
         <IconChevron size={14} />
       </span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} role="menuitem" className="bol-row">
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <button type="button" role="menuitem" onClick={onClick} className="bol-row">
+      {inner}
     </button>
   );
 }

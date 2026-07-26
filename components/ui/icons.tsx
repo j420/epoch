@@ -35,13 +35,23 @@ function Svg({ size = 20, className = '', children }: IconProps & { children: Re
   );
 }
 
-/** A signboard on a post — "read a plaque". */
-export function IconPlaque(props: IconProps) {
+/** A viewfinder with a lens — "point your camera at a monument". */
+export function IconViewfinder(props: IconProps) {
   return (
     <Svg {...props}>
-      <rect x="3" y="4" width="18" height="11" rx="2" />
-      <path d="M7 8h10M7 11.5h6" />
-      <path d="M12 15v5M9 20h6" />
+      <path d="M3 8.5V6a3 3 0 0 1 3-3h2.5M15.5 3H18a3 3 0 0 1 3 3v2.5M21 15.5V18a3 3 0 0 1-3 3h-2.5M8.5 21H6a3 3 0 0 1-3-3v-2.5" />
+      <circle cx="12" cy="12" r="3.4" />
+    </Svg>
+  );
+}
+
+/** A circled 'i' — the photograph's own caption. */
+export function IconInfo(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5.5" />
+      <circle cx="12" cy="7.75" r="0.9" fill="currentColor" stroke="none" />
     </Svg>
   );
 }
