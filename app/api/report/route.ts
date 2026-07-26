@@ -166,15 +166,19 @@ function parseClassification(raw: string): Classification {
         ? (kindRaw.trim().toLowerCase() as ReportKind)
         : 'unknown';
 
+    // An unrecognised type ("vandalism", "damage") means the model did not follow
+    // the contract at all, so we do not trust its severity either — full fallback.
+    if (kind === 'unknown') return FALLBACK;
+
     const sevRaw = obj.severity ?? obj.level ?? obj.score;
     const sevNum = typeof sevRaw === 'number' ? sevRaw : Number(String(sevRaw ?? '').trim());
     const severity: Severity = Number.isFinite(sevNum)
       ? (Math.min(5, Math.max(1, Math.round(sevNum))) as Severity)
       : 3;
 
-    // A recognised type with a garbage severity is still a useful classification;
-    // an unrecognised type is not, so it degrades all the way to the fallback.
-    return { kind, severity, parsed: kind !== 'unknown' };
+    // A recognised type with a garbage severity is still a useful classification —
+    // the severity has already been clamped to a sane 3.
+    return { kind, severity, parsed: true };
   } catch {
     return FALLBACK;
   }

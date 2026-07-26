@@ -169,8 +169,10 @@ export async function POST(req: Request) {
     let rewriteError: string | null = null;
 
     if (!usable) {
+      // Contract: unusable OCR returns rawOcr:'' so the left column shows the
+      // honest empty state rather than a line of noise dressed up as evidence.
+      rawOcr = '';
       plain = await localize(UNREADABLE, lang);
-      rawOcr = usable ? rawOcr : '';
     } else {
       const tRewrite = Date.now();
       try {
