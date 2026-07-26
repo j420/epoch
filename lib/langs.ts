@@ -56,7 +56,10 @@ export const LANGS: Record<LangCode, LangInfo> = {
   'ks-IN':  { code: 'ks-IN',  native: 'کٲشُر',     english: 'Kashmiri',  script: 'Perso-Arabic',     speakable: false, voiceFallback: 'ur-IN' },
   'sd-IN':  { code: 'sd-IN',  native: 'سنڌي',      english: 'Sindhi',    script: 'Perso-Arabic',     speakable: false, voiceFallback: 'hi-IN' },
   'mni-IN': { code: 'mni-IN', native: 'ꯃꯤꯇꯩꯂꯣꯟ',   english: 'Manipuri',  script: 'Meetei Mayek',     speakable: false, voiceFallback: 'bn-IN' },
-  'brx-IN': { code: 'brx-IN', native: 'बर-ा',  english: 'Bodo',      script: 'Devanagari',       speakable: false, voiceFallback: 'hi-IN' },
+  // Bodo's endonym is written बड़ो or बर' (the apostrophe marks a schwa). An earlier
+  // value here was mangled to "बर-ा", which is not a word — it rendered as visible
+  // nonsense the moment the coverage panel showed every language in its own script.
+  'brx-IN': { code: 'brx-IN', native: 'बड़ो',   english: 'Bodo',      script: 'Devanagari',       speakable: false, voiceFallback: 'hi-IN' },
   'sat-IN': { code: 'sat-IN', native: 'ᱥᱟᱱᱛᱟᱲᱤ',   english: 'Santali',   script: 'Ol Chiki',         speakable: false, voiceFallback: 'hi-IN' },
 };
 

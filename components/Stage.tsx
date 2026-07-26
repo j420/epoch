@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import LanguageCoverage from '@/components/LanguageCoverage';
 import LivingPhoto from '@/components/LivingPhoto';
 import { LeaveMemory } from '@/components/echo';
 import PlaqueReader from '@/components/vision/PlaqueReader';
@@ -47,7 +48,7 @@ export default function Stage({ monument }: StageProps) {
   const [started, setStarted] = useState(false);
   const [invitationIndex, setInvitationIndex] = useState(0);
   const [showRail, setShowRail] = useState(true);
-  const [sheet, setSheet] = useState<'plaque' | 'report' | null>(null);
+  const [sheet, setSheet] = useState<'plaque' | 'report' | 'languages' | null>(null);
 
   const voice = useVoiceLoop({ monumentId: monument.id });
 
@@ -297,6 +298,11 @@ export default function Stage({ monument }: StageProps) {
           <button type="button" onClick={() => setSheet('report')} className="bol-chip">
             report damage
           </button>
+          {/* Not a picker — see components/LanguageCoverage.tsx. It shows the range
+              and is honest about the twelve languages we cannot yet voice. */}
+          <button type="button" onClick={() => setSheet('languages')} className="bol-chip">
+            languages I speak
+          </button>
         </div>
       </div>
 
@@ -326,14 +332,16 @@ export default function Stage({ monument }: StageProps) {
         >
           <div className="flex items-center justify-between p-4">
             <span className="text-sm font-medium text-sandstone-100">
-              {sheet === 'plaque' ? 'Read a plaque' : 'Report damage'}
+              {sheet === 'plaque' ? 'Read a plaque' : sheet === 'report' ? 'Report damage' : 'Languages'}
             </span>
             <button type="button" onClick={() => setSheet(null)} className="bol-chip" aria-label="Close">
               close
             </button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
-            {sheet === 'plaque' ? (
+            {sheet === 'languages' ? (
+              <LanguageCoverage detected={voice.lang} />
+            ) : sheet === 'plaque' ? (
               <PlaqueReader
                 lang={voice.lang ?? undefined}
                 monumentId={monument.id}
