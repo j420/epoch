@@ -1,0 +1,239 @@
+{
+  "id": "taj-mahal",
+  "city": "Agra",
+  "aspect": 0.5,
+  "hero": "/monuments/taj-mahal/hero.png",
+  "depth": "/monuments/taj-mahal/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Taj Mahal",
+    "hi-IN": "ताज महल",
+    "ur-IN": "تاج محل",
+    "bn-IN": "তাজমহল",
+    "ta-IN": "தாஜ் மகால்",
+    "te-IN": "తాజ్ మహల్",
+    "kn-IN": "ತಾಜ್ ಮಹಲ್",
+    "ml-IN": "താജ് മഹൽ",
+    "mr-IN": "ताजमहाल",
+    "gu-IN": "તાજમહેલ",
+    "pa-IN": "ਤਾਜ ਮਹਿਲ",
+    "od-IN": "ତାଜମହଲ",
+    "as-IN": "তাজমহল"
+  },
+  "regions": [
+    {
+      "id": "dome",
+      "x": 0.5,
+      "y": 0.31,
+      "z": 0.35,
+      "label": {
+        "en-IN": "my great dome",
+        "hi-IN": "मेरा बड़ा गुंबद",
+        "ur-IN": "میرا بڑا گنبد",
+        "ta-IN": "என் பெரிய குவிமாடம்",
+        "bn-IN": "আমার বড় গম্বুজ",
+        "te-IN": "నా పెద్ద గోపురం",
+        "mr-IN": "माझा मोठा घुमट"
+      }
+    },
+    {
+      "id": "iwan",
+      "x": 0.5,
+      "y": 0.56,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the great arch at my heart",
+        "hi-IN": "मेरे बीच का बड़ा मेहराब",
+        "ur-IN": "میرے دل کا بڑا محراب",
+        "ta-IN": "என் நடுவிலுள்ள பெரிய வளைவு",
+        "bn-IN": "আমার বুকের বড় খিলান",
+        "te-IN": "నా నడిబొడ్డులోని పెద్ద తోరణం",
+        "mr-IN": "माझ्या मध्यभागीचा मोठा कमानदरवाजा"
+      }
+    },
+    {
+      "id": "minaret",
+      "x": 0.146,
+      "y": 0.46,
+      "z": 0.5,
+      "label": {
+        "en-IN": "my four minarets",
+        "hi-IN": "मेरी चार मीनारें",
+        "ur-IN": "میری چار مینار",
+        "ta-IN": "என் நான்கு மினாரங்கள்",
+        "bn-IN": "আমার চারটি মিনার",
+        "te-IN": "నా నాలుగు మినార్లు",
+        "mr-IN": "माझे चार मिनार"
+      }
+    },
+    {
+      "id": "inlay",
+      "x": 0.35,
+      "y": 0.5,
+      "z": 0.6,
+      "label": {
+        "en-IN": "the flowers set into my marble",
+        "hi-IN": "मेरे संगमरमर में जड़े फूल",
+        "ur-IN": "میرے سنگِ مرمر میں جڑے پھول",
+        "ta-IN": "என் பளிங்கில் பதிக்கப்பட்ட பூக்கள்",
+        "bn-IN": "আমার মর্মরে বসানো ফুল",
+        "te-IN": "నా పాలరాతిలో పొదిగిన పూలు",
+        "mr-IN": "माझ्या संगमरवरात जडलेली फुले"
+      }
+    },
+    {
+      "id": "chhatri",
+      "x": 0.638,
+      "y": 0.375,
+      "z": 0.4,
+      "label": {
+        "en-IN": "the little domed kiosks around my dome",
+        "hi-IN": "मेरे गुंबद के इर्द-गिर्द की छतरियाँ",
+        "ur-IN": "میرے گنبد کے گرد چھتریاں",
+        "ta-IN": "என் குவிமாடத்தைச் சுற்றியுள்ள சிறு மண்டபங்கள்",
+        "bn-IN": "আমার গম্বুজ ঘিরে ছোট ছত্রি",
+        "te-IN": "నా గోపురం చుట్టూ ఉన్న చిన్న ఛత్రులు",
+        "mr-IN": "माझ्या घुमटाभोवतीच्या छत्र्या"
+      }
+    },
+    {
+      "id": "plinth",
+      "x": 0.5,
+      "y": 0.648,
+      "z": 0.72,
+      "label": {
+        "en-IN": "the marble platform I stand on",
+        "hi-IN": "जिस चबूतरे पर मैं खड़ा हूँ",
+        "ur-IN": "جس چبوترے پر میں کھڑا ہوں",
+        "ta-IN": "நான் நிற்கும் பளிங்கு மேடை",
+        "bn-IN": "যে মর্মর বেদিতে আমি দাঁড়িয়ে",
+        "te-IN": "నేను నిలిచిన పాలరాతి వేదిక",
+        "mr-IN": "मी उभा असलेला संगमरवरी चौथरा"
+      }
+    },
+    {
+      "id": "pool",
+      "x": 0.5,
+      "y": 0.85,
+      "z": 0.9,
+      "label": {
+        "en-IN": "the water that holds my reflection",
+        "hi-IN": "वह पानी जिसमें मेरा अक्स है",
+        "ur-IN": "وہ پانی جس میں میرا عکس ہے",
+        "ta-IN": "என் நிழலைத் தாங்கும் நீர்",
+        "bn-IN": "যে জলে আমার ছায়া",
+        "te-IN": "నా ప్రతిబింబం నిలిపిన నీరు",
+        "mr-IN": "माझे प्रतिबिंब धरणारे पाणी"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.78,
+      "y": 0.14,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the sky above me",
+        "hi-IN": "मेरे ऊपर का आसमान",
+        "ur-IN": "میرے اوپر کا آسمان",
+        "ta-IN": "என் மேலே வானம்",
+        "bn-IN": "আমার উপরের আকাশ",
+        "te-IN": "నా పైన ఆకాశం",
+        "mr-IN": "माझ्यावरचे आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/taj-mahal/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me a little over a century ago.",
+        "hi-IN": "जैसे सौ बरस पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "The Taj Mahal was commissioned by the fifth Mughal emperor Shah Jahan as the mausoleum of his wife Mumtaz Mahal. It is a funerary complex rather than a palace: the tomb stands at the head of a walled garden, with a mosque to its west and a matching guest house, the jawab, to its east.",
+      "citation": "UNESCO World Heritage Centre, Taj Mahal (ref. 252); Archaeological Survey of India, Taj Mahal site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "Mumtaz Mahal died on 17 June 1631 at Burhanpur, in present-day Madhya Pradesh, while giving birth to her fourteenth child. She was buried first in a garden on the bank of the Tapti, and her body was brought to Agra in December 1631.",
+      "citation": "Archaeological Survey of India, Taj Mahal site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s3",
+      "text": "Work began in 1632. The mausoleum itself was finished within about a decade, and the whole complex — the mosque, the guest house, the great gateway, the outer courtyard and the cloisters — was completed in 1653. Sources differ over exactly when the tomb building alone was considered done.",
+      "citation": "UNESCO World Heritage Centre, Taj Mahal (ref. 252)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The chief architect named in the sources is Ustad Ahmad Lahauri, Shah Jahan's court architect, who worked with a board of architects including Mir Abd-ul Karim. The attribution rests on a verse by his son, Lutfullah Muhandis, rather than on a building record.",
+      "citation": "UNESCO World Heritage Centre, Taj Mahal (ref. 252); Encyclopaedia Britannica, Taj Mahal",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "The mausoleum is a square of roughly 58.6 metres a side, raised on a marble plinth about 95 metres square and some 7 metres high. The walled complex covers about 17 hectares, with a charbagh garden roughly 300 metres square.",
+      "citation": "Archaeological Survey of India, Taj Mahal site record; UNESCO World Heritage Centre, Taj Mahal (ref. 252)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "The main dome is a double shell. The outer bulbous dome is about 17.7 metres in diameter and rises roughly 35 metres above the roof on a cylindrical drum; the inner dome, seen from the chamber below, is about 24.4 metres high. Four smaller domed chhatris stand around it, and a gilded finial crowns the whole.",
+      "citation": "Archaeological Survey of India, Taj Mahal site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s7",
+      "text": "Four minarets stand at the corners of the plinth, each about 40 metres high, and each leans very slightly outward from the tomb. The often-repeated explanation that they were tilted so as to fall away from the tomb in an earthquake is a guidebook tradition and is not documented in Mughal sources.",
+      "citation": "Archaeological Survey of India, Taj Mahal site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s8",
+      "text": "The facing is white marble quarried at Makrana in Rajasthan, over 300 kilometres away; the gateway, mosque and jawab are of red sandstone from near Fatehpur Sikri. The inlay work, parchin kari, uses stones brought from far off — jasper from Punjab, turquoise from Tibet, lapis lazuli from Afghanistan, sapphire from Sri Lanka, jade and crystal from China, carnelian from Arabia.",
+      "citation": "Archaeological Survey of India, Taj Mahal site record; UNESCO World Heritage Centre, Taj Mahal (ref. 252)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "The inscriptions are Quranic verses in thuluth script by the Persian calligrapher Abd al-Haqq, whom Shah Jahan titled Amanat Khan; he signed his work within the marble, one of very few named craftsmen. The great gateway carries the lines: O soul, thou art at rest. Return to the Lord at peace with Him, and He at peace with you.",
+      "citation": "Archaeological Survey of India, Taj Mahal site record; Encyclopaedia Iranica, Amanat Khan Shirazi",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "Two famous stories about the Taj are legends, not history. The 'Black Taj' said to have been planned across the river rests solely on the account of the traveller Jean-Baptiste Tavernier, and excavation at Mehtab Bagh in 1993 found a Mughal garden but no black marble. The story that Shah Jahan had the workers' hands cut off has no basis in any contemporary source.",
+      "citation": "Archaeological Survey of India, Mehtab Bagh excavation record; historians S. Irfan Habib and Najaf Haider, cited in published fact-checks",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s11",
+      "text": "In the eighteenth century the Taj was stripped of its silver doors, chandeliers and carpets, which were melted down and never replaced. Viceroy Lord Curzon ordered a major restoration, completed in 1908, and presented a bronze lamp made in Cairo by Todros Badir, hung in the tomb chamber on 16 February 1908.",
+      "citation": "Archaeological Survey of India, Taj Mahal conservation record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s12",
+      "text": "In 1942 the dome was hidden under bamboo scaffolding to look like a stockpile of stores, in case of air attack, and during later wars the marble was covered with green-dyed tarpaulins. The Taj Mahal was inscribed on the UNESCO World Heritage List in 1983 under cultural criterion (i), is a centrally protected monument in the care of the Archaeological Survey of India, and is shielded by the Taj Trapezium Zone created by the Supreme Court of India in December 1996.",
+      "citation": "UNESCO World Heritage Centre, Taj Mahal (ref. 252); Archaeological Survey of India; Supreme Court of India, M.C. Mehta v. Union of India, 30 December 1996",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am the Taj Mahal. Shah Jahan raised me for Mumtaz Mahal — come closer, and I will tell you about her.",
+    "hi-IN": "मैं ताज महल हूँ। शाहजहाँ ने मुझे मुमताज़ महल के लिए बनवाया था — पास आओ, मैं तुम्हें उनकी कहानी सुनाऊँ।",
+    "ur-IN": "میں تاج محل ہوں۔ شاہجہاں نے مجھے ممتاز محل کے لیے بنوایا تھا — قریب آؤ، میں تمہیں ان کی کہانی سناؤں۔",
+    "bn-IN": "আমি তাজমহল। শাহজাহান আমাকে মমতাজ মহলের জন্য গড়েছিলেন — কাছে এসো, আমি তাঁর কথা বলি।",
+    "ta-IN": "நான் தாஜ் மகால். ஷாஜகான் என்னை மும்தாஜ் மகாலுக்காக எழுப்பினார் — அருகில் வாருங்கள், அவரைப் பற்றிச் சொல்கிறேன்.",
+    "te-IN": "నేను తాజ్ మహల్. షాజహాన్ నన్ను ముంతాజ్ మహల్ కోసం కట్టించాడు — దగ్గరకు రండి, ఆమె గురించి చెబుతాను.",
+    "mr-IN": "मी ताजमहाल. शहाजहानने मला मुमताज महलसाठी उभारले — जवळ या, मी तिची गोष्ट सांगतो.",
+    "kn-IN": "ನಾನು ತಾಜ್ ಮಹಲ್. ಷಹಜಹಾನ್ ನನ್ನನ್ನು ಮುಮ್ತಾಜ್ ಮಹಲ್‌ಗಾಗಿ ಕಟ್ಟಿಸಿದ — ಹತ್ತಿರ ಬನ್ನಿ, ಅವಳ ಕಥೆ ಹೇಳುತ್ತೇನೆ."
+  }
+}
