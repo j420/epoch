@@ -305,8 +305,25 @@ function renderDepth(shape) {
 
 // ---------------------------------------------------------------------------
 
-const only = process.argv.slice(2);
+const args = process.argv.slice(2);
+const force = args.includes('--force');
+const only = args.filter((a) => !a.startsWith('--'));
 const ids = only.length ? only : Object.keys(SHAPES);
+
+/**
+ * Monuments whose hero is a real photograph. Written by scripts/fetch-photos.mjs.
+ * Missing file simply means nothing is locked yet.
+ */
+const locked = (() => {
+  try {
+    const lock = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'public', 'monuments', 'photo-lock.json'), 'utf8'),
+    );
+    return new Set(Object.keys(lock.plates ?? {}));
+  } catch {
+    return new Set();
+  }
+})();
 
 let total = 0;
 for (const id of ids) {
@@ -320,7 +337,8 @@ for (const id of ids) {
   fs.mkdirSync(outDir, { recursive: true });
 
   const aspect = (shape.W / shape.H).toFixed(4).replace(/0+$/, '');
-  console.log(`\n${id}  ${shape.W}x${shape.H}  aspect ${aspect}`);
+  const note = locked.has(id) && !force ? '  (procedural geometry only — hero is a photograph)' : '';
+  console.log(`\n${id}  ${shape.W}x${shape.H}  aspect ${aspect}${note}`);
 
   const write = (name, buf) => {
     fs.writeFileSync(path.join(outDir, name), buf);
@@ -328,10 +346,26 @@ for (const id of ids) {
     console.log(`  ${name.padEnd(16)} ${(buf.length / 1024).toFixed(0)} KB`);
   };
 
-  write('hero.png', encodePng(shape.W, shape.H, renderHero(shape), 2));
-  write('era-1900.png', encodePng(shape.W, shape.H, renderHero(shape, { sepia: true }), 2));
+  const photographed = locked.has(id) && !force;
+  if (photographed) {
+    // The hero and the era plate are a licensed photograph. Leave them alone.
+    console.log('  hero.png / era-1900.png  KEPT — real photograph (see photo-lock.json)');
+  } else {
+    write('hero.png', encodePng(shape.W, shape.H, renderHero(shape), 2));
+    write('era-1900.png', encodePng(shape.W, shape.H, renderHero(shape, { sepia: true }), 2));
+  }
+  // depth.png is always regenerated: `public/sw.js` precaches the path and
+  // `scripts/smoke.ts` asserts it, so the file has to exist. For a photographed
+  // monument content/<id>.json sets `"depth": ""`, so the app never loads it —
+  // it is a stale artefact of the procedural set, not a map of the photograph.
   write('depth.png', encodePng(shape.W, shape.H, renderDepth(shape), 0));
 }
 
 console.log(`\nDone — ${(total / 1024 / 1024).toFixed(2)} MB total.`);
-console.log('These are PLACEHOLDERS — swap in real photographs before the demo.');
+if (locked.size && !force) {
+  console.log(
+    `${locked.size} monument(s) have real photographs and were left alone: ` +
+      `${[...locked].join(', ')}. See public/monuments/CREDITS.md.`,
+  );
+}
+console.log('Anything else here is a PLACEHOLDER — swap in real photographs before the demo.');
