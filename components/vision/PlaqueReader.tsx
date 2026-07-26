@@ -152,11 +152,17 @@ export default function PlaqueReader({
 
   return (
     <section className={`mx-auto w-full max-w-3xl ${className}`} aria-live="polite">
-      <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-sandstone-100">Read this plaque to me</h2>
-          <p className="text-xs text-sandstone-200/70">
-            Answering in {langName.native} · {langName.english}
+          <h2 className="text-[1.35rem] font-semibold leading-tight tracking-tight text-sandstone-50">
+            Read this plaque to me
+          </h2>
+          <p className="mt-1 text-[0.72rem] uppercase tracking-[0.12em] text-sandstone-200/55">
+            Answering in{' '}
+            <span lang={code} className="indic-text normal-case tracking-normal text-sandstone-100">
+              {langName.native}
+            </span>{' '}
+            · {langName.english}
           </p>
         </div>
 
@@ -166,7 +172,7 @@ export default function PlaqueReader({
             onClick={() => setShowLimit((v) => !v)}
             aria-expanded={showLimit}
             title={LIMIT_TOOLTIP}
-            className="bol-chip cursor-help"
+            className="bol-chip bol-tap cursor-help px-3.5"
           >
             <span aria-hidden="true">◑</span> what I can read
           </button>
@@ -196,7 +202,9 @@ export default function PlaqueReader({
             type="button"
             onClick={read}
             disabled={!file || phase === 'reading'}
-            className="mt-3 w-full rounded-xl bg-sandstone-400 px-4 py-3 text-base font-semibold text-night-900 disabled:opacity-40 active:scale-[0.99]"
+            className="mt-3 min-h-[52px] w-full rounded-xl bg-sandstone-300 px-4 py-3 text-base font-semibold text-night-950
+                       shadow-[0_10px_30px_-14px_rgba(226,162,113,0.8)] transition-[transform,background-color]
+                       duration-fast ease-bol hover:bg-sandstone-200 active:scale-[0.99] disabled:opacity-40 disabled:shadow-none"
           >
             {phase === 'reading' ? 'Reading the board…' : 'Read it to me'}
           </button>
@@ -220,7 +228,7 @@ export default function PlaqueReader({
       {phase === 'error' && error && (
         <div role="alert" className="bol-glass mt-3 border-sandstone-500/40 p-4 text-sm leading-relaxed text-sandstone-100">
           {error}
-          <button type="button" onClick={startOver} className="mt-3 block rounded-lg border border-white/15 px-3 py-2 text-xs">
+          <button type="button" onClick={startOver} className="bol-tap mt-3 inline-flex rounded-lg border border-white/15 px-4 text-xs transition-colors duration-fast ease-bol hover:bg-white/[0.07]">
             Try another photograph
           </button>
         </div>
@@ -231,7 +239,7 @@ export default function PlaqueReader({
           {/* LEFT — the proof. Raw, unedited, in its own script. */}
           <div className="bol-glass flex flex-col p-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-sandstone-200/70">what the model read</h3>
+              <h3 className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-sandstone-200/60">what the model read</h3>
               <span className="text-[10px] text-sandstone-200/50">{result.ms.ocr}ms</span>
             </div>
             <pre
@@ -248,10 +256,10 @@ export default function PlaqueReader({
           {/* RIGHT — the plain-language rewrite, in the visitor's language. */}
           <div className="bol-glass flex flex-col p-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-sandstone-200/70">in plain words</h3>
+              <h3 className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-sandstone-200/60">in plain words</h3>
               <span className="text-[10px] text-sandstone-200/50">{result.ms.rewrite}ms</span>
             </div>
-            <p dir="auto" className="indic-text mt-2 text-xl font-medium text-sandstone-50">
+            <p dir="auto" className="indic-text mt-3 text-[1.35rem] font-medium leading-snug text-sandstone-50">
               {result.plain}
             </p>
 
@@ -261,7 +269,7 @@ export default function PlaqueReader({
                   <button
                     type="button"
                     onClick={play}
-                    className="rounded-full bg-sandstone-300 px-4 py-2 text-sm font-semibold text-night-900"
+                    className="bol-tap inline-flex rounded-full bg-sandstone-300 px-5 text-sm font-semibold text-night-950 shadow-[0_8px_24px_-12px_rgba(226,162,113,0.9)] hover:bg-sandstone-200"
                   >
                     {playing ? '❙❙ pause' : '▶ listen'}
                   </button>
@@ -287,7 +295,7 @@ export default function PlaqueReader({
               </p>
             )}
 
-            <button type="button" onClick={startOver} className="mt-4 self-start rounded-lg border border-white/15 px-3 py-2 text-xs">
+            <button type="button" onClick={startOver} className="bol-tap mt-4 inline-flex self-start rounded-lg border border-white/15 px-4 text-xs transition-colors duration-fast ease-bol hover:bg-white/[0.07]">
               Read another
             </button>
           </div>

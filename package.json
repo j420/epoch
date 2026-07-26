@@ -2,7 +2,7 @@
   "name": "bol",
   "version": "0.1.0",
   "private": true,
-  "description": "Bol — scan and speak to an Indian monument in any of 22 languages. No app. No language picker.",
+  "description": "Bol \u2014 scan and speak to an Indian monument in any of 22 languages. No app. No language picker.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +10,10 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "smoke": "tsx scripts/smoke.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "verify:language": "tsx scripts/verify-language.ts",
+    "verify:guardrails": "tsx scripts/verify-guardrails.ts",
+    "verify": "npm run verify:language && npm run verify:guardrails"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.3.1",

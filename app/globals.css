@@ -2,24 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================================================================
+   Bol — visual system
+   ---------------------------------------------------------------------------
+   One idea governs everything here: the photograph IS the interface. Chrome is
+   light glass and gradient scrim, never a panel sitting on the image. The
+   palette is the monument's own — sandstone in evening light, night in shade.
+
+   Everything below is tokens first (type, motion, elevation), then the handful
+   of component classes the whole app shares. No webfont is downloaded: there is
+   no network at build or runtime, so the stacks below are system fonts plus
+   every Noto Indic family a real device is likely to already have.
+   =========================================================================== */
+
 :root {
   color-scheme: dark;
+
+  /* ---- surface -------------------------------------------------------- */
   --bol-bg: #0a0908;
+  --bol-ink: #f8e6d4;
+  --bol-ink-bright: #fdf6ef;
+
+  /* ---- type ------------------------------------------------------------
+     Latin comes from the platform UI face (Roboto on Android, SF on iOS,
+     Segoe on Windows) because it is already resident, hinted for the screen,
+     and costs zero bytes. Indic glyphs then fall through, per glyph, to the
+     first family in the list that actually covers the script — Noto on
+     Android/ChromeOS, the Sangam faces on iOS/macOS, Nirmala UI on Windows.
+     The last resort is `sans-serif`, so a device with none of these still
+     renders text rather than tofu wherever its own default has coverage.   */
+  --font-latin: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    'Liberation Sans', Arial;
+  --font-indic: 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Noto Sans Gurmukhi',
+    'Noto Sans Gujarati', 'Noto Sans Oriya', 'Noto Sans Tamil', 'Noto Sans Telugu',
+    'Noto Sans Kannada', 'Noto Sans Malayalam', 'Noto Sans Ol Chiki', 'Noto Sans Meetei Mayek',
+    'Noto Sans Sinhala', 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Nirmala UI',
+    'Kohinoor Devanagari', 'Devanagari Sangam MN', 'Bangla Sangam MN', 'Gurmukhi MN',
+    'Gujarati Sangam MN', 'Oriya Sangam MN', 'Tamil Sangam MN', 'Telugu Sangam MN',
+    'Kannada Sangam MN', 'Malayalam Sangam MN', 'Geeza Pro', 'Lohit Devanagari', sans-serif;
+  --font-body: var(--font-latin), var(--font-indic);
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* ---- motion ----------------------------------------------------------
+     Three durations and two curves, used everywhere. `--bol-ease` is the
+     house curve: leaves fast, settles slowly, like something heavy coming to
+     rest. Nothing in Bol should ever bounce.                               */
+  --bol-fast: 140ms;
+  --bol-base: 260ms;
+  --bol-slow: 560ms;
+  --bol-ease: cubic-bezier(0.22, 0.75, 0.24, 1);
+  --bol-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- layout ---------------------------------------------------------- */
+  --bol-safe-b: env(safe-area-inset-bottom, 0px);
+  --bol-safe-t: env(safe-area-inset-top, 0px);
 }
 
 html,
 body {
   height: 100%;
   background: var(--bol-bg);
-  color: #f8e6d4;
+  color: var(--bol-ink);
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: var(--font-indic), 'Noto Sans', system-ui, sans-serif;
-  /* The photograph fills the viewport; nothing should scroll behind it. */
+  /* NB: the old rule was `var(--font-indic), …` with --font-indic never
+     defined, which makes the whole declaration invalid at computed-value time
+     and silently fell back to Tailwind's preflight stack. Now it is real. */
+  font-family: var(--font-body);
+  font-synthesis-weight: none;
+}
+
+/*
+ * The Stage is full-bleed and must not scroll behind the photograph — but this
+ * started life on `body`, which silently trapped every ordinary page in the app
+ * (the monument index, /live, /admin) at one viewport tall with no way to reach
+ * the rest. Scoped to the pages that actually want it.
+ */
+body:has(> main[data-bol-stage]) {
   overflow: hidden;
+}
+
+/* A focus ring that survives on both stone and sky. Warm, two-tone, always
+   visible — never removed, only replaced. */
+:where(a, button, [role='button'], input, textarea, select, summary):focus-visible {
+  outline: 2px solid #efc8a4;
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(226, 162, 113, 0.3);
+  color: #fdf6ef;
+}
+
+/* Scrollbars inside glass panels shouldn't be a bright grey slab. */
+@supports (scrollbar-width: thin) {
+  .bol-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(248, 230, 212, 0.22) transparent;
+  }
 }
 
 /* Prompt 2: honour prefers-reduced-motion everywhere, not just in the shader. */
@@ -30,29 +113,254 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
 @layer components {
-  /* Glass chrome that sits over the photograph without competing with it. */
+  /* ---- glass ------------------------------------------------------------
+     Chrome that sits over the photograph without competing with it: a dark
+     wash, a hairline top highlight so it reads as a raised surface rather
+     than a hole, and a long soft shadow so it detaches from the image.    */
   .bol-glass {
-    @apply rounded-2xl border border-white/10 bg-black/35 backdrop-blur-md;
+    @apply rounded-2xl border border-white/[0.12] bg-night-950/55 backdrop-blur-xl;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 18px 40px -26px rgba(0, 0, 0, 0.95);
   }
 
+  /* A quieter glass for large reading surfaces (/live, /admin) where blur is
+     wasted because there is no photograph underneath. */
+  .bol-panel {
+    @apply rounded-2xl border border-white/[0.09] bg-white/[0.035];
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* ---- chips ------------------------------------------------------------
+     A chip is a LABEL by default — status, a detected language, a count.
+     Interactive things get `.bol-tap` on top, which guarantees the 44px
+     target without inflating the many read-only chips across the app.     */
   .bol-chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-sandstone-200/25 bg-black/40 px-3 py-1
-           text-xs font-medium tracking-wide text-sandstone-100 backdrop-blur-md;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-sandstone-200/20 bg-black/45
+           px-3 py-1 text-xs font-medium tracking-wide text-sandstone-100 backdrop-blur-md;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  }
+
+  .bol-tap {
+    @apply min-h-[44px] min-w-[44px] justify-center;
+    transition:
+      background-color var(--bol-fast) var(--bol-ease),
+      border-color var(--bol-fast) var(--bol-ease),
+      transform var(--bol-fast) var(--bol-ease);
+  }
+
+  .bol-tap:active {
+    transform: scale(0.97);
+  }
+
+  a.bol-chip:hover,
+  button.bol-chip:hover {
+    @apply border-sandstone-200/45 bg-black/60;
+  }
+
+  /* ---- a row in the tools sheet ---------------------------------------- */
+  .bol-row {
+    @apply flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm text-sandstone-100;
+    min-height: 48px;
+    transition:
+      background-color var(--bol-fast) var(--bol-ease),
+      transform var(--bol-fast) var(--bol-ease);
+  }
+
+  .bol-row:hover {
+    @apply bg-white/[0.07];
+  }
+
+  .bol-row:active {
+    transform: scale(0.985);
   }
 
   .bol-shimmer {
-    background-image: linear-gradient(90deg, rgba(248, 230, 212, 0.04) 25%, rgba(248, 230, 212, 0.14) 50%, rgba(248, 230, 212, 0.04) 75%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(248, 230, 212, 0.04) 25%,
+      rgba(248, 230, 212, 0.14) 50%,
+      rgba(248, 230, 212, 0.04) 75%
+    );
     background-size: 200% 100%;
     @apply animate-shimmer;
   }
 }
 
-/* Indic scripts need a little more line height than Latin to avoid clipped matras. */
+@layer utilities {
+  /* ---- legibility over a photograph ------------------------------------
+     Tested against BOTH regions of every hero: the bright hazy sky at the top
+     and the dark stone at the bottom. A single drop-shadow is not enough over
+     a bright sky, so this is a tight dark halo plus a wide diffuse one — the
+     wide one does the work on sky, the tight one on stone.                */
+  .bol-legible {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.92),
+      0 2px 10px rgba(0, 0, 0, 0.8),
+      0 0 30px rgba(0, 0, 0, 0.65);
+  }
+
+  .bol-legible-soft {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.85),
+      0 0 18px rgba(0, 0, 0, 0.6);
+  }
+
+  /* A localised scrim that pools light behind a block of text without ever
+     drawing an edge — the "never a panel" rule, honoured. */
+  .bol-pool {
+    background: radial-gradient(
+      120% 100% at 50% 55%,
+      rgba(4, 3, 2, 0.78) 0%,
+      rgba(4, 3, 2, 0.55) 42%,
+      rgba(4, 3, 2, 0.16) 72%,
+      rgba(4, 3, 2, 0) 100%
+    );
+  }
+
+  /* The floor: a deep, long gradient that the mic and its cluster sit on. */
+  .bol-floor {
+    background: linear-gradient(
+      to top,
+      rgba(3, 2, 2, 0.94) 0%,
+      rgba(3, 2, 2, 0.86) 18%,
+      rgba(4, 3, 2, 0.6) 42%,
+      rgba(4, 3, 2, 0.22) 70%,
+      rgba(4, 3, 2, 0) 100%
+    );
+  }
+
+  .bol-ceiling {
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 2, 2, 0.72) 0%,
+      rgba(3, 2, 2, 0.34) 45%,
+      rgba(4, 3, 2, 0) 100%
+    );
+  }
+
+  /* Evening light: a warm hearth behind the microphone so the one loud thing
+     on screen has somewhere to be loud. */
+  .bol-hearth {
+    background: radial-gradient(
+      52% 60% at 50% 78%,
+      rgba(226, 162, 113, 0.17) 0%,
+      rgba(193, 98, 47, 0.09) 38%,
+      rgba(0, 0, 0, 0) 72%
+    );
+  }
+
+  .bol-vignette {
+    background: radial-gradient(115% 85% at 50% 42%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.55) 100%);
+  }
+
+  .bol-hairline {
+    background-image: linear-gradient(
+      to right,
+      rgba(248, 230, 212, 0) 0%,
+      rgba(248, 230, 212, 0.16) 18%,
+      rgba(248, 230, 212, 0.16) 82%,
+      rgba(248, 230, 212, 0) 100%
+    );
+  }
+
+  .font-mono-bol {
+    font-family: var(--font-mono);
+  }
+
+  /* Numbers that must line up column to column across polls. */
+  .bol-numeral {
+    font-variant-numeric: tabular-nums lining;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* ===========================================================================
+   Indic typography
+   ---------------------------------------------------------------------------
+   Indic scripts are not Latin with different shapes. Three things matter:
+
+   1. LEADING. Devanagari, Bengali, Gurmukhi and Odia stack matras above and
+      below the line; Tamil, Telugu, Kannada and Malayalam stack vowel signs
+      too. Latin's comfortable 1.5 clips them. 1.75–1.9 is the floor.
+   2. OPTICAL SIZE. At the same font-size, the southern scripts and Odia read
+      noticeably smaller than Latin because their glyphs sit lower in the em.
+      A ~6% bump makes a mixed-script list look like one size, not two.
+   3. NEVER LETTERSPACE. Tracking utilities break conjuncts and detach matras.
+      `.indic-text` defends itself against `tracking-*` applied further up.
+
+   Perso-Arabic (Urdu, Sindhi, Kashmiri) gets the most leading of all —
+   Nastaliq descends steeply — and `unicode-bidi: isolate` so an RTL run can
+   never reorder the Latin around it. Direction is deliberately NOT forced to
+   rtl: these strings appear inside LTR compositions (a name above an English
+   subtitle, a chip reading "اردو → हिन्दी") where a forced rtl would flip the
+   meaning of the arrow and right-align one card out of ten.
+   =========================================================================== */
+
 .indic-text {
-  line-height: 1.7;
+  line-height: 1.75;
+  letter-spacing: 0;
   text-wrap: pretty;
+  unicode-bidi: isolate;
+  font-variant-ligatures: normal;
+  font-kerning: normal;
+  /* Matras that overshoot the line box are not clipped by an ancestor's
+     overflow when the glyph has a little room to breathe. */
+  padding-block: 0.01em;
+}
+
+/* Devanagari family + Bengali/Assamese/Gurmukhi/Gujarati: headline-based
+   scripts, generous leading, no size change. */
+.indic-text:lang(hi),
+.indic-text:lang(mr),
+.indic-text:lang(ne),
+.indic-text:lang(sa),
+.indic-text:lang(kok),
+.indic-text:lang(mai),
+.indic-text:lang(doi),
+.indic-text:lang(brx),
+.indic-text:lang(bn),
+.indic-text:lang(as),
+.indic-text:lang(pa),
+.indic-text:lang(gu) {
+  line-height: 1.8;
+}
+
+/* Southern scripts + Odia: loop-heavy, optically small, need both. */
+.indic-text:lang(ta),
+.indic-text:lang(te),
+.indic-text:lang(kn),
+.indic-text:lang(ml),
+.indic-text:lang(or),
+.indic-text:lang(od),
+.indic-text:lang(si) {
+  font-size: 1.06em;
+  line-height: 1.85;
+}
+
+/* Perso-Arabic. Nastaliq's diagonal baseline needs real air. */
+.indic-text:lang(ur),
+.indic-text:lang(sd),
+.indic-text:lang(ks),
+.indic-text:lang(fa),
+.indic-text:lang(ar) {
+  font-size: 1.08em;
+  line-height: 2;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Ol Chiki (Santali) and Meetei Mayek (Manipuri) are upright and even —
+   they only need the letterspacing defence, already applied above. */
+
+/* A block that is genuinely a whole RTL paragraph — used where the container
+   is RTL-only, never inside a mixed row. */
+.bol-rtl {
+  direction: rtl;
+  text-align: right;
 }

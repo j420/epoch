@@ -1,0 +1,226 @@
+{
+  "id": "gateway-of-india",
+  "city": "Mumbai",
+  "aspect": 0.75,
+  "hero": "/monuments/gateway-of-india/hero.png",
+  "depth": "",
+  "credit": "Photograph: A.Savin, Wikimedia Commons (Free Art License 1.3), cropped. No depth map yet — shown as a still photograph with a slow camera move. Full chain: public/monuments/CREDITS.md.",
+  "displayName": {
+    "en-IN": "Gateway of India",
+    "hi-IN": "गेटवे ऑफ़ इंडिया",
+    "mr-IN": "गेटवे ऑफ इंडिया",
+    "gu-IN": "ગેટવે ઓફ ઇન્ડિયા",
+    "ur-IN": "گیٹ وے آف انڈیا",
+    "bn-IN": "গেটওয়ে অফ ইন্ডিয়া",
+    "ta-IN": "கேட்வே ஆஃப் இந்தியா",
+    "te-IN": "గేట్‌వే ఆఫ్ ఇండియా",
+    "kn-IN": "ಗೇಟ್‌ವೇ ಆಫ್ ಇಂಡಿಯಾ",
+    "ml-IN": "ഗേറ്റ്‌വേ ഓഫ് ഇന്ത്യ",
+    "pa-IN": "ਗੇਟਵੇ ਆਫ਼ ਇੰਡੀਆ",
+    "od-IN": "ଗେଟୱେ ଅଫ୍ ଇଣ୍ଡିଆ"
+  },
+  "regions": [
+    {
+      "id": "arch",
+      "x": 0.5,
+      "y": 0.66,
+      "z": 0.58,
+      "label": {
+        "en-IN": "the great arch you walk through",
+        "hi-IN": "वह बड़ा मेहराब जिससे तुम गुज़रते हो",
+        "mr-IN": "ज्यातून तुम्ही जाता ती मोठी कमान",
+        "gu-IN": "જે મોટી કમાનમાંથી તમે પસાર થાઓ છો",
+        "ta-IN": "நீங்கள் கடந்து செல்லும் பெரிய வளைவு",
+        "bn-IN": "যে বড় খিলান দিয়ে তুমি হেঁটে যাও",
+        "te-IN": "మీరు నడిచి వెళ్ళే పెద్ద తోరణం"
+      }
+    },
+    {
+      "id": "dome",
+      "x": 0.5,
+      "y": 0.34,
+      "z": 0.4,
+      "label": {
+        "en-IN": "my central dome",
+        "hi-IN": "मेरा बीच का गुंबद",
+        "mr-IN": "माझा मधला घुमट",
+        "gu-IN": "મારો વચ્ચેનો ઘુમ્મટ",
+        "ta-IN": "என் நடுக் குவிமாடம்",
+        "bn-IN": "আমার মাঝের গম্বুজ",
+        "te-IN": "నా మధ్య గోపురం"
+      }
+    },
+    {
+      "id": "turret",
+      "x": 0.312,
+      "y": 0.42,
+      "z": 0.52,
+      "label": {
+        "en-IN": "my corner turrets",
+        "hi-IN": "मेरे कोनों की बुर्जियाँ",
+        "mr-IN": "माझे कोपऱ्यांचे बुरूज",
+        "gu-IN": "મારા ખૂણાના બુરજ",
+        "ta-IN": "என் மூலைக் கோபுரங்கள்",
+        "bn-IN": "আমার কোণের বুরুজ",
+        "te-IN": "నా మూలల బురుజులు"
+      }
+    },
+    {
+      "id": "screen",
+      "x": 0.34,
+      "y": 0.48,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the pierced stone screens",
+        "hi-IN": "पत्थर की जालियाँ",
+        "mr-IN": "दगडी जाळ्या",
+        "gu-IN": "પથ્થરની જાળી",
+        "ta-IN": "கல்லில் துளையிட்ட திரைகள்",
+        "bn-IN": "পাথরের জালি",
+        "te-IN": "రాతి జాలీలు"
+      }
+    },
+    {
+      "id": "hall",
+      "x": 0.2,
+      "y": 0.63,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the halls on either side of me",
+        "hi-IN": "मेरे दोनों तरफ़ के कमरे",
+        "mr-IN": "माझ्या दोन्ही बाजूंचे दालन",
+        "gu-IN": "મારી બંને બાજુના ખંડ",
+        "ta-IN": "என் இருபுறமும் உள்ள மண்டபங்கள்",
+        "bn-IN": "আমার দু'পাশের কক্ষ",
+        "te-IN": "నా రెండు వైపుల మందిరాలు"
+      }
+    },
+    {
+      "id": "quay",
+      "x": 0.5,
+      "y": 0.8,
+      "z": 0.8,
+      "label": {
+        "en-IN": "the quay at Apollo Bunder",
+        "hi-IN": "अपोलो बंदर का घाट",
+        "mr-IN": "अपोलो बंदरचा धक्का",
+        "gu-IN": "એપોલો બંદરનો ધક્કો",
+        "ta-IN": "அப்பல்லோ பந்தர் துறைமுகக் கரை",
+        "bn-IN": "অ্যাপোলো বন্দরের ঘাট",
+        "te-IN": "అపోలో బందర్ రేవు"
+      }
+    },
+    {
+      "id": "harbour",
+      "x": 0.5,
+      "y": 0.92,
+      "z": 0.92,
+      "label": {
+        "en-IN": "the harbour water before me",
+        "hi-IN": "मेरे आगे का समंदर",
+        "mr-IN": "माझ्यासमोरचा समुद्र",
+        "gu-IN": "મારી સામેનો દરિયો",
+        "ta-IN": "என் முன்னால் துறைமுகக் கடல்",
+        "bn-IN": "আমার সামনের সমুদ্র",
+        "te-IN": "నా ముందున్న సముద్రం"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.78,
+      "y": 0.15,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the monsoon sky above me",
+        "hi-IN": "मेरे ऊपर बरसात का आसमान",
+        "mr-IN": "माझ्यावरचे पावसाळी आकाश",
+        "gu-IN": "મારી ઉપરનું ચોમાસાનું આકાશ",
+        "ta-IN": "என் மேலே பருவமழை வானம்",
+        "bn-IN": "আমার উপরের বর্ষার আকাশ",
+        "te-IN": "నా పైన వర్షాకాల ఆకాశం"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/gateway-of-india/era-1900.png",
+      "caption": {
+        "en-IN": "As an early camera would have found this shore, before I was built.",
+        "hi-IN": "जैसे पुराने कैमरे ने यह किनारा देखा होता, मेरे बनने से पहले।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "The Gateway of India was erected to commemorate the landing of King George V and Queen Mary at Apollo Bunder on 2 December 1911, on their way to the Delhi Durbar. It was the first visit to India by a reigning British monarch.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record; Encyclopaedia Britannica, Gateway of India",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "The arch did not exist when the royal couple arrived. What stood at Apollo Bunder in December 1911 was only a temporary model of the design that would later be built in stone.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "The Gateway was designed by the Scottish architect George Wittet, consulting architect to the Bombay government, who also designed the Prince of Wales Museum nearby. His final design was sanctioned in 1914.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The foundation stone was laid on 31 March 1913 by the Governor of Bombay, Sir George Sydenham Clarke.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "Before the arch could rise the ground itself had to be made: Apollo Bunder was reclaimed from the harbour between 1915 and 1919 to provide a foundation. Construction of the arch followed in the early 1920s.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "The Gateway is an arch 26 metres high. Its central dome is 15 metres in diameter, and the structure is built of yellow basalt with reinforced concrete.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record; Encyclopaedia Britannica, Gateway of India",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "The style is Indo-Saracenic, with elements drawn from the Muslim architecture of sixteenth-century Gujarat. The grand approach road and esplanade that Wittet's scheme envisaged were never built, for lack of funds.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record; Encyclopaedia Britannica, Gateway of India",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s8",
+      "text": "The Gateway was opened on 4 December 1924 by the Viceroy, Rufus Isaacs, Earl of Reading. Afterwards it served as the ceremonial entrance to India for Viceroys and newly arriving Governors of Bombay, who would land at Apollo Bunder and pass beneath it.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record; Encyclopaedia Britannica, Gateway of India",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "On 28 February 1948 the 1st Battalion, Somerset Light Infantry — the last British troops in India — paraded through Bombay and halted at the Gateway for a farewell ceremony before embarking for home. An Indian Army guard of honour gave the salute, and the regiment was presented with a silver replica of the Gateway itself.",
+      "citation": "National Army Museum, London, collection record: the last British troops to leave India, Bombay, 1948",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "A statue of Chhatrapati Shivaji Maharaj was installed facing the Gateway in 1961, and a statue of Swami Vivekananda stands nearby. The Gateway is not a centrally protected monument of the Archaeological Survey of India: it is a Grade-I heritage structure protected and maintained by the Directorate of Archaeology and Museums, Government of Maharashtra.",
+      "citation": "Directorate of Archaeology and Museums, Government of Maharashtra, Gateway of India site record and conservation plan",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am the Gateway of India. Ships have come and gone past me for a hundred years — stay a while and ask.",
+    "hi-IN": "मैं गेटवे ऑफ़ इंडिया हूँ। सौ बरस से जहाज़ मेरे सामने से आते-जाते रहे हैं — ज़रा ठहरो और पूछो।",
+    "mr-IN": "मी गेटवे ऑफ इंडिया. शंभर वर्षे जहाजं माझ्यासमोरून येत-जात आहेत — जरा थांबा आणि विचारा.",
+    "gu-IN": "હું ગેટવે ઓફ ઇન્ડિયા છું. સો વર્ષથી વહાણો મારી સામેથી આવે-જાય છે — થોડું રોકાઓ ને પૂછો.",
+    "ur-IN": "میں گیٹ وے آف انڈیا ہوں۔ سو برس سے جہاز میرے سامنے سے آتے جاتے رہے ہیں — ذرا ٹھہرو اور پوچھو۔",
+    "bn-IN": "আমি গেটওয়ে অফ ইন্ডিয়া। একশো বছর ধরে জাহাজ আমার সামনে দিয়ে আসা-যাওয়া করছে — একটু দাঁড়াও, জিজ্ঞেস করো।",
+    "ta-IN": "நான் கேட்வே ஆஃப் இந்தியா. நூறு ஆண்டுகளாகக் கப்பல்கள் என்முன் வந்து போகின்றன — சற்று நில்லுங்கள், கேளுங்கள்.",
+    "te-IN": "నేను గేట్‌వే ఆఫ్ ఇండియా. వంద ఏళ్లుగా ఓడలు నా ముందు నుంచి వస్తూ పోతున్నాయి — కాసేపు ఆగి అడగండి."
+  }
+}

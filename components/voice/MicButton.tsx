@@ -221,11 +221,15 @@ export function MicButton({
         onKeyDown={handleKey}
         onContextMenu={(e) => e.preventDefault()}
         className={[
-          'relative flex items-center justify-center rounded-full border transition-transform duration-150',
-          'touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-sandstone-200/70',
+          // The one loud object in the product. Idle it is warm glass with a
+          // faint hearth-glow behind it; listening it becomes solid sandstone,
+          // the only saturated surface anywhere on the Stage.
+          'relative flex items-center justify-center rounded-full border',
+          'transition-[transform,background-color,border-color,box-shadow] duration-base ease-bol',
+          'touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-sandstone-200 focus-visible:ring-offset-2 focus-visible:ring-offset-black/40',
           listening
-            ? 'scale-95 border-sandstone-300/70 bg-sandstone-500/85 animate-listen-pulse'
-            : 'border-white/15 bg-black/45 backdrop-blur-md',
+            ? 'scale-95 animate-listen-pulse border-sandstone-200/80 bg-sandstone-500 shadow-[0_10px_40px_-8px_rgba(193,98,47,0.75)]'
+            : 'border-sandstone-100/25 bg-black/40 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_10px_36px_-14px_rgba(226,162,113,0.55)]',
           disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer active:scale-95',
         ].join(' ')}
         style={{ width: size * 0.62, height: size * 0.62 }}

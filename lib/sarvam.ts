@@ -3,6 +3,7 @@ import 'server-only';
 import { LRU } from './lru';
 import { SarvamAuth, SarvamBadResponse, SarvamError, SarvamNotConfigured, SarvamRateLimit, isRetryable } from './errors';
 import { normalizeLang, resolveVoice, type LangCode } from './langs';
+import { castVoice, isSpeakerRejection, safeDefaultSpeaker } from './voices';
 import { b64ToBytes, bytesToB64, concatAudio } from './wav';
 
 /**
@@ -54,6 +55,14 @@ export interface SpeakResult {
   requestedLang: LangCode;
   degraded: boolean;
   speaker: string;
+  /** Bulbul's speaking rate actually sent, after clamping to the model's window. */
+  pace: number;
+  /**
+   * Set when Bulbul rejected the speaker we cast and we retried with the model's
+   * own default. Non-null means a casting choice in lib/voices.ts is wrong and
+   * someone needs to see it — the route logs it as a `speaker_fallback` event.
+   */
+  speakerFallback: { from: string; to: string; reason: string } | null;
   chunks: number;
   latencyMs: number;
   cached: boolean;
@@ -357,42 +366,109 @@ export async function speak(
   text: string,
   lang: string,
   speaker?: string,
-  opts: { pace?: number; enablePreprocessing?: boolean; signal?: AbortSignal; bypassCache?: boolean } = {},
+  opts: {
+    pace?: number;
+    enablePreprocessing?: boolean;
+    signal?: AbortSignal;
+    bypassCache?: boolean;
+    /** Casts the monument's own voice. Unknown or absent falls back to the language default. */
+    monumentId?: string | null;
+  } = {},
 ): Promise<SpeakResult> {
   const started = Date.now();
-  const target = resolveVoice(lang, speaker);
+
+  /**
+   * SPEAKER SELECTION LIVES IN lib/voices.ts, NOT HERE.
+   *
+   * It has to, because the answer is model-dependent: bulbul:v2 and bulbul:v3
+   * have completely disjoint speaker catalogues, and the v2 name every language
+   * in lib/langs.ts used to carry ('anushka') is rejected outright by the v3
+   * model this file requests by default. castVoice() applies the resolution
+   * order — env force, caller, monument, language, model default — and then
+   * guarantees the name it returns is one the configured model actually holds.
+   */
+  const cast = castVoice({
+    lang: resolveVoice(lang).voiceLang,
+    monumentId: opts.monumentId ?? null,
+    speaker,
+    pace: opts.pace ?? null,
+  });
+  const target = resolveVoice(lang, cast.speaker);
   const clean = text.trim();
   if (!clean) throw new SarvamBadResponse('speak() called with empty text');
 
-  const cacheKey = JSON.stringify([clean, target.voiceLang, target.speaker, opts.pace ?? 1]);
+  /**
+   * textLang is in the key even though it does not change a single byte of audio.
+   *
+   * The cached SpeakResult carries `requestedLang` and `degraded`, which describe
+   * THE VISITOR, not the waveform. Keying on voiceLang alone meant the first caller
+   * to miss set those fields for everyone afterwards: speak(line, 'sa-IN') then
+   * speak(the same line, 'hi-IN') told the Hindi visitor their language could not
+   * be spoken; in the other order it silently swallowed the Sanskrit speaker's
+   * voice-gap notice. Not hypothetical — didNotCatch('sa-IN') resolves to the exact
+   * same Hindi string, so a demo hits this by simply mishearing two visitors.
+   */
+  const cacheKey = JSON.stringify([clean, target.voiceLang, target.textLang, target.speaker, cast.pace]);
   if (!opts.bypassCache) {
     const hit = ttsCache.get(cacheKey);
     if (hit) return { ...hit, cached: true, latencyMs: Date.now() - started };
   }
 
   const chunks = chunkForTts(clean);
-  const buffers: Uint8Array[] = [];
 
-  for (const chunk of chunks) {
-    const body = await sarvamFetch<any>('/text-to-speech', {
-      json: {
-        text: chunk,
-        target_language_code: target.voiceLang,
-        model: MODELS.tts,
-        speaker: target.speaker,
-        pace: opts.pace ?? 1.0,
-        enable_preprocessing: opts.enablePreprocessing ?? true,
-      },
-      signal: opts.signal,
-    });
-    const b64s = readAudioB64(body);
-    if (b64s.length === 0) {
-      throw new SarvamBadResponse('Bulbul returned no audio field (checked audios/audio/data.*)', {
-        endpoint: '/text-to-speech',
-        body: Object.keys(body ?? {}),
+  const synthesize = async (voice: string): Promise<Uint8Array[]> => {
+    const buffers: Uint8Array[] = [];
+    for (const chunk of chunks) {
+      const body = await sarvamFetch<any>('/text-to-speech', {
+        json: {
+          text: chunk,
+          target_language_code: target.voiceLang,
+          model: MODELS.tts,
+          speaker: voice,
+          pace: cast.pace,
+          enable_preprocessing: opts.enablePreprocessing ?? true,
+        },
+        signal: opts.signal,
       });
+      const b64s = readAudioB64(body);
+      if (b64s.length === 0) {
+        throw new SarvamBadResponse('Bulbul returned no audio field (checked audios/audio/data.*)', {
+          endpoint: '/text-to-speech',
+          body: Object.keys(body ?? {}),
+        });
+      }
+      for (const b of b64s) buffers.push(b64ToBytes(b));
     }
-    for (const b of b64s) buffers.push(b64ToBytes(b));
+    return buffers;
+  };
+
+  /**
+   * SILENCE IS THE WORST OUTCOME.
+   *
+   * Every casting choice in lib/voices.ts was made without hearing the voice,
+   * against a catalogue we could only read about. If Bulbul refuses the name we
+   * sent, retrying once with the model's own default costs ~200ms and keeps the
+   * monument talking; giving up loses the visitor's turn entirely. Only a 4xx
+   * that actually looks like a speaker complaint is retried — a 5xx or a
+   * timeout is a real outage and must surface as one rather than be disguised
+   * as a different voice.
+   */
+  const fallbackSpeaker = safeDefaultSpeaker(cast.model);
+  let speakerFallback: SpeakResult['speakerFallback'] = null;
+  let usedSpeaker = target.speaker;
+  let buffers: Uint8Array[];
+  try {
+    buffers = await synthesize(usedSpeaker);
+  } catch (err) {
+    if (usedSpeaker === fallbackSpeaker || !isSpeakerRejection(err, usedSpeaker)) throw err;
+    const reason = (err as Error).message;
+    console.warn(
+      `[sarvam] Bulbul rejected speaker "${usedSpeaker}" for ${MODELS.tts}; retrying with "${fallbackSpeaker}". ` +
+        `Fix the casting in lib/voices.ts. (${reason})`,
+    );
+    buffers = await synthesize(fallbackSpeaker);
+    speakerFallback = { from: usedSpeaker, to: fallbackSpeaker, reason: reason.slice(0, 200) };
+    usedSpeaker = fallbackSpeaker;
   }
 
   const { bytes, mime } = concatAudio(buffers);
@@ -406,7 +482,9 @@ export async function speak(
     voiceLang: target.voiceLang,
     requestedLang: target.textLang,
     degraded: target.degraded,
-    speaker: target.speaker,
+    speaker: usedSpeaker,
+    pace: cast.pace,
+    speakerFallback,
     chunks: chunks.length,
     latencyMs: Date.now() - started,
     cached: false,
@@ -505,16 +583,61 @@ export async function translate(
 // readDocument() — Sarvam Vision / Akshar. Indic OCR for plaques and signboards.
 // ---------------------------------------------------------------------------
 
+/**
+ * Sarvam's parse endpoint has returned its extracted text base64-encoded in some
+ * versions and as plain text in others. Handing base64 straight to the rewrite
+ * model would produce confident nonsense from what looks like a successful OCR —
+ * a silent failure, and the worst kind, because the side-by-side "proof" panel
+ * would be showing the judge a wall of gibberish.
+ *
+ * So decode only when the string is unambiguously base64 AND the decoded bytes are
+ * valid UTF-8 containing letters. Indic scripts are multi-byte, so a mis-decode
+ * reliably produces replacement characters, which is the check that catches it.
+ */
+function maybeDecodeBase64(value: string): string {
+  const compact = value.replace(/\s+/g, '');
+  // Real OCR output contains spaces and punctuation; base64 does not.
+  if (compact.length < 32 || compact.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(compact)) return value;
+  try {
+    const decoded = Buffer.from(compact, 'base64').toString('utf8');
+    if (!decoded || decoded.includes('�')) return value;
+    // Must look like language, not binary that happened to decode.
+    if (!/\p{L}/u.test(decoded)) return value;
+    return decoded.trim();
+  } catch {
+    return value;
+  }
+}
+
 export async function readDocument(
   file: Blob | Buffer | Uint8Array,
   prompt?: string,
-  opts: { filename?: string; signal?: AbortSignal } = {},
+  opts: {
+    filename?: string;
+    signal?: AbortSignal;
+    /** Single-page by default — a plaque photo is one page. */
+    pageNumber?: number;
+    /** 'large' is the accurate Sarvam Vision model; 'small' is faster and weaker. */
+    mode?: 'large' | 'small';
+  } = {},
 ): Promise<string> {
   const blob = toBlob(file, 'image/jpeg');
 
   const form = new FormData();
   form.append('file', blob, opts.filename ?? 'plaque.jpg');
   if (prompt) form.append('prompt', prompt);
+
+  // Confirmed against Sarvam's published examples: /parse/parsepdf takes these three
+  // alongside the file. Despite the endpoint name it accepts JPEG and PNG as well as
+  // PDF, which is what makes the phone-photo plaque path viable at all.
+  //   page_number    — a plaque photo is always a single page
+  //   sarvam_mode    — "large" is the accurate model; "small" trades accuracy for speed
+  //   prompt_caching — pointless here, every plaque photo is different
+  // Sending them is the safer bet than omitting them: an unknown field is normally
+  // ignored, whereas a missing required field is a 400.
+  form.append('page_number', String(opts.pageNumber ?? 1));
+  form.append('sarvam_mode', opts.mode ?? process.env.SARVAM_VISION_MODE ?? 'large');
+  form.append('prompt_caching', 'false');
 
   // Sarvam has shipped this under a couple of paths across versions. Try in order.
   const candidates = (process.env.SARVAM_VISION_PATHS ?? '/parse/parsepdf,/v1/document/parse,/document-parse')
@@ -528,7 +651,7 @@ export async function readDocument(
       const body = await sarvamFetch<any>(path, { form, attempts: 2, signal: opts.signal, timeoutMs: 90_000 });
       const out =
         pick(body, 'output', 'text', 'content', 'markdown', 'parsed_text', 'data.output', 'data.text') ?? '';
-      if (typeof out === 'string' && out.trim()) return out.trim();
+      if (typeof out === 'string' && out.trim()) return maybeDecodeBase64(out.trim());
       if (Array.isArray(out)) return out.map((p: any) => (typeof p === 'string' ? p : pick(p, 'text', 'content') ?? '')).join('\n\n').trim();
       lastErr = new SarvamBadResponse(`Vision at ${path} returned no text`, { endpoint: path, body: Object.keys(body ?? {}) });
     } catch (err) {

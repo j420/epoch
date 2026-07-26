@@ -31,15 +31,21 @@ export function LanguageChip({ lang, notice = null, className = '' }: LanguageCh
   const { native, english } = detectedChip(lang);
 
   return (
-    <div className={`flex flex-col items-start gap-1.5 ${className}`}>
-      <span className="bol-chip indic-text" role="status" aria-live="polite">
-        <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-sandstone-300" />
-        <span>{native}</span>
-        <span className="text-sandstone-200/50">· {english} detected</span>
+    <div className={`flex flex-col items-start gap-2 ${className}`}>
+      <span
+        className="bol-chip animate-fade-in border-sandstone-200/30 bg-black/55 py-1.5 pl-2.5 pr-3.5"
+        role="status"
+        aria-live="polite"
+      >
+        <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-sandstone-300 shadow-[0_0_8px_rgba(226,162,113,0.9)]" />
+        <span lang={lang} className="indic-text text-sm text-sandstone-50">
+          {native}
+        </span>
+        <span className="text-[0.7rem] uppercase tracking-[0.1em] text-sandstone-200/55">{english} detected</span>
       </span>
 
       {notice ? (
-        <span className="bol-glass indic-text max-w-xs px-3 py-2 text-[11px] leading-relaxed text-sandstone-200/75">
+        <span className="bol-glass indic-text animate-fade-in max-w-[17rem] px-3.5 py-2.5 text-[11px] leading-relaxed text-sandstone-200/80">
           {notice}
         </span>
       ) : null}

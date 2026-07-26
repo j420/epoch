@@ -1,0 +1,211 @@
+{
+  "id": "hawa-mahal",
+  "city": "Jaipur",
+  "aspect": 0.5,
+  "hero": "/monuments/hawa-mahal/hero.png",
+  "depth": "/monuments/hawa-mahal/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Hawa Mahal",
+    "hi-IN": "हवा महल",
+    "ur-IN": "ہوا محل",
+    "mr-IN": "हवा महाल",
+    "gu-IN": "હવા મહેલ",
+    "bn-IN": "হাওয়া মহল",
+    "ta-IN": "ஹவா மஹால்",
+    "te-IN": "హవా మహల్",
+    "kn-IN": "ಹವಾ ಮಹಲ್",
+    "ml-IN": "ഹവാ മഹൽ",
+    "pa-IN": "ਹਵਾ ਮਹਿਲ",
+    "od-IN": "ହୱା ମହଲ"
+  },
+  "regions": [
+    {
+      "id": "jharokhas",
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5,
+      "label": {
+        "en-IN": "my many little windows",
+        "hi-IN": "मेरे सैकड़ों झरोखे",
+        "ur-IN": "میرے سیکڑوں جھروکے",
+        "ta-IN": "என் நூற்றுக்கணக்கான சிறு சாளரங்கள்",
+        "bn-IN": "আমার শত শত ছোট জানালা",
+        "te-IN": "నా వందల చిన్న కిటికీలు",
+        "mr-IN": "माझे शेकडो झरोके"
+      }
+    },
+    {
+      "id": "jaali",
+      "x": 0.7,
+      "y": 0.45,
+      "z": 0.5,
+      "label": {
+        "en-IN": "the carved stone lattice",
+        "hi-IN": "पत्थर की जाली",
+        "ur-IN": "پتھر کی جالی",
+        "ta-IN": "செதுக்கிய கல் சல்லடை",
+        "bn-IN": "খোদাই করা পাথরের জালি",
+        "te-IN": "చెక్కిన రాతి జాలీ",
+        "mr-IN": "कोरलेली दगडी जाळी"
+      }
+    },
+    {
+      "id": "crown",
+      "x": 0.5,
+      "y": 0.31,
+      "z": 0.38,
+      "label": {
+        "en-IN": "my topmost storey",
+        "hi-IN": "मेरी सबसे ऊपरी मंज़िल",
+        "ur-IN": "میری سب سے اوپری منزل",
+        "ta-IN": "என் உச்சித் தளம்",
+        "bn-IN": "আমার সবচেয়ে উপরের তলা",
+        "te-IN": "నా అత్యున్నత అంతస్తు",
+        "mr-IN": "माझा सर्वात वरचा मजला"
+      }
+    },
+    {
+      "id": "cornice",
+      "x": 0.3,
+      "y": 0.575,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the white cornices between my storeys",
+        "hi-IN": "मंज़िलों के बीच के सफ़ेद छज्जे",
+        "ur-IN": "منزلوں کے درمیان سفید چھجے",
+        "ta-IN": "தளங்களுக்கிடையேயான வெண் விளிம்புகள்",
+        "bn-IN": "তলার মাঝের সাদা কার্নিশ",
+        "te-IN": "అంతస్తుల మధ్య తెల్లని చూరులు",
+        "mr-IN": "मजल्यांमधले पांढरे छज्जे"
+      }
+    },
+    {
+      "id": "arcade",
+      "x": 0.5,
+      "y": 0.8,
+      "z": 0.65,
+      "label": {
+        "en-IN": "the arcade along my base",
+        "hi-IN": "मेरे नीचे की मेहराबदार क़तार",
+        "ur-IN": "میرے نیچے کی محرابی قطار",
+        "ta-IN": "என் அடித்தளத்தின் வளைவு வரிசை",
+        "bn-IN": "আমার নিচের খিলানসারি",
+        "te-IN": "నా అడుగున ఉన్న తోరణ వరుస",
+        "mr-IN": "माझ्या तळाशीची कमानरांग"
+      }
+    },
+    {
+      "id": "street",
+      "x": 0.5,
+      "y": 0.95,
+      "z": 0.9,
+      "label": {
+        "en-IN": "the bazaar street below me",
+        "hi-IN": "मेरे नीचे की बाज़ार गली",
+        "ur-IN": "میرے نیچے کا بازار",
+        "ta-IN": "என் கீழுள்ள சந்தைத் தெரு",
+        "bn-IN": "আমার নিচের বাজার-রাস্তা",
+        "te-IN": "నా కింది బజారు వీధి",
+        "mr-IN": "माझ्या खालची बाजारपेठ"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.2,
+      "y": 0.14,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the Jaipur sky above me",
+        "hi-IN": "मेरे ऊपर जयपुर का आसमान",
+        "ur-IN": "میرے اوپر جے پور کا آسمان",
+        "ta-IN": "என் மேலே ஜெய்ப்பூர் வானம்",
+        "bn-IN": "আমার উপরে জয়পুরের আকাশ",
+        "te-IN": "నా పైన జైపూర్ ఆకాశం",
+        "mr-IN": "माझ्यावरचे जयपूरचे आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/hawa-mahal/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me a little over a century ago.",
+        "hi-IN": "जैसे सौ बरस पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "Hawa Mahal was completed in 1799 for Maharaja Sawai Pratap Singh, who ruled Jaipur from 1778 to 1803. Its architect was Lal Chand Ustad.",
+      "citation": "Rajasthan Department of Archaeology and Museums, Hawa Mahal; Encyclopaedia Britannica, Hawa Mahal",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "It was built as an extension of the zenana, the women's quarters, of the City Palace. The facade is a viewing screen: royal women observing purdah could watch the bazaar and its processions from inside without being seen from the street.",
+      "citation": "Encyclopaedia Britannica, Hawa Mahal; Rajasthan Department of Archaeology and Museums",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "The street facade carries 953 jharokhas — small projecting windows — each screened with carved sandstone jaali.",
+      "citation": "Rajasthan Department of Archaeology and Museums, Hawa Mahal",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The facade stands about 15 metres high, and it is a screen more than a building: the top three of its five storeys are barely one room deep.",
+      "citation": "Encyclopaedia Britannica, Hawa Mahal",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "The building is five storeys tall and pyramidal in outline, each level stepping back from the one below.",
+      "citation": "Rajasthan Department of Archaeology and Museums, Hawa Mahal; Encyclopaedia Britannica",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "It is built of red and pink sandstone, with the window motifs picked out in white limewash. The jaali screens draw the breeze through and cool the chambers behind, which is how it came by its name, the Palace of Winds.",
+      "citation": "Encyclopaedia Britannica, Hawa Mahal; Rajasthan Department of Archaeology and Museums",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "There are no staircases inside. The five levels are joined by ramps.",
+      "citation": "Rajasthan Department of Archaeology and Museums, Hawa Mahal",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s8",
+      "text": "Sawai Pratap Singh was a devotee of Krishna who wrote devotional verse under the pen-name Brajnidhi, and the stepped, fanned silhouette of the building is said to echo Krishna's mukut, his crown.",
+      "citation": "Rajasthan Department of Archaeology and Museums, Hawa Mahal",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "The style fuses Rajput and Mughal work: domed chhatris, fluted pillars and lotus and floral motifs from the one tradition, stone filigree and arches from the other. The five floors carry names — Sharad Mandir, Ratan Mandir, Vichitra Mandir, Prakash Mandir and Hawa Mandir, the wind chamber.",
+      "citation": "Encyclopaedia Britannica, Hawa Mahal; Rajasthan Department of Archaeology and Museums",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "The building was restored in 2005 and 2006, the first major work on it in roughly fifty years. It is a state-protected monument in the care of the Rajasthan Department of Archaeology and Museums, with an archaeological museum in its courtyard, and since 6 July 2019 it has stood inside a UNESCO World Heritage property: Jaipur City, Rajasthan, inscribed under criteria (ii), (iv) and (vi).",
+      "citation": "Rajasthan Department of Archaeology and Museums, conservation record; UNESCO World Heritage Centre, Jaipur City, Rajasthan",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am Hawa Mahal. Nine hundred and fifty-three little windows watch the bazaar through me — ask me what they have seen.",
+    "hi-IN": "मैं हवा महल हूँ। मेरे नौ सौ तिरपन झरोखे बाज़ार को देखते रहे हैं — पूछो, उन्होंने क्या देखा है।",
+    "ur-IN": "میں ہوا محل ہوں۔ میرے نو سو ترپن جھروکے بازار کو دیکھتے رہے ہیں — پوچھو، انہوں نے کیا دیکھا ہے۔",
+    "mr-IN": "मी हवा महाल. माझे नऊशे त्रेपन्न झरोके बाजार पाहत आले आहेत — त्यांनी काय पाहिले, विचारा.",
+    "gu-IN": "હું હવા મહેલ છું. મારા નવસો ત્રેપન ઝરૂખા બજારને જોતા આવ્યા છે — તેમણે શું જોયું, પૂછો.",
+    "bn-IN": "আমি হাওয়া মহল। আমার নয়শো তিপ্পান্নটা ছোট জানালা বাজার দেখে এসেছে — জিজ্ঞেস করো, তারা কী দেখেছে।",
+    "ta-IN": "நான் ஹவா மஹால். என் தொள்ளாயிரத்து ஐம்பத்து மூன்று சிறு சாளரங்கள் சந்தையைப் பார்த்து வந்துள்ளன — அவை கண்டதைக் கேளுங்கள்.",
+    "te-IN": "నేను హవా మహల్. నా తొమ్మిది వందల యాభై మూడు కిటికీలు బజారును చూస్తూ వచ్చాయి — అవి చూసినది అడగండి."
+  }
+}

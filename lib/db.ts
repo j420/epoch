@@ -319,6 +319,24 @@ function tally(values: (string | null | undefined)[]): { code: string; count: nu
   return [...counts.entries()].map(([code, count]) => ({ code, count })).sort((a, b) => b.count - a.count);
 }
 
+/**
+ * Wait for every queued file-store write to reach disk.
+ *
+ * `logEvent` and friends deliberately do NOT await `persist()` — analytics must
+ * never sit in the latency budget of a voice turn. The cost is that a reader
+ * hitting store.json immediately after a write can miss it, which made the
+ * language suite flake at roughly one run in eight: eight event assertions
+ * failing together with "0 lang_switch events", then passing on a re-run.
+ *
+ * Anything that reads the store directly rather than through this module must
+ * await this first. Production never needs it; test harnesses always do.
+ */
+export async function flushStore(): Promise<void> {
+  // Two turns: the second awaits any write that the first one's completion queued.
+  await writeQueue;
+  await writeQueue;
+}
+
 /** Used by scripts/seed.ts and the demo reset key. */
 export async function resetFileStore(): Promise<void> {
   memoryStore = structuredClone(EMPTY);

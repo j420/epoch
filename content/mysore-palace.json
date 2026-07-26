@@ -1,0 +1,225 @@
+{
+  "id": "mysore-palace",
+  "city": "Mysuru",
+  "aspect": 0.75,
+  "hero": "/monuments/mysore-palace/hero.png",
+  "depth": "/monuments/mysore-palace/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Mysore Palace",
+    "kn-IN": "ಮೈಸೂರು ಅರಮನೆ",
+    "hi-IN": "मैसूर महल",
+    "ta-IN": "மைசூர் அரண்மனை",
+    "te-IN": "మైసూరు రాజప్రాసాదం",
+    "ml-IN": "മൈസൂർ കൊട്ടാരം",
+    "bn-IN": "মহীশূর প্রাসাদ",
+    "mr-IN": "म्हैसूर राजवाडा",
+    "gu-IN": "મૈસુર મહેલ",
+    "pa-IN": "ਮੈਸੂਰ ਮਹਿਲ",
+    "ur-IN": "میسور محل",
+    "od-IN": "ମହୀଶୂର ରାଜପ୍ରାସାଦ"
+  },
+  "regions": [
+    {
+      "id": "tower",
+      "x": 0.5,
+      "y": 0.3,
+      "z": 0.4,
+      "label": {
+        "en-IN": "my five-storey tower",
+        "kn-IN": "ನನ್ನ ಐದು ಅಂತಸ್ತಿನ ಗೋಪುರ",
+        "hi-IN": "मेरा पाँच मंज़िला बुर्ज",
+        "ta-IN": "என் ஐந்து மாடிக் கோபுரம்",
+        "te-IN": "నా ఐదు అంతస్తుల గోపురం",
+        "ml-IN": "എന്റെ അഞ്ചുനില ഗോപുരം",
+        "bn-IN": "আমার পাঁচতলা মিনার",
+        "mr-IN": "माझा पाच मजली मनोरा"
+      }
+    },
+    {
+      "id": "domes",
+      "x": 0.196,
+      "y": 0.4,
+      "z": 0.46,
+      "label": {
+        "en-IN": "my pink marble domes",
+        "kn-IN": "ನನ್ನ ಗುಲಾಬಿ ಅಮೃತಶಿಲೆಯ ಗುಮ್ಮಟಗಳು",
+        "hi-IN": "मेरे गुलाबी संगमरमरी गुंबद",
+        "ta-IN": "என் இளஞ்சிவப்புப் பளிங்கு குவிமாடங்கள்",
+        "te-IN": "నా గులాబీ పాలరాతి గోపురాలు",
+        "ml-IN": "എന്റെ പിങ്ക് മാർബിൾ താഴികക്കുടങ്ങൾ",
+        "bn-IN": "আমার গোলাপি মর্মর গম্বুজ",
+        "mr-IN": "माझे गुलाबी संगमरवरी घुमट"
+      }
+    },
+    {
+      "id": "arcade",
+      "x": 0.18,
+      "y": 0.63,
+      "z": 0.6,
+      "label": {
+        "en-IN": "my long arcades",
+        "kn-IN": "ನನ್ನ ಉದ್ದನೆಯ ಕಮಾನು ಸಾಲುಗಳು",
+        "hi-IN": "मेरी लंबी मेहराबदार क़तारें",
+        "ta-IN": "என் நீண்ட வளைவு வரிசைகள்",
+        "te-IN": "నా పొడవాటి తోరణ వరుసలు",
+        "ml-IN": "എന്റെ നീണ്ട കമാനനിരകൾ",
+        "bn-IN": "আমার লম্বা খিলানসারি",
+        "mr-IN": "माझ्या लांब कमानरांगा"
+      }
+    },
+    {
+      "id": "porch",
+      "x": 0.5,
+      "y": 0.72,
+      "z": 0.75,
+      "label": {
+        "en-IN": "the porch you enter by",
+        "kn-IN": "ನೀವು ಒಳಬರುವ ಮುಖಮಂಟಪ",
+        "hi-IN": "जिस ड्योढ़ी से तुम आते हो",
+        "ta-IN": "நீங்கள் நுழையும் முகப்பு மண்டபம்",
+        "te-IN": "మీరు ప్రవేశించే ముఖమండపం",
+        "ml-IN": "നിങ്ങൾ കടന്നുവരുന്ന മുഖമണ്ഡപം",
+        "bn-IN": "যে বারান্দা দিয়ে তুমি ঢোকো",
+        "mr-IN": "ज्या दरबारी सोप्यातून तुम्ही येता"
+      }
+    },
+    {
+      "id": "wings",
+      "x": 0.86,
+      "y": 0.72,
+      "z": 0.6,
+      "label": {
+        "en-IN": "my long grey granite wings",
+        "kn-IN": "ನನ್ನ ಉದ್ದನೆಯ ಬೂದು ಗ್ರಾನೈಟ್ ರೆಕ್ಕೆಗಳು",
+        "hi-IN": "मेरे लंबे स्लेटी ग्रेनाइट पंख",
+        "ta-IN": "என் நீண்ட சாம்பல் கருங்கல் பகுதிகள்",
+        "te-IN": "నా పొడవాటి బూడిద గ్రానైట్ రెక్కలు",
+        "ml-IN": "എന്റെ നീണ്ട ചാരനിറ കരിങ്കൽ ചിറകുകൾ",
+        "bn-IN": "আমার লম্বা ধূসর গ্রানাইট বাহু",
+        "mr-IN": "माझे लांब करड्या ग्रॅनाइटचे बाहू"
+      }
+    },
+    {
+      "id": "lawn",
+      "x": 0.5,
+      "y": 0.95,
+      "z": 0.9,
+      "label": {
+        "en-IN": "the ground where the Dasara procession forms",
+        "kn-IN": "ದಸರಾ ಮೆರವಣಿಗೆ ಸೇರುವ ಅಂಗಳ",
+        "hi-IN": "वह मैदान जहाँ दशहरे की सवारी जुड़ती है",
+        "ta-IN": "தசரா ஊர்வலம் ஒன்றுகூடும் திடல்",
+        "te-IN": "దసరా ఊరేగింపు సమకూరే ప్రాంగణం",
+        "ml-IN": "ദസറ ഘോഷയാത്ര ഒരുങ്ങുന്ന മുറ്റം",
+        "bn-IN": "যেখানে দশেরার শোভাযাত্রা জড়ো হয়",
+        "mr-IN": "जिथे दसऱ्याची मिरवणूक जमते ते मैदान"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.2,
+      "y": 0.12,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the sky above me",
+        "kn-IN": "ನನ್ನ ಮೇಲಿನ ಆಕಾಶ",
+        "hi-IN": "मेरे ऊपर का आसमान",
+        "ta-IN": "என் மேலே வானம்",
+        "te-IN": "నా పైన ఆకాశం",
+        "ml-IN": "എനിക്കു മുകളിലെ ആകാശം",
+        "bn-IN": "আমার উপরের আকাশ",
+        "mr-IN": "माझ्यावरचे आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/mysore-palace/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera would have found me while I was still being built.",
+        "kn-IN": "ನನ್ನ ಕಟ್ಟಡ ಕೆಲಸ ನಡೆಯುತ್ತಿದ್ದಾಗ ಕ್ಯಾಮೆರಾ ನನ್ನನ್ನು ಕಂಡಂತೆ.",
+        "hi-IN": "जब मैं बन ही रहा था, तब कैमरे ने जैसे मुझे देखा होता।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "This is Amba Vilas Palace, the official residence of the Wadiyar dynasty and the seat of the Kingdom of Mysore. The Wadiyars ruled from 1399 until the kingdom's merger with the Indian Union around 1950.",
+      "citation": "Mysore Palace Board; Karnataka Department of Archaeology, Museums and Heritage",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "The palace that stood here before was largely of wood, and it burned on 20 February 1897 during the wedding of Princess Jayalakshammanni, eldest daughter of Chamarajendra Wadiyar X. The fire destroyed roughly a fifth of the building, including the Durbar Hall, the armoury, the Sanskrit library and the music room.",
+      "citation": "Mysore Palace Board, History",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "The present palace was commissioned in 1897 on behalf of the boy-Maharaja Krishnaraja Wadiyar IV, then a minor, by his mother and Regent, Maharani Kempananjammanni Vani Vilasa Sannidhana. The British architect Henry Irwin, who had designed the Madras High Court, drew the plans, and executive engineer B. P. Raghavulu Naidu oversaw the work.",
+      "citation": "Mysore Palace Board, History",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "Construction ran from 1897 to 1912, fifteen years, at a cost of Rs 41,47,913 — a little over forty-one lakh rupees of the day.",
+      "citation": "Mysore Palace Board, History",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "The palace is built in the Indo-Saracenic style, blending Hindu, Rajput, Gothic and Islamic elements. Its main block is three storeys of fine grey granite, topped by deep pink marble domes.",
+      "citation": "Mysore Palace Board, Architecture",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "Above the palace rises a five-storey tower 145 feet high, about 44 metres, crowned by a gilded dome and a single golden flag.",
+      "citation": "Mysore Palace Board, Architecture",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "The Kalyana Mantapa, the marriage pavilion, is octagonal, and its domed ceiling is filled with multi-hued stained glass in peacock motifs arranged in geometric patterns. The stained glass and its iron framework were designed by Mysuru artists and wrought in Glasgow; the floor beneath answers it with a peacock mosaic laid in tiles from England.",
+      "citation": "Mysore Palace Board, Marriage Pavilion (Kalyana Mantapa)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s8",
+      "text": "Visitors enter through the Gombe Thotti, the Doll's Pavilion — a long gallery of traditional dolls from the nineteenth and early twentieth centuries, alongside Indian and European sculpture, ceremonial objects and a wooden elephant howdah.",
+      "citation": "Mysore Palace Board, Amba Vilas; Karnataka Tourism",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "The golden howdah, the Ambari, is carried on the lead elephant in the Jamboo Savari procession that closes Mysuru Dasara. Its core is wood, sheathed in filigreed gold, and it weighs about 750 kilograms in all. Since the end of royal rule the howdah carries not a king but the idol of Goddess Chamundeshwari.",
+      "citation": "Mysore Palace Board; Karnataka Department of Tourism, Mysuru Dasara records",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "On Sundays, on national holidays and through the ten nights of Dasara, the palace is outlined in about 97,000 electric bulbs, all switched on together. The Durbar Hall, the Diwan-e-Aam, is where the Maharaja held ceremonial court, and the golden throne, the Chinnada Simhasana, is assembled and displayed there during Dasara.",
+      "citation": "Mysore Palace Board, Palace Illumination and Amba Vilas",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s11",
+      "text": "The palace is owned and managed by the Government of Karnataka, which acquired it under the Mysore Palace (Acquisition and Transfer) Act, 1998; a portion remains occupied by descendants of the Wadiyar family. In the financial year 2024-25 about 3.9 million people walked through it.",
+      "citation": "Mysore Palace (Acquisition and Transfer) Act, 1998, Government of Karnataka; Mysore Palace Board visitor statistics",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am the palace at Mysuru. Ninety-seven thousand lamps light me on a festival night — ask me anything.",
+    "kn-IN": "ನಾನು ಮೈಸೂರಿನ ಅರಮನೆ. ಹಬ್ಬದ ರಾತ್ರಿ ತೊಂಬತ್ತೇಳು ಸಾವಿರ ದೀಪಗಳು ನನ್ನನ್ನು ಬೆಳಗುತ್ತವೆ — ಏನಾದರೂ ಕೇಳಿ.",
+    "hi-IN": "मैं मैसूर का महल हूँ। त्योहार की रात सत्तानवे हज़ार बत्तियाँ मुझे रोशन करती हैं — जो पूछना है, पूछो।",
+    "ta-IN": "நான் மைசூர் அரண்மனை. விழா இரவில் தொண்ணூற்று ஏழாயிரம் விளக்குகள் என்னை ஒளிரச் செய்யும் — கேளுங்கள்.",
+    "te-IN": "నేను మైసూరు రాజప్రాసాదం. పండుగ రాత్రి తొంభై ఏడు వేల దీపాలు నన్ను వెలిగిస్తాయి — ఏమైనా అడగండి.",
+    "ml-IN": "ഞാൻ മൈസൂർ കൊട്ടാരം. ഉത്സവരാത്രിയിൽ തൊണ്ണൂറ്റിയേഴായിരം വിളക്കുകൾ എന്നെ തെളിയിക്കും — എന്തും ചോദിക്കൂ.",
+    "bn-IN": "আমি মহীশূরের প্রাসাদ। উৎসবের রাতে সাতানব্বই হাজার বাতি আমাকে আলোয় ভরিয়ে দেয় — যা জানতে চাও, জিজ্ঞেস করো।",
+    "mr-IN": "मी म्हैसूरचा राजवाडा. उत्सवाच्या रात्री सत्याण्णव हजार दिवे मला उजळून टाकतात — काहीही विचारा."
+  }
+}

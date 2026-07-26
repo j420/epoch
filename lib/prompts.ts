@@ -131,10 +131,28 @@ export function answerSystemPrompt(
     .join(', ');
   const eraList = (monument.eras ?? []).map((e) => e.year).join(', ');
 
+  /**
+   * LANGUAGE COMES FIRST, AND IT COMES TWICE.
+   *
+   * The failure this guards against is specific and was the whole reason the
+   * voice loop was audited: Saaras detects Tamil, the SOURCES block is in
+   * English, and the model — pulled by the language of the context it can see —
+   * answers in English anyway. The visitor then hears a language they did not
+   * speak, which is the one thing this product cannot do.
+   *
+   * Two levers, both cheap: state the rule first (it is the constraint the rest
+   * of the prompt is subordinate to), and state it again immediately before the
+   * model starts generating, after the SOURCES (see the closing line below).
+   * The mismatch is also detected after the fact in app/api/answer — a prompt is
+   * a request, not a guarantee.
+   */
   const rules = [
+    `- Reply in ${li.english} (${li.native}), written in the ${li.script} script.`,
+    code === 'en-IN'
+      ? '- The visitor spoke to me in English, so I answer in English.'
+      : `- The visitor spoke to me in ${li.english}. Every word I say back must be in ${li.english}, in the ${li.script} script. The SOURCES below are written in English — my answer must NOT be. Do not answer in English, do not answer in Hindi, and do not mix English sentences into the reply.`,
     '- Answer ONLY from the SOURCES below. If the answer is not there, say you do not remember it.',
     '- Maximum two sentences. Warm, plain, a little poetic. Never list. Never lecture.',
-    `- Reply in ${li.english} (${li.native}), written in the ${li.script} script.`,
   ];
 
   // The whole corpus is in front of the model, so "I was given this source,
@@ -167,6 +185,9 @@ export function answerSystemPrompt(
     ...rules,
     'SOURCES:',
     formatSources(sources),
+    // Recency matters more than any rule stated 400 tokens earlier: the last
+    // thing the model reads before it writes is which language to write in.
+    `Answer the visitor now, in ${li.english} (${li.native}), then the JSON directive.`,
   ].join('\n');
 }
 
@@ -337,4 +358,98 @@ const SCRIPT_RANGES: [RegExp, LangCode][] = [
 export function guessLangFromScript(text: string): LangCode | null {
   for (const [re, code] of SCRIPT_RANGES) if (re.test(text)) return code;
   return null;
+}
+
+/**
+ * The typed-fallback resolver: what language do we answer a keyboard in when
+ * there is no Saaras detection to obey and no earlier utterance to remember?
+ *
+ * `guessLangFromScript` deliberately returns null for Latin text so that a
+ * visitor mid-conversation keeps the language they were already speaking. But at
+ * the very first typed question there is nothing to keep, and `normalizeLang`
+ * would then hand back DEFAULT_LANG — answering a plainly English question in
+ * Hindi. Latin letters are the one script we can read as a language of their
+ * own, so we do, and only here.
+ *
+ * Romanised Indic ("Qutub kitna purana hai") lands on English by this route, and
+ * that is the accepted cost: it is only ever reached when Saaras is unavailable,
+ * and any later utterance overrides it. When Saaras IS available its detection
+ * arrives on the request and this function is never called.
+ */
+export function guessLangFromText(text: string): LangCode | null {
+  const byScript = guessLangFromScript(text);
+  if (byScript) return byScript;
+  return /[A-Za-z]{2}/.test(text) ? 'en-IN' : null;
+}
+
+// ---------------------------------------------------------------------------
+// 5. Reply-language verification
+// ---------------------------------------------------------------------------
+
+/** One matcher per `LangInfo.script` value in lib/langs.ts. */
+const SCRIPT_MATCHERS: Record<string, RegExp> = {
+  Latin: /[A-Za-z]/,
+  Devanagari: /[ऀ-ॿ]/,
+  Bengali: /[ঀ-৿]/,
+  'Bengali-Assamese': /[ঀ-৿]/,
+  Gujarati: /[઀-૿]/,
+  Gurmukhi: /[਀-੿]/,
+  Kannada: /[ಀ-೿]/,
+  Malayalam: /[ഀ-ൿ]/,
+  Odia: /[଀-୿]/,
+  Tamil: /[஀-௿]/,
+  Telugu: /[ఀ-౿]/,
+  'Perso-Arabic': /[؀-ۿݐ-ݿﭐ-﷿ﹰ-ﻼ]/,
+  'Meetei Mayek': /[ꯀ-꯿ꫠ-꫿]/,
+  'Ol Chiki': /[᱐-᱿]/,
+};
+
+/**
+ * 'match'     the reply is written in the script the visitor's language uses
+ * 'mismatch'  it is confidently NOT — enough letters of the wrong script and
+ *             none of the right one to rule out a stray loanword
+ * 'unknown'   too little text to judge (numerals, a single word, an emoji)
+ */
+export type ScriptCheck = 'match' | 'mismatch' | 'unknown';
+
+const count = (text: string, re: RegExp) => (text.match(new RegExp(re.source, 'gu')) ?? []).length;
+
+/**
+ * A cheap, dependency-free sanity check on the one thing the visitor will notice
+ * instantly: did the monument answer in a script they can read?
+ *
+ * It verifies the SCRIPT, not the language — Hindi, Marathi, Sanskrit, Nepali,
+ * Konkani, Maithili, Dogri and Bodo all share Devanagari, and Bengali and
+ * Assamese share their script, so a Hindi reply to a Marathi speaker passes this
+ * check. It catches the failure that actually happens in production (the model
+ * defaulting to the English of the SOURCES block) and it never fires on a
+ * correct reply, which is what makes it safe to act on.
+ */
+export function checkReplyScript(text: string, lang: LangCode): ScriptCheck {
+  const clean = text.trim();
+  if (!clean) return 'unknown';
+
+  const expectedScript = info(lang).script;
+  const matcher = SCRIPT_MATCHERS[expectedScript];
+  if (!matcher) return 'unknown';
+
+  const expected = count(clean, matcher);
+  if (expected > 0 && expectedScript !== 'Latin') return 'match';
+
+  const latin = count(clean, SCRIPT_MATCHERS.Latin);
+
+  if (expectedScript === 'Latin') {
+    // English expected. A stray Indic proper noun is fine; a whole Indic
+    // sentence is not.
+    let indic = 0;
+    for (const [name, re] of Object.entries(SCRIPT_MATCHERS)) {
+      if (name === 'Latin') continue;
+      indic += count(clean, re);
+    }
+    if (indic === 0) return latin >= 2 ? 'match' : 'unknown';
+    return indic >= 8 && indic > latin ? 'mismatch' : 'unknown';
+  }
+
+  // An Indic language was expected and not one letter of its script came back.
+  return latin >= 8 ? 'mismatch' : 'unknown';
 }

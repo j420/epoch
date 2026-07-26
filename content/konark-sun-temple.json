@@ -1,0 +1,234 @@
+{
+  "id": "konark-sun-temple",
+  "city": "Konark",
+  "aspect": 0.5,
+  "hero": "/monuments/konark-sun-temple/hero.png",
+  "depth": "/monuments/konark-sun-temple/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Konark Sun Temple",
+    "od-IN": "କୋଣାର୍କ ସୂର୍ଯ୍ୟ ମନ୍ଦିର",
+    "hi-IN": "कोणार्क सूर्य मंदिर",
+    "bn-IN": "কোণার্ক সূর্য মন্দির",
+    "ta-IN": "கோணார்க் சூரியன் கோயில்",
+    "te-IN": "కోణార్క్ సూర్య దేవాలయం",
+    "kn-IN": "ಕೋನಾರ್ಕ್ ಸೂರ್ಯ ದೇವಾಲಯ",
+    "ml-IN": "കോണാർക്ക് സൂര്യക്ഷേത്രം",
+    "mr-IN": "कोणार्क सूर्य मंदिर",
+    "gu-IN": "કોણાર્ક સૂર્ય મંદિર",
+    "pa-IN": "ਕੋਣਾਰਕ ਸੂਰਜ ਮੰਦਰ",
+    "ur-IN": "کونارک سوریہ مندر",
+    "as-IN": "কোণাৰ্ক সূৰ্য মন্দিৰ"
+  },
+  "regions": [
+    {
+      "id": "wheel",
+      "x": 0.27,
+      "y": 0.857,
+      "z": 0.92,
+      "label": {
+        "en-IN": "my carved stone wheels",
+        "od-IN": "ମୋର ଖୋଦିତ ପଥର ଚକ",
+        "hi-IN": "मेरे उकेरे हुए पत्थर के पहिये",
+        "bn-IN": "আমার খোদাই করা পাথরের চাকা",
+        "ta-IN": "என் செதுக்கிய கல் சக்கரங்கள்",
+        "te-IN": "నా చెక్కిన రాతి చక్రాలు",
+        "mr-IN": "माझी कोरलेली दगडी चाके"
+      }
+    },
+    {
+      "id": "roof",
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5,
+      "label": {
+        "en-IN": "my stepped roof",
+        "od-IN": "ମୋର ପାହାଚ ପାହାଚ ଛାତ",
+        "hi-IN": "मेरी सीढ़ीदार छत",
+        "bn-IN": "আমার ধাপে ধাপে ওঠা ছাদ",
+        "ta-IN": "என் படிநிலைக் கூரை",
+        "te-IN": "నా మెట్ల పైకప్పు",
+        "mr-IN": "माझे पायरीदार छत"
+      }
+    },
+    {
+      "id": "carvings",
+      "x": 0.3,
+      "y": 0.775,
+      "z": 0.7,
+      "label": {
+        "en-IN": "the figures carved into my walls",
+        "od-IN": "ମୋ କାନ୍ଥରେ ଖୋଦିତ ମୂର୍ତ୍ତି",
+        "hi-IN": "मेरी दीवारों में उकेरी मूर्तियाँ",
+        "bn-IN": "আমার দেয়ালে খোদাই করা মূর্তি",
+        "ta-IN": "என் சுவர்களில் செதுக்கிய உருவங்கள்",
+        "te-IN": "నా గోడలలో చెక్కిన బొమ్మలు",
+        "mr-IN": "माझ्या भिंतींतील कोरीव मूर्ती"
+      }
+    },
+    {
+      "id": "crown",
+      "x": 0.5,
+      "y": 0.35,
+      "z": 0.4,
+      "label": {
+        "en-IN": "the crown of my porch",
+        "od-IN": "ମୋ ଜଗମୋହନର ମୁକୁଟ",
+        "hi-IN": "मेरे मंडप का शिखर",
+        "bn-IN": "আমার মণ্ডপের চূড়া",
+        "ta-IN": "என் மண்டபத்தின் உச்சி",
+        "te-IN": "నా మండపం శిఖరం",
+        "mr-IN": "माझ्या मंडपाचे शिखर"
+      }
+    },
+    {
+      "id": "plinth",
+      "x": 0.5,
+      "y": 0.87,
+      "z": 0.88,
+      "label": {
+        "en-IN": "the chariot platform I ride on",
+        "od-IN": "ମୁଁ ଚଢ଼ିଥିବା ରଥର ପିଠି",
+        "hi-IN": "जिस रथ-चौकी पर मैं सवार हूँ",
+        "bn-IN": "যে রথের বেদিতে আমি চড়ে আছি",
+        "ta-IN": "நான் ஏறியிருக்கும் தேர்த் தளம்",
+        "te-IN": "నేను ఎక్కిన రథ వేదిక",
+        "mr-IN": "मी बसलेला रथाचा चौथरा"
+      }
+    },
+    {
+      "id": "sanctum",
+      "x": 0.7,
+      "y": 0.775,
+      "z": 0.72,
+      "label": {
+        "en-IN": "the hall that still stands",
+        "od-IN": "ଏବେ ବି ଠିଆ ହୋଇଥିବା ଜଗମୋହନ",
+        "hi-IN": "जो मंडप अब भी खड़ा है",
+        "bn-IN": "যে মণ্ডপ এখনও দাঁড়িয়ে",
+        "ta-IN": "இன்னும் நிற்கும் மண்டபம்",
+        "te-IN": "ఇంకా నిలిచి ఉన్న మండపం",
+        "mr-IN": "अजूनही उभा असलेला मंडप"
+      }
+    },
+    {
+      "id": "shore",
+      "x": 0.5,
+      "y": 0.95,
+      "z": 0.92,
+      "label": {
+        "en-IN": "the sand at my feet",
+        "od-IN": "ମୋ ପାଦ ତଳେ ବାଲି",
+        "hi-IN": "मेरे पैरों की रेत",
+        "bn-IN": "আমার পায়ের বালি",
+        "ta-IN": "என் காலடி மணல்",
+        "te-IN": "నా పాదాల వద్ద ఇసుక",
+        "mr-IN": "माझ्या पायाशीची वाळू"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.2,
+      "y": 0.15,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the sky my sun crosses",
+        "od-IN": "ମୋ ସୂର୍ଯ୍ୟ ପାର ହେଉଥିବା ଆକାଶ",
+        "hi-IN": "वह आसमान जिससे मेरा सूरज गुज़रता है",
+        "bn-IN": "যে আকাশ পেরিয়ে আমার সূর্য চলে",
+        "ta-IN": "என் சூரியன் கடக்கும் வானம்",
+        "te-IN": "నా సూర్యుడు దాటే ఆకాశం",
+        "mr-IN": "माझा सूर्य ओलांडतो ते आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/konark-sun-temple/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me a little over a century ago.",
+        "od-IN": "ଶହେ ବର୍ଷ ତଳେ କ୍ୟାମେରା ମୋତେ ଯେମିତି ଦେଖିଥିଲା।",
+        "hi-IN": "जैसे सौ बरस पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "The Sun Temple at Konark was raised about 1250 CE by King Narasimhadeva I of the Eastern Ganga dynasty, who reigned from 1238 to 1264.",
+      "citation": "UNESCO World Heritage Centre, Sun Temple, Konarak (ref. 246); Archaeological Survey of India, Konarak Sun Temple site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "The whole temple was conceived as the chariot of Surya, the sun: twenty-four carved wheels, twelve pairs, ranged along its flanks, and seven horses straining at the front.",
+      "citation": "UNESCO World Heritage Centre, Sun Temple, Konarak (ref. 246); Archaeological Survey of India",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "Each wheel is about 3 metres across, with eight broad spokes and eight slender ones between them. They were carved to mark the turning of time — twelve pairs for the twelve months, seven horses for the seven days.",
+      "citation": "UNESCO World Heritage Centre, Sun Temple, Konarak (ref. 246)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The great tower, the deul, has fallen. It is commonly reckoned to have stood about 70 metres high. The porch beside it, the jagamohana, still stands, and is what visitors see today.",
+      "citation": "Archaeological Survey of India, Konarak Sun Temple site record; Odisha State Archaeology",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "When the tower came down is not known, some time in the late sixteenth or early seventeenth century, and why is not known either. A copper-plate inscription of 1384 CE shows the temple was complete and in active worship long after it was built, which rules out the old story that it fell during construction.",
+      "citation": "Archaeological Survey of India, Konarak Sun Temple site record; UNESCO World Heritage Centre",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "European sailors in the Bay of Bengal called it the Black Pagoda, against the White Pagoda of Jagannath at Puri, and steered by the pair of them.",
+      "citation": "Archaeological Survey of India, Konarak Sun Temple site record; UNESCO World Heritage Centre",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "Three stones make the temple. Khondalite for the body and most of the sculpture; chlorite, dark and fine-grained, reserved for doorframes, the Surya images, the Navagraha lintel and the Aruna pillar; and laterite hidden below in the foundations, the platform core and the stairs.",
+      "citation": "Archaeological Survey of India, Konarak Sun Temple conservation record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s8",
+      "text": "Khondalite is the temple's weakness. It weathers easily, and salt wind and heavy coastal rain break it down into a spongy oxide, which is why conservation here never stops.",
+      "citation": "Archaeological Survey of India, Konarak conservation record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s9",
+      "text": "In 1903 the British packed the jagamohana solid with sand and sealed it, fearing it would collapse. It stayed filled for a hundred and twenty years; the Archaeological Survey of India began taking the sand out in September 2023.",
+      "citation": "Archaeological Survey of India, Konarak Sun Temple conservation record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s10",
+      "text": "The nata-mandira, the hall of dance, stands detached on the temple's axis. The walls carry maithuna figures alongside elephants, hunts and military processions, and colossal groups of a lion astride an elephant guard the approach. The Aruna Stambha, the pillar of the sun's charioteer, was moved long ago to the Lion Gate of the Jagannath temple at Puri.",
+      "citation": "Archaeological Survey of India, Konarak Sun Temple site record; Odisha State Archaeology",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s11",
+      "text": "The temple was built near the mouth of the Chandrabhaga, on the shore; the water has drawn back since, and the sea is no longer at its feet. It was inscribed on the UNESCO World Heritage List in 1984 as Sun Temple, Konarak, under criteria (i), (iii) and (vi), and is a centrally protected monument under the Archaeological Survey of India's Bhubaneswar Circle, with a site museum beside it holding sculpture recovered from the ruin.",
+      "citation": "UNESCO World Heritage Centre, Sun Temple, Konarak (ref. 246); Archaeological Survey of India, Bhubaneswar Circle",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am the Sun Temple at Konark. I was carved as a chariot for the sun, and I have lost my tower — ask me what remains.",
+    "od-IN": "ମୁଁ କୋଣାର୍କର ସୂର୍ଯ୍ୟ ମନ୍ଦିର। ମୋତେ ସୂର୍ଯ୍ୟଙ୍କ ରଥ ରୂପେ ଗଢ଼ାଯାଇଥିଲା, ମୋ ଶିଖର ଝଡ଼ି ପଡ଼ିଛି — ଯାହା ରହିଛି ପଚାର।",
+    "hi-IN": "मैं कोणार्क का सूर्य मंदिर हूँ। मुझे सूरज के रथ की तरह गढ़ा गया था, और मेरा शिखर गिर चुका है — जो बचा है, वह पूछो।",
+    "bn-IN": "আমি কোণার্কের সূর্য মন্দির। আমাকে সূর্যের রথ করে গড়া হয়েছিল, আমার চূড়া ভেঙে পড়েছে — যা রয়ে গেছে, তা জিজ্ঞেস করো।",
+    "ta-IN": "நான் கோணார்க்கின் சூரியன் கோயில். சூரியனின் தேராக என்னைச் செதுக்கினார்கள்; என் கோபுரம் விழுந்துவிட்டது — மிச்சமிருப்பதைக் கேளுங்கள்.",
+    "te-IN": "నేను కోణార్క్ సూర్య దేవాలయం. సూర్యుని రథంలా నన్ను చెక్కారు; నా శిఖరం కూలిపోయింది — మిగిలినది అడగండి.",
+    "mr-IN": "मी कोणार्कचे सूर्य मंदिर. सूर्याचा रथ म्हणून मला घडवले; माझे शिखर पडून गेले — जे उरले आहे ते विचारा.",
+    "kn-IN": "ನಾನು ಕೋನಾರ್ಕ್ ಸೂರ್ಯ ದೇವಾಲಯ. ಸೂರ್ಯನ ರಥವಾಗಿ ನನ್ನನ್ನು ಕೆತ್ತಿದರು; ನನ್ನ ಶಿಖರ ಕುಸಿದಿದೆ — ಉಳಿದಿರುವುದನ್ನು ಕೇಳಿ."
+  }
+}

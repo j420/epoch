@@ -22,8 +22,27 @@ export interface LangInfo {
   speakable: boolean;
   /** If not speakable, the closest language Bulbul can voice. */
   voiceFallback?: LangCode;
-  /** Default Bulbul speaker for this language. */
+  /**
+   * Default **bulbul:v2** speaker for this language.
+   *
+   * Left at 'anushka' because that is v2's own default and is a name v2
+   * accepts. It is NOT a valid bulbul:v3 name — the two catalogues are
+   * disjoint — so nothing on the v3 path may use this field. Real speaker
+   * selection lives in lib/voices.ts, which is model-aware; this stays as the
+   * last-resort value for `resolveVoice()` callers that predate it.
+   */
   speaker?: string;
+  /**
+   * Default **bulbul:v3** speaker for this language.
+   *
+   * Every entry is v3's own default, `shubh`, and deliberately so: we have no
+   * evidence that any particular v3 voice is more native to one of the eleven
+   * languages than another, and guessing here would be unfalsifiable. The field
+   * exists so that when someone with a live key does the listening, there is a
+   * per-language slot to write the answer into. See LANGUAGE_DEFAULT_SPEAKER in
+   * lib/voices.ts, which is what actually reads it.
+   */
+  speakerV3?: string;
 }
 
 /** The 11 languages Bulbul v3 can voice. */
@@ -33,17 +52,17 @@ export const SPEAKABLE: LangCode[] = [
 
 export const LANGS: Record<LangCode, LangInfo> = {
   // ---- Bulbul-speakable ----
-  'en-IN': { code: 'en-IN', native: 'English', english: 'English', script: 'Latin', speakable: true, speaker: 'anushka' },
-  'hi-IN': { code: 'hi-IN', native: 'हिन्दी', english: 'Hindi', script: 'Devanagari', speakable: true, speaker: 'anushka' },
-  'bn-IN': { code: 'bn-IN', native: 'বাংলা', english: 'Bengali', script: 'Bengali', speakable: true, speaker: 'anushka' },
-  'gu-IN': { code: 'gu-IN', native: 'ગુજરાતી', english: 'Gujarati', script: 'Gujarati', speakable: true, speaker: 'anushka' },
-  'kn-IN': { code: 'kn-IN', native: 'ಕನ್ನಡ', english: 'Kannada', script: 'Kannada', speakable: true, speaker: 'anushka' },
-  'ml-IN': { code: 'ml-IN', native: 'മലയാളം', english: 'Malayalam', script: 'Malayalam', speakable: true, speaker: 'anushka' },
-  'mr-IN': { code: 'mr-IN', native: 'मराठी', english: 'Marathi', script: 'Devanagari', speakable: true, speaker: 'anushka' },
-  'od-IN': { code: 'od-IN', native: 'ଓଡ଼ିଆ', english: 'Odia', script: 'Odia', speakable: true, speaker: 'anushka' },
-  'pa-IN': { code: 'pa-IN', native: 'ਪੰਜਾਬੀ', english: 'Punjabi', script: 'Gurmukhi', speakable: true, speaker: 'anushka' },
-  'ta-IN': { code: 'ta-IN', native: 'தமிழ்', english: 'Tamil', script: 'Tamil', speakable: true, speaker: 'anushka' },
-  'te-IN': { code: 'te-IN', native: 'తెలుగు', english: 'Telugu', script: 'Telugu', speakable: true, speaker: 'anushka' },
+  'en-IN': { code: 'en-IN', native: 'English', english: 'English', script: 'Latin', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'hi-IN': { code: 'hi-IN', native: 'हिन्दी', english: 'Hindi', script: 'Devanagari', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'bn-IN': { code: 'bn-IN', native: 'বাংলা', english: 'Bengali', script: 'Bengali', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'gu-IN': { code: 'gu-IN', native: 'ગુજરાતી', english: 'Gujarati', script: 'Gujarati', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'kn-IN': { code: 'kn-IN', native: 'ಕನ್ನಡ', english: 'Kannada', script: 'Kannada', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'ml-IN': { code: 'ml-IN', native: 'മലയാളം', english: 'Malayalam', script: 'Malayalam', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'mr-IN': { code: 'mr-IN', native: 'मराठी', english: 'Marathi', script: 'Devanagari', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'od-IN': { code: 'od-IN', native: 'ଓଡ଼ିଆ', english: 'Odia', script: 'Odia', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'pa-IN': { code: 'pa-IN', native: 'ਪੰਜਾਬੀ', english: 'Punjabi', script: 'Gurmukhi', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'ta-IN': { code: 'ta-IN', native: 'தமிழ்', english: 'Tamil', script: 'Tamil', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
+  'te-IN': { code: 'te-IN', native: 'తెలుగు', english: 'Telugu', script: 'Telugu', speakable: true, speaker: 'anushka', speakerV3: 'shubh' },
 
   // ---- Saaras understands, Bulbul cannot voice. Honest degradation. ----
   'as-IN':  { code: 'as-IN',  native: 'অসমীয়া',   english: 'Assamese',  script: 'Bengali-Assamese', speakable: false, voiceFallback: 'bn-IN' },
@@ -56,7 +75,10 @@ export const LANGS: Record<LangCode, LangInfo> = {
   'ks-IN':  { code: 'ks-IN',  native: 'کٲشُر',     english: 'Kashmiri',  script: 'Perso-Arabic',     speakable: false, voiceFallback: 'ur-IN' },
   'sd-IN':  { code: 'sd-IN',  native: 'سنڌي',      english: 'Sindhi',    script: 'Perso-Arabic',     speakable: false, voiceFallback: 'hi-IN' },
   'mni-IN': { code: 'mni-IN', native: 'ꯃꯤꯇꯩꯂꯣꯟ',   english: 'Manipuri',  script: 'Meetei Mayek',     speakable: false, voiceFallback: 'bn-IN' },
-  'brx-IN': { code: 'brx-IN', native: 'बर-ा',  english: 'Bodo',      script: 'Devanagari',       speakable: false, voiceFallback: 'hi-IN' },
+  // Bodo's endonym is written बड़ो or बर' (the apostrophe marks a schwa). An earlier
+  // value here was mangled to "बर-ा", which is not a word — it rendered as visible
+  // nonsense the moment the coverage panel showed every language in its own script.
+  'brx-IN': { code: 'brx-IN', native: 'बड़ो',   english: 'Bodo',      script: 'Devanagari',       speakable: false, voiceFallback: 'hi-IN' },
   'sat-IN': { code: 'sat-IN', native: 'ᱥᱟᱱᱛᱟᱲᱤ',   english: 'Santali',   script: 'Ol Chiki',         speakable: false, voiceFallback: 'hi-IN' },
 };
 
@@ -83,7 +105,31 @@ export function normalizeLang(raw: string | null | undefined): LangCode {
   };
   if (iso3[base]) return iso3[base];
 
+  // Full English names, in case Saaras ever returns "Tamil" rather than "ta-IN".
+  const byName = Object.values(LANGS).find((l) => l.english.toLowerCase() === lower);
+  if (byName) return byName.code;
+
+  /**
+   * Falling through to Hindi silently is the dangerous path: if Saaras changes its
+   * response shape, EVERY visitor gets answered in Hindi and nothing anywhere says
+   * why. The value is still returned so the product degrades rather than crashes,
+   * but it is now loud, and `isRecognisedLang` lets callers tell a real detection
+   * from a fallback.
+   */
+  if (s && s.toLowerCase() !== 'unknown') {
+    console.warn(`[langs] unrecognised language "${s}" — falling back to ${DEFAULT_LANG}. ` + `If this fires in production, Saaras' response shape has changed; check /api/sarvam/selftest.`);
+  }
   return DEFAULT_LANG;
+}
+
+/** True when `raw` actually names a language we hold, rather than hitting the default. */
+export function isRecognisedLang(raw: string | null | undefined): boolean {
+  if (!raw?.trim()) return false;
+  const normalised = normalizeLang(raw);
+  if (normalised !== DEFAULT_LANG) return true;
+  // Distinguish a genuine Hindi detection from a fallback that merely landed there.
+  const lower = raw.trim().toLowerCase();
+  return lower === 'hi-in' || lower === 'hi' || lower === 'hin' || lower === 'hindi';
 }
 
 export function info(code: LangCode): LangInfo {

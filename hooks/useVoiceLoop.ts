@@ -75,6 +75,19 @@ export interface VoiceDebug {
 
 export interface UseVoiceLoopOptions {
   monumentId?: string;
+  /**
+   * Where the answering turn is POSTed. Defaults to the grounded monument loop.
+   *
+   * The uploaded-photo feature needs a DIFFERENT answering route, because a user's
+   * photograph has no source chunks and must never narrate history. Without this
+   * option its only recourse was wrapping window.fetch to re-point one request,
+   * which is fragile and easy to leave installed. Worth noting why it matters:
+   * /api/answer resolves an unknown monument id to the registry default, so an
+   * uploaded photo would otherwise have answered in Qutub Minar's cited voice.
+   */
+  answerEndpoint?: string;
+  /** Merged into the answer POST body — extra context a custom endpoint needs. */
+  answerExtras?: Record<string, unknown>;
   /** Auto-stop on silence. When false the mic only stops when the UI says so. */
   autoVad?: boolean;
   /** Keep the mic open during playback so the visitor can interrupt. Default true. */
@@ -252,7 +265,7 @@ const nextTurnId = () => `t${++turnCounter}-${Date.now().toString(36)}`;
 // ---------------------------------------------------------------------------
 
 export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
-  const { monumentId = 'qutub-minar' } = options;
+  const { monumentId = 'qutub-minar', answerEndpoint = '/api/answer', answerExtras } = options;
 
   // Latest callbacks without re-creating every handler on each render.
   const optsRef = useRef(options);
@@ -289,6 +302,12 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
   const stateRef = useRef<VoiceState>('idle');
   const sessionIdRef = useRef<string | null>(null);
   const langRef = useRef<string | null>(null);
+  // Held in refs so runTurn (which is memoised on a long dependency list) always
+  // reads the current value without re-creating the whole turn machine.
+  const answerEndpointRef = useRef(answerEndpoint);
+  answerEndpointRef.current = answerEndpoint;
+  const answerExtrasRef = useRef(answerExtras);
+  answerExtrasRef.current = answerExtras;
   const capsRef = useRef(capabilities);
   const maxRecordMsRef = useRef(DEFAULT_MAX_RECORD_MS);
 
@@ -674,7 +693,15 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
         res = await fetch('/api/speak?raw=1', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ text, lang: speakLang ?? undefined, sessionId: sessionIdRef.current ?? undefined }),
+          // monumentId drives per-monument voice casting in lib/voices.ts. Without
+          // it every monument falls back to the language default and they all sound
+          // like the same person — which defeats the point of casting them at all.
+          body: JSON.stringify({
+            text,
+            lang: speakLang ?? undefined,
+            monumentId,
+            sessionId: sessionIdRef.current ?? undefined,
+          }),
           signal,
         });
       } catch (err) {
@@ -737,7 +764,7 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
 
       let res: Response;
       try {
-        res = await fetch('/api/answer', {
+        res = await fetch(answerEndpointRef.current, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
@@ -746,6 +773,7 @@ export function useVoiceLoop(options: UseVoiceLoopOptions = {}): VoiceLoop {
             monumentId,
             sessionId: sessionIdRef.current ?? undefined,
             elapsedMs: Math.round(performance.now() - startedAt),
+            ...(answerExtrasRef.current ?? {}),
           }),
           signal,
         });

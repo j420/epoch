@@ -3,8 +3,8 @@
   "city": "Delhi",
   "aspect": 0.5,
   "hero": "/monuments/qutub-minar/hero.png",
-  "depth": "/monuments/qutub-minar/depth.png",
-  "credit": "Photograph: public domain. Depth map generated with Depth Anything V2.",
+  "depth": "",
+  "credit": "Photograph: Ramesam, Wikimedia Commons (CC BY-SA 3.0), cropped. No depth map yet — shown as a still photograph with a slow camera move. Full chain: public/monuments/CREDITS.md.",
   "displayName": {
     "en-IN": "Qutub Minar",
     "hi-IN": "क़ुतुब मीनार",

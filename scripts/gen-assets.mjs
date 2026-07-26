@@ -2,31 +2,38 @@
  * Procedural placeholder assets for the Living Photograph engine.
  *
  * WHY THIS EXISTS: the build environment's network policy blocks every image host
- * (Wikimedia included), so no real photograph of Qutub Minar can be fetched here.
- * Rather than ship a grey rectangle, this renders a structurally faithful stand-in
- * — a tapering, fluted, five-storey tower with balconies — together with a depth
- * map that is *actually correct for that image*.
+ * (Wikimedia included), so no real photograph of any of the ten monuments can be
+ * fetched here. Rather than ship ten grey rectangles, this renders a structurally
+ * faithful stand-in for each — together with a depth map that is *actually correct
+ * for that image*.
  *
  * That matters: the parallax, the region camera moves and the focus spotlight are
  * all genuinely demonstrable right now, with no ML depth inference and no network.
  *
- * SWAP THESE BEFORE THE DEMO. Drop a real photo at hero.webp (<=2048px long edge,
- * <400KB) and a Depth Anything V2 map at depth.png (1024px, <200KB). Nothing in the
- * code needs to change — the filenames and the aspect in content/qutub-minar.json
- * are the only contract.
+ * The geometry lives in scripts/monument-shapes.mjs. Every shape exposes exactly one
+ * function, `hit(u, v, out)`, and BOTH renderers below call it and nothing else —
+ * which is why the depth map cannot drift out of agreement with the picture.
  *
- *   node scripts/gen-assets.mjs
+ * SWAP THESE BEFORE THE DEMO. Drop a real photo at hero.png (<=2048px long edge)
+ * and a Depth Anything V2 map at depth.png for any monument and nothing in the code
+ * needs to change — the filenames and the `aspect` in content/<id>.json are the only
+ * contract. The aspect is derived from W/H here, so the two can never disagree.
+ *
+ * THAT SWAP HAS NOW HAPPENED for some of the ten. `scripts/fetch-photos.mjs` pulls
+ * real, licensed photographs and records them in public/monuments/photo-lock.json.
+ * This script refuses to overwrite a locked monument's hero and era plates, because
+ * doing so would silently replace a licensed photograph with a drawing and nobody
+ * would notice until the demo. Pass --force if that is genuinely what you want.
+ *
+ *   node scripts/gen-assets.mjs              # every monument still on placeholders
+ *   node scripts/gen-assets.mjs taj-mahal    # just one
+ *   node scripts/gen-assets.mjs --force      # ignore the photo lock (destructive)
  */
 
 import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
-
-const W = 896;
-const H = 1792; // aspect 0.50 — a phone viewport, so `contain` framing fills it
-                // rather than letterboxing. A tower must never be cropped top or
-                // bottom, so the frame is matched to the phone instead.
-const OUT = path.join(process.cwd(), 'public', 'monuments', 'qutub-minar');
+import { SHAPES, clamp, lerp, smoothstep, hash2, fbm } from './monument-shapes.mjs';
 
 // ---------------------------------------------------------------------------
 // Minimal PNG encoder (no dependencies — sharp/canvas are not installed)
@@ -87,95 +94,63 @@ function encodePng(width, height, pixels, colorType) {
 }
 
 // ---------------------------------------------------------------------------
-// Deterministic noise — same output every run, so the depth map always matches
+// Shared shading. The key light sits high and to the left for every monument, so
+// the ten heroes read as one set rather than ten unrelated pictures.
 // ---------------------------------------------------------------------------
 
-function hash2(x, y) {
-  let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263);
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+const newSurface = () => ({ z: 0, nx: 0, nz: 1, r: 0, g: 0, b: 0, k: 1 });
+
+function litColour(s, u, v, dst) {
+  const light = clamp(0.36 + 0.72 * clamp(s.nz * 0.86 - s.nx * 0.42));
+  // Weathered stone grain — the cheapest thing that stops a render reading as CAD.
+  const grain = 0.93 + fbm(u * 46, v * 150, 4) * 0.16;
+  const kk = light * s.k * grain;
+  dst[0] = s.r * kk;
+  dst[1] = s.g * kk;
+  dst[2] = s.b * kk;
+  return dst;
 }
 
-function valueNoise(x, y) {
-  const xi = Math.floor(x);
-  const yi = Math.floor(y);
-  const xf = x - xi;
-  const yf = y - yi;
-  const s = (t) => t * t * (3 - 2 * t);
-  const u = s(xf);
-  const v = s(yf);
-  const a = hash2(xi, yi);
-  const b = hash2(xi + 1, yi);
-  const c = hash2(xi, yi + 1);
-  const d = hash2(xi + 1, yi + 1);
-  return a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
+function skyColour(shape, u, v, dst) {
+  const t = smoothstep(0, 0.95, v);
+  const { top, horizon, cloud } = shape.sky;
+  let r = lerp(top[0], horizon[0], t);
+  let g = lerp(top[1], horizon[1], t);
+  let b = lerp(top[2], horizon[2], t);
+  const c = fbm(u * 3.2, v * 5 + 11, 5);
+  const mask = smoothstep(0.45, 0.75, c) * smoothstep(0.05, 0.5, v) * cloud;
+  dst[0] = r + mask;
+  dst[1] = g + mask * 0.95;
+  dst[2] = b + mask * 0.9;
+  return dst;
 }
 
-function fbm(x, y, octaves = 4) {
-  let sum = 0;
-  let amp = 0.5;
-  let freq = 1;
-  for (let i = 0; i < octaves; i++) {
-    sum += valueNoise(x * freq, y * freq) * amp;
-    freq *= 2;
-    amp *= 0.5;
-  }
-  return sum;
-}
-
-const clamp = (v, lo = 0, hi = 1) => (v < lo ? lo : v > hi ? hi : v);
-const lerp = (a, b, t) => a + (b - a) * t;
-const smoothstep = (e0, e1, x) => {
-  const t = clamp((x - e0) / (e1 - e0));
-  return t * t * (3 - 2 * t);
-};
-
-// ---------------------------------------------------------------------------
-// Tower geometry — shared by the colour render and the depth render so they agree
-// ---------------------------------------------------------------------------
-
-const TOP = 0.11;    // v of the crown
-const BASE = 0.93;   // v where the tower meets the ground
-const W_TOP = 0.062; // half-width at the crown
-const W_BASE = 0.178;// half-width at the base
-
-/** Five storeys, each ending in a projecting balcony. */
-const STOREYS = [0.11, 0.30, 0.475, 0.625, 0.775, 0.93];
-
-function halfWidthAt(v) {
-  const t = clamp((v - TOP) / (BASE - TOP));
-  // Slight entasis: the real minar swells a little rather than tapering as a pure cone.
-  const base = lerp(W_TOP, W_BASE, Math.pow(t, 1.18));
-
-  // Balcony flanges at every storey boundary.
-  let flange = 0;
-  for (let i = 1; i < STOREYS.length - 1; i++) {
-    const b = STOREYS[i];
-    const d = Math.abs(v - b);
-    if (d < 0.018) flange = Math.max(flange, (1 - d / 0.018) * 0.030);
-  }
-  return base + flange;
-}
-
-/** -1..1 across the tower, or null outside it. */
-function towerU(u, v) {
-  if (v < TOP || v > BASE) return null;
-  const hw = halfWidthAt(v);
-  const dx = (u - 0.5) / hw;
-  return Math.abs(dx) <= 1 ? dx : null;
-}
-
-function storeyIndex(v) {
-  for (let i = 0; i < STOREYS.length - 1; i++) if (v >= STOREYS[i] && v < STOREYS[i + 1]) return i;
-  return STOREYS.length - 2;
+function groundColour(shape, u, v, dst) {
+  const gy = shape.ground.y;
+  const t = smoothstep(gy, 1, v);
+  const tex = fbm(u * 18, v * 60 + 5, 4);
+  dst[0] = lerp(shape.ground.far[0], shape.ground.near[0], t) + tex * 26;
+  dst[1] = lerp(shape.ground.far[1], shape.ground.near[1], t) + tex * 30;
+  dst[2] = lerp(shape.ground.far[2], shape.ground.near[2], t) + tex * 16;
+  return dst;
 }
 
 // ---------------------------------------------------------------------------
 // Colour render
 // ---------------------------------------------------------------------------
 
-function renderHero({ sepia = false } = {}) {
+function renderHero(shape, { sepia = false } = {}) {
+  const { W, H } = shape;
   const px = Buffer.alloc(W * H * 3);
+  const surf = newSurface();
+  const mirror = newSurface();
+  const c = [0, 0, 0];
+  const m = [0, 0, 0];
+  const wide = W >= H;
+  const vigX = wide ? 1.0 : 1.25;
+  const vigY = wide ? 1.25 : 1.0;
+  const water = shape.water ?? null;
+  const step = sepia ? 4 : 3;
 
   for (let y = 0; y < H; y++) {
     const v = y / H;
@@ -185,82 +160,46 @@ function renderHero({ sepia = false } = {}) {
       let g;
       let b;
 
-      const dx = towerU(u, v);
-
-      if (dx === null) {
-        // ---- sky and ground ----
-        if (v < 0.955) {
-          // Late-afternoon sky: warm near the horizon, deeper blue overhead.
-          const t = smoothstep(0.0, 0.95, v);
-          r = lerp(96, 214, t);
-          g = lerp(126, 178, t);
-          b = lerp(168, 148, t);
-          // Soft cloud banding
-          const cloud = fbm(u * 3.2, v * 5.0 + 11, 5);
-          const cloudMask = smoothstep(0.45, 0.75, cloud) * smoothstep(0.05, 0.5, v) * 40;
-          r += cloudMask;
-          g += cloudMask * 0.95;
-          b += cloudMask * 0.9;
-        } else {
-          // ---- ground ----
-          const t = smoothstep(0.955, 1.0, v);
-          const grass = fbm(u * 18, v * 60 + 5, 4);
-          r = lerp(96, 66, t) + grass * 26;
-          g = lerp(92, 62, t) + grass * 30;
-          b = lerp(70, 46, t) + grass * 16;
+      if (shape.hit(u, v, surf)) {
+        litColour(surf, u, v, c);
+        r = c[0]; g = c[1]; b = c[2];
+      } else if (water && v >= water.y) {
+        // ---- the tank / the harbour ----
+        const t = smoothstep(water.y, 1, v);
+        // Reflections are compressed and broken up by a slow swell.
+        const swell = Math.sin(v * 190 + fbm(u * 5, v * 26, 3) * 8) * water.ripple * (0.35 + t);
+        const mv = water.y - (v - water.y) * 0.86 + swell;
+        const mu = u + swell * 0.6;
+        r = lerp(shape.sky.horizon[0], 76, t * 0.5) * 0.84;
+        g = lerp(shape.sky.horizon[1], 96, t * 0.5) * 0.86;
+        b = lerp(shape.sky.horizon[2], 112, t * 0.5) * 0.9;
+        if (mv > 0 && shape.hit(mu, mv, mirror)) {
+          litColour(mirror, mu, mv, m);
+          const s = water.strength * (1 - t * 0.3);
+          r = lerp(r, m[0] * 0.9, s);
+          g = lerp(g, m[1] * 0.9, s);
+          b = lerp(b, m[2] * 0.92, s);
         }
+        // Specular glitter on the ripples.
+        const gl = smoothstep(0.62, 0.95, fbm(u * 70, v * 210, 3)) * 34 * (0.3 + t);
+        r += gl; g += gl; b += gl * 0.9;
+      } else if (v >= shape.ground.y) {
+        groundColour(shape, u, v, c);
+        r = c[0]; g = c[1]; b = c[2];
       } else {
-        // ---- the tower ----
-        const s = storeyIndex(v);
-        // Firoz Shah rebuilt the top two storeys in marble — they read lighter.
-        const marble = s >= 4 ? 0 : s >= 3 ? 0.35 : 0;
-        const upper = s >= 3 ? 1 : 0;
-
-        // 24 flutes, alternating angular and rounded, wrapped round a cylinder.
-        const theta = Math.asin(clamp(dx, -1, 1));
-        const ribs = upper ? 16 : 24;
-        const flute = Math.cos(theta * ribs);
-        const fluteShade = 0.86 + 0.14 * Math.pow(Math.abs(flute), 0.6);
-
-        // Cylindrical form shading: lit from the upper left.
-        const nz = Math.sqrt(clamp(1 - dx * dx));
-        const light = clamp(0.36 + 0.72 * clamp(nz * 0.86 - dx * 0.42));
-
-        // Sandstone base colour, marble mixed in for the upper storeys.
-        const sandR = lerp(176, 226, marble);
-        const sandG = lerp(104, 196, marble);
-        const sandB = lerp(74, 168, marble);
-
-        // Carved inscription bands: darker horizontal ribbons.
-        let band = 1;
-        for (let i = 1; i < STOREYS.length - 1; i++) {
-          const d = Math.abs(v - (STOREYS[i] - 0.030));
-          if (d < 0.011) band = Math.min(band, 0.72 + 0.28 * (d / 0.011));
-        }
-        // Balcony undersides (muqarnas) throw a hard shadow.
-        let balconyShadow = 1;
-        for (let i = 1; i < STOREYS.length - 1; i++) {
-          const d = v - STOREYS[i];
-          if (d > 0 && d < 0.014) balconyShadow = Math.min(balconyShadow, 0.42 + 0.58 * (d / 0.014));
-        }
-
-        // Weathered stone grain.
-        const grain = 0.93 + fbm(u * 46, v * 150, 4) * 0.16;
-
-        const k = light * fluteShade * band * balconyShadow * grain;
-        r = sandR * k;
-        g = sandG * k;
-        b = sandB * k;
+        skyColour(shape, u, v, c);
+        r = c[0]; g = c[1]; b = c[2];
       }
 
       // ---- atmosphere: haze rising from the base, then vignette ----
-      const haze = smoothstep(0.62, 1.0, v) * 0.20;
-      r = lerp(r, 208, haze);
-      g = lerp(g, 190, haze);
-      b = lerp(b, 168, haze);
+      const hz = shape.haze;
+      const haze = smoothstep(hz.start, 1, v) * hz.amount;
+      r = lerp(r, hz.col[0], haze);
+      g = lerp(g, hz.col[1], haze);
+      b = lerp(b, hz.col[2], haze);
 
-      const cx = (u - 0.5) * 1.25;
-      const cy = (v - 0.5) * 1.0;
+      const cx = (u - 0.5) * vigX;
+      const cy = (v - 0.5) * vigY;
       const vig = 1 - clamp(Math.sqrt(cx * cx + cy * cy) - 0.34) * 0.85;
       r *= vig;
       g *= vig;
@@ -273,7 +212,7 @@ function renderHero({ sepia = false } = {}) {
         r = clamp((flat * 1.07 + 26) / 255) * 255;
         g = clamp((flat * 0.96 + 14) / 255) * 255;
         b = clamp((flat * 0.74 + 6) / 255) * 255;
-        const age = (hash2(x >> 1, y >> 1) - 0.5) * 22;
+        const age = (hash2(x >> 1, y >> 1) - 0.5) * 20;
         r += age;
         g += age;
         b += age;
@@ -281,10 +220,11 @@ function renderHero({ sepia = false } = {}) {
 
       // Film grain — the single cheapest thing that makes a render read as a photograph.
       // Sampled at half resolution and quantised: full per-pixel noise is incompressible
-      // and pushed the PNG past the 400KB page budget for no visible gain at phone DPI.
+      // and pushed the PNG past the page budget for no visible gain at phone DPI.
       const grain = (Math.round(hash2(x >> 1, y >> 1) * 4) / 4 - 0.5) * 9;
-      // Quantise to 3-value steps. Invisible on a phone, roughly halves the PNG.
-      const q = (n) => Math.round((clamp((n + grain) / 255) * 255) / 3) * 3;
+      // Quantise to 3-value steps (4 for the flat sepia plate). Invisible on a phone,
+      // roughly halves the PNG.
+      const q = (n) => Math.round((clamp((n + grain) / 255) * 255) / step) * step;
       const o = (y * W + x) * 3;
       px[o] = q(r);
       px[o + 1] = q(g);
@@ -295,40 +235,69 @@ function renderHero({ sepia = false } = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Depth render — MUST agree with the colour render pixel for pixel
+// Depth render — cannot disagree with the colour render, because it asks the same
+// `hit` the same question and simply reads a different field off the answer.
 // ---------------------------------------------------------------------------
 
-function renderDepth() {
-  const px = Buffer.alloc(W * H);
+function renderDepth(shape) {
+  const { W, H } = shape;
+  const buf = new Float32Array(W * H);
+  const surf = newSurface();
+  const water = shape.water ?? null;
+
   for (let y = 0; y < H; y++) {
     const v = y / H;
     for (let x = 0; x < W; x++) {
       const u = x / W;
       let d;
-      const dx = towerU(u, v);
-
-      if (dx !== null) {
-        // Cylindrical roundness: the centre of the shaft is nearest the camera.
-        // This is what makes the parallax read as a solid round tower rather than
-        // a flat cut-out, and it is the whole reason a matching depth map matters.
-        const round = Math.sqrt(clamp(1 - dx * dx));
-        d = 0.70 + round * 0.30;
-        // The crown is further away than the base — the tower recedes as it rises.
-        d -= smoothstep(BASE, TOP, v) * 0.18;
-      } else if (v >= 0.955) {
-        // Ground plane sweeping toward the viewer.
-        d = lerp(0.30, 0.96, smoothstep(0.955, 1.0, v));
+      if (shape.hit(u, v, surf)) {
+        d = surf.z;
+      } else if (water && v >= water.y) {
+        // Water is a plane sweeping toward the viewer. Note it takes the plane's
+        // depth, NOT the depth of whatever it happens to be reflecting — that is
+        // what makes a reflection behave like a reflection under parallax.
+        d = lerp(0.34, 0.98, smoothstep(water.y, 1, v));
+      } else if (v >= shape.ground.y) {
+        d = lerp(0.3, 0.96, smoothstep(shape.ground.y, 1, v));
       } else {
-        // Sky: effectively at infinity, with a whisper of cloud relief so the
-        // dust motes and drift have something to parallax against.
-        d = 0.02 + fbm(u * 3.2, v * 5.0 + 11, 3) * 0.05;
+        // Sky: effectively at infinity, with a whisper of cloud relief so the dust
+        // motes and the drift have something to parallax against.
+        d = 0.02 + fbm(u * 3.2, v * 5 + 11, 3) * 0.05;
       }
+      buf[y * W + x] = clamp(d);
+    }
+  }
 
-      // Slight blur at the silhouette so displacement does not tear a hard edge.
-      const edgeSoft = dx !== null ? smoothstep(1.0, 0.86, Math.abs(dx)) : 1;
-      d = lerp(0.12, d, 0.25 + 0.75 * edgeSoft);
-
-      px[y * W + x] = clamp(d) * 255;
+  // A two-pass box blur softens every silhouette at once, so displacement never
+  // tears a hard edge. Two pixels at this resolution is well under a millimetre
+  // of apparent blur on a phone, and it compresses better besides.
+  const R = 2;
+  const tmp = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      let s = 0;
+      let n = 0;
+      for (let i = -R; i <= R; i++) {
+        const xx = x + i;
+        if (xx < 0 || xx >= W) continue;
+        s += buf[y * W + xx];
+        n++;
+      }
+      tmp[y * W + x] = s / n;
+    }
+  }
+  const px = Buffer.alloc(W * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      let s = 0;
+      let n = 0;
+      for (let i = -R; i <= R; i++) {
+        const yy = y + i;
+        if (yy < 0 || yy >= H) continue;
+        s += tmp[yy * W + x];
+        n++;
+      }
+      px[y * W + x] = Math.round(clamp(s / n) * 255);
     }
   }
   return px;
@@ -336,15 +305,67 @@ function renderDepth() {
 
 // ---------------------------------------------------------------------------
 
-fs.mkdirSync(OUT, { recursive: true });
+const args = process.argv.slice(2);
+const force = args.includes('--force');
+const only = args.filter((a) => !a.startsWith('--'));
+const ids = only.length ? only : Object.keys(SHAPES);
 
-const write = (name, buf) => {
-  fs.writeFileSync(path.join(OUT, name), buf);
-  console.log(`  ${name.padEnd(16)} ${(buf.length / 1024).toFixed(0)} KB`);
-};
+/**
+ * Monuments whose hero is a real photograph. Written by scripts/fetch-photos.mjs.
+ * Missing file simply means nothing is locked yet.
+ */
+const locked = (() => {
+  try {
+    const lock = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'public', 'monuments', 'photo-lock.json'), 'utf8'),
+    );
+    return new Set(Object.keys(lock.plates ?? {}));
+  } catch {
+    return new Set();
+  }
+})();
 
-console.log(`Generating placeholder assets in ${OUT}`);
-write('hero.png', encodePng(W, H, renderHero(), 2));
-write('era-1900.png', encodePng(W, H, renderHero({ sepia: true }), 2));
-write('depth.png', encodePng(W, H, renderDepth(), 0));
-console.log('Done. These are PLACEHOLDERS — swap in a real photograph before the demo.');
+let total = 0;
+for (const id of ids) {
+  const shape = SHAPES[id];
+  if (!shape) {
+    console.error(`  ! unknown monument "${id}" — known: ${Object.keys(SHAPES).join(', ')}`);
+    process.exitCode = 1;
+    continue;
+  }
+  const outDir = path.join(process.cwd(), 'public', 'monuments', id);
+  fs.mkdirSync(outDir, { recursive: true });
+
+  const aspect = (shape.W / shape.H).toFixed(4).replace(/0+$/, '');
+  const note = locked.has(id) && !force ? '  (procedural geometry only — hero is a photograph)' : '';
+  console.log(`\n${id}  ${shape.W}x${shape.H}  aspect ${aspect}${note}`);
+
+  const write = (name, buf) => {
+    fs.writeFileSync(path.join(outDir, name), buf);
+    total += buf.length;
+    console.log(`  ${name.padEnd(16)} ${(buf.length / 1024).toFixed(0)} KB`);
+  };
+
+  const photographed = locked.has(id) && !force;
+  if (photographed) {
+    // The hero and the era plate are a licensed photograph. Leave them alone.
+    console.log('  hero.png / era-1900.png  KEPT — real photograph (see photo-lock.json)');
+  } else {
+    write('hero.png', encodePng(shape.W, shape.H, renderHero(shape), 2));
+    write('era-1900.png', encodePng(shape.W, shape.H, renderHero(shape, { sepia: true }), 2));
+  }
+  // depth.png is always regenerated: `public/sw.js` precaches the path and
+  // `scripts/smoke.ts` asserts it, so the file has to exist. For a photographed
+  // monument content/<id>.json sets `"depth": ""`, so the app never loads it —
+  // it is a stale artefact of the procedural set, not a map of the photograph.
+  write('depth.png', encodePng(shape.W, shape.H, renderDepth(shape), 0));
+}
+
+console.log(`\nDone — ${(total / 1024 / 1024).toFixed(2)} MB total.`);
+if (locked.size && !force) {
+  console.log(
+    `${locked.size} monument(s) have real photographs and were left alone: ` +
+      `${[...locked].join(', ')}. See public/monuments/CREDITS.md.`,
+  );
+}
+console.log('Anything else here is a PLACEHOLDER — swap in real photographs before the demo.');
