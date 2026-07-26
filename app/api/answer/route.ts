@@ -8,9 +8,10 @@ import { getMonument } from '@/lib/monuments';
 import {
   VISUAL_EXTRA_RULE,
   answerMessages,
+  checkReplyScript,
   classificationMessages,
   doNotRemember,
-  guessLangFromScript,
+  guessLangFromText,
   memoryLeadIn,
   noMemoriesYet,
   parseIntent,
@@ -18,7 +19,7 @@ import {
   retrievalDepth,
 } from '@/lib/prompts';
 import { retrieveSources } from '@/lib/retrieval';
-import { MODELS, chat, isConfigured } from '@/lib/sarvam';
+import { MODELS, chat, isConfigured, translate } from '@/lib/sarvam';
 import { EMPTY_DIRECTIVE, type Intent, type Monument, type SourceChunk, type StageTimings, type VisualDirective } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
     const monument = getMonument(monumentId);
     // Language always comes from upstream (Saaras). The script guess is only a
     // last resort for the typed fallback, where there is no detection to use.
-    const lang: LangCode = body.lang ? normalizeLang(body.lang) : normalizeLang(guessLangFromScript(transcript) ?? undefined);
+    const lang: LangCode = body.lang ? normalizeLang(body.lang) : normalizeLang(guessLangFromText(transcript) ?? undefined);
 
     const timings: StageTimings = {};
 
@@ -240,12 +241,52 @@ export async function POST(req: NextRequest) {
       await logEvent('empty_after_strip', { raw: raw.slice(0, 300) }, sessionId);
     }
 
+    /**
+     * DID IT ACTUALLY ANSWER IN THE VISITOR'S LANGUAGE?
+     *
+     * The prompt asks, twice, and the model still sometimes answers in the
+     * English of the SOURCES block — most often on the DEEP model, and most
+     * often for the languages with the least training data, which are exactly
+     * the visitors this product exists for. A prompt is a request, not a
+     * guarantee, so the reply is checked before it is spoken.
+     *
+     * `checkReplyScript` only reports 'mismatch' when the expected script is
+     * completely absent AND there is a sentence of Latin in its place, so a
+     * correct reply cannot trigger this. When it does fire we repair with one
+     * Sarvam translate call rather than shipping a language the visitor did not
+     * speak; if the repair fails we speak the original and say so in the payload
+     * instead of failing the turn. Either way the event is logged, because a
+     * mismatch is a prompt regression someone needs to see.
+     */
+    let langMismatch = false;
+    let langRepaired = false;
+    if (checkReplyScript(text, lang) === 'mismatch') {
+      langMismatch = true;
+      const tRepair = Date.now();
+      await logEvent('lang_mismatch', { lang, intent, model, text: text.slice(0, 200) }, sessionId);
+      try {
+        const repaired = await translate(text, lang, { colloquial: true });
+        if (repaired && checkReplyScript(repaired, lang) !== 'mismatch') {
+          text = repaired;
+          langRepaired = true;
+        }
+        await logEvent('lang_repair', { lang, ok: langRepaired, ms: Date.now() - tRepair }, sessionId);
+      } catch (err) {
+        // Speaking the wrong language is bad; speaking nothing is worse.
+        console.warn('[api/answer] language repair failed:', (err as Error).message);
+        await logEvent('lang_repair_failed', { lang, error: (err as Error).message }, sessionId);
+      }
+      timings.generate = (timings.generate ?? 0) + (Date.now() - tRepair);
+    }
+
     timings.total = Date.now() - t0;
     await record(sessionId, text, lang, timings, intent, model, retrieval.chunks, {
       scores: retrieval.scores,
       directive,
       retrievalMode: retrieval.mode,
       admittedIgnorance: refused,
+      langMismatch,
+      langRepaired,
       clientElapsedMs: body.elapsedMs ?? null,
     });
     if (refused) {
@@ -267,6 +308,10 @@ export async function POST(req: NextRequest) {
       scores: retrieval.scores,
       directiveOk: parsed.ok,
       remembered: parsed.remembered,
+      /** True when the model replied in the wrong script and we caught it. */
+      langMismatch,
+      /** True when the mismatch was repaired by translating into `lang`. */
+      langRepaired,
       ...(memoryHandoff ? { handoff: memoryHandoff } : {}),
     });
   } catch (err) {

@@ -61,10 +61,23 @@ export async function POST(req: NextRequest) {
       bypassCache: body.bypassCache === true,
     });
 
-    // Bulbul speaks 11 of the 23 languages Saaras understands. When we had to
-    // substitute a relative we say so, out loud, in the visitor's own language.
-    const notice = result.degraded ? voiceGapNotice(lang) : null;
-    if (result.degraded) {
+    /**
+     * Bulbul speaks 11 of the 23 languages Saaras understands. When we had to
+     * substitute a relative we say so, out loud, in the visitor's own language.
+     *
+     * `degraded` and `requestedLang` are taken from resolveVoice() here rather
+     * than from the speak() result, and that is deliberate. lib/sarvam's TTS
+     * cache is keyed on (text, VOICE language, speaker, pace) — the language the
+     * visitor actually spoke is not in the key — but the cached value carries
+     * `requestedLang` and `degraded` from whoever missed the cache first. Two
+     * languages that share a voice therefore share an entry: a Sanskrit visitor
+     * and a Hindi visitor hearing the same Hindi-voiced line collide, and the
+     * Hindi visitor gets told their language could not be spoken. resolveVoice()
+     * is a pure function of the language on THIS request, so it cannot go stale.
+     */
+    const degraded = target.degraded;
+    const notice = degraded ? voiceGapNotice(lang) : null;
+    if (degraded) {
       await logEvent('voice_gap', { lang, voiceLang: result.voiceLang, speaker: result.speaker }, sessionId);
     }
 
@@ -84,9 +97,9 @@ export async function POST(req: NextRequest) {
           // HTTP headers are latin-1 only and these values are in Indic scripts,
           // so the notice is percent-encoded; the client decodeURIComponent()s it.
           'x-bol-voice-lang': result.voiceLang,
-          'x-bol-requested-lang': result.requestedLang,
+          'x-bol-requested-lang': target.textLang,
           'x-bol-speaker': result.speaker,
-          'x-bol-degraded': String(result.degraded),
+          'x-bol-degraded': String(degraded),
           'x-bol-notice': notice ? encodeURIComponent(notice) : '',
           'x-bol-chunks': String(result.chunks),
           'x-bol-cached': String(result.cached),
@@ -100,9 +113,9 @@ export async function POST(req: NextRequest) {
       mime: result.mime,
       bytes: result.bytes,
       voiceLang: result.voiceLang,
-      requestedLang: result.requestedLang,
+      requestedLang: target.textLang,
       speaker: result.speaker,
-      degraded: result.degraded,
+      degraded,
       notice,
       chunks: result.chunks,
       cached: result.cached,
