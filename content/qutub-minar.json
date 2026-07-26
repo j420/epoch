@@ -1,0 +1,203 @@
+{
+  "id": "qutub-minar",
+  "city": "Delhi",
+  "aspect": 0.75,
+  "hero": "/monuments/qutub-minar/hero.png",
+  "depth": "/monuments/qutub-minar/depth.png",
+  "credit": "Photograph: public domain. Depth map generated with Depth Anything V2.",
+  "displayName": {
+    "en-IN": "Qutub Minar",
+    "hi-IN": "क़ुतुब मीनार",
+    "ur-IN": "قطب مینار",
+    "bn-IN": "কুতুব মিনার",
+    "ta-IN": "குதுப் மினார்",
+    "te-IN": "కుతుబ్ మినార్",
+    "kn-IN": "ಕುತುಬ್ ಮಿನಾರ್",
+    "ml-IN": "ഖുതുബ് മിനാർ",
+    "mr-IN": "कुतुब मिनार",
+    "gu-IN": "કુતુબ મિનાર",
+    "pa-IN": "ਕੁਤੁਬ ਮੀਨਾਰ",
+    "od-IN": "କୁତୁବ ମିନାର",
+    "as-IN": "কুটুব মিনাৰ"
+  },
+  "regions": [
+    {
+      "id": "base",
+      "x": 0.5,
+      "y": 0.82,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the first storey",
+        "hi-IN": "पहली मंज़िल",
+        "ta-IN": "முதல் தளம்",
+        "bn-IN": "প্রথম তলা",
+        "te-IN": "మొదటి అంతస్తు",
+        "mr-IN": "पहिला मजला"
+      }
+    },
+    {
+      "id": "flutes",
+      "x": 0.5,
+      "y": 0.68,
+      "z": 0.45,
+      "label": {
+        "en-IN": "my fluted shaft",
+        "hi-IN": "मेरी धारीदार दीवार",
+        "ta-IN": "என் சுருள் தூண்",
+        "bn-IN": "আমার খাঁজকাটা স্তম্ভ",
+        "te-IN": "నా చారల స్తంభం",
+        "mr-IN": "माझा नक्षीदार खांब"
+      }
+    },
+    {
+      "id": "balcony",
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.4,
+      "label": {
+        "en-IN": "the balconies",
+        "hi-IN": "छज्जे",
+        "ta-IN": "மாடங்கள்",
+        "bn-IN": "বারান্দা",
+        "te-IN": "బాల్కనీలు",
+        "mr-IN": "सज्जे"
+      }
+    },
+    {
+      "id": "inscriptions",
+      "x": 0.46,
+      "y": 0.6,
+      "z": 0.5,
+      "label": {
+        "en-IN": "the carved bands of writing",
+        "hi-IN": "उकेरी हुई लिखाई",
+        "ta-IN": "செதுக்கப்பட்ட எழுத்துகள்",
+        "bn-IN": "খোদাই করা লিপি",
+        "te-IN": "చెక్కిన లిపి",
+        "mr-IN": "कोरलेले लेख"
+      }
+    },
+    {
+      "id": "dome",
+      "x": 0.5,
+      "y": 0.18,
+      "z": 0.35,
+      "label": {
+        "en-IN": "my crown",
+        "hi-IN": "मेरा शिखर",
+        "ta-IN": "என் உச்சி",
+        "bn-IN": "আমার চূড়া",
+        "te-IN": "నా శిఖరం",
+        "mr-IN": "माझे शिखर"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.72,
+      "y": 0.12,
+      "z": 0.15,
+      "label": {
+        "en-IN": "the sky above me",
+        "hi-IN": "मेरे ऊपर का आसमान",
+        "ta-IN": "என் மேலே வானம்",
+        "bn-IN": "আমার উপরের আকাশ",
+        "te-IN": "నా పైన ఆకాశం",
+        "mr-IN": "माझ्यावरचे आकाश"
+      }
+    },
+    {
+      "id": "courtyard",
+      "x": 0.24,
+      "y": 0.88,
+      "z": 0.7,
+      "label": {
+        "en-IN": "the courtyard at my feet",
+        "hi-IN": "मेरे पैरों का आँगन",
+        "ta-IN": "என் காலடி முற்றம்",
+        "bn-IN": "আমার পায়ের প্রাঙ্গণ",
+        "te-IN": "నా పాదాల వద్ద ప్రాంగణం",
+        "mr-IN": "माझ्या पायाशी अंगण"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/qutub-minar/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera first found me, a little over a century ago.",
+        "hi-IN": "जैसे एक सदी पहले कैमरे ने मुझे पहली बार देखा।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "Qutub Minar is a tapering tower of five storeys standing 72.5 metres high, with a base diameter of about 14.3 metres narrowing to about 2.7 metres at the top. A spiral staircase of 379 steps runs inside it. It is the tallest brick minaret in the world.",
+      "citation": "Archaeological Survey of India, Qutb Minar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s2",
+      "text": "Construction was begun in 1199 CE by Qutb ud-Din Aibak, the first ruler of the Delhi Sultanate, who raised only the first storey. His successor and son-in-law Shams ud-Din Iltutmish added three more storeys.",
+      "citation": "Archaeological Survey of India, Qutb Minar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s3",
+      "text": "In 1369 CE lightning struck and damaged the top storey. Firoz Shah Tughlaq rebuilt the upper section, replacing it with two storeys faced in red sandstone and white marble, which is why the top of the tower differs in material from its base.",
+      "citation": "Archaeological Survey of India, Qutb Minar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s4",
+      "text": "The shaft is fluted with alternating angular and rounded ribs on the lower storeys, and is wrapped in bands of carved inscriptions in Kufic and Naskh script bearing verses from the Quran and records of the builders.",
+      "citation": "Archaeological Survey of India, Qutb Minar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s5",
+      "text": "Each storey is separated by a projecting balcony carried on stalactite-like bracketing known as muqarnas. The balconies were once used to call the faithful to prayer from the adjoining mosque.",
+      "citation": "Archaeological Survey of India, Qutb Minar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s6",
+      "text": "The Qutb complex around the minar includes the Quwwat-ul-Islam Mosque, the earliest surviving mosque of the Delhi Sultanate, the Alai Darwaza gateway completed in 1311 CE by Alauddin Khalji, and the Alai Minar, an unfinished tower intended to be twice the height of Qutub Minar.",
+      "citation": "UNESCO World Heritage Centre, Qutb Minar and its Monuments, Delhi",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "In the courtyard stands the Iron Pillar, about 7.2 metres tall, bearing a Sanskrit inscription in Gupta-period Brahmi script referring to a king named Chandra. It has resisted rust for over sixteen centuries because of a protective layer of crystalline iron hydrogen phosphate formed on its surface.",
+      "citation": "Archaeological Survey of India; National Metallurgical Laboratory studies of the Delhi Iron Pillar",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s8",
+      "text": "An earthquake in 1803 damaged the tower. Major Robert Smith of the British Indian Army repaired it in 1828 and placed a Bengali-style cupola on top, which was judged out of keeping and taken down in 1848. That cupola still stands on the lawn to the south-east and is known as Smith's Folly.",
+      "citation": "Archaeological Survey of India, Qutb Minar conservation history",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s9",
+      "text": "Qutb Minar and its Monuments were inscribed on the UNESCO World Heritage List in 1993. The interior staircase has been closed to visitors since 1981 following a stampede on the stairs.",
+      "citation": "UNESCO World Heritage Centre; Archaeological Survey of India",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "The tower is built chiefly of red and buff sandstone quarried locally, with marble introduced in the upper storeys. It leans very slightly, by roughly 65 centimetres from vertical, which is considered within safe limits and is monitored regularly.",
+      "citation": "Archaeological Survey of India structural monitoring reports",
+      "license": "public domain (government of India)"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am Qutub Minar. I have watched Delhi for eight hundred years — ask me anything.",
+    "hi-IN": "मैं क़ुतुब मीनार हूँ। आठ सौ बरस से दिल्ली को देख रहा हूँ — जो पूछना है, पूछो।",
+    "ta-IN": "நான் குதுப் மினார். எண்ணூறு ஆண்டுகளாக டெல்லியைப் பார்த்து நிற்கிறேன் — கேளுங்கள்.",
+    "bn-IN": "আমি কুতুব মিনার। আটশো বছর ধরে দিল্লিকে দেখছি — যা জানতে চাও, জিজ্ঞেস করো।",
+    "te-IN": "నేను కుతుబ్ మినార్. ఎనిమిది వందల ఏళ్లుగా ఢిల్లీని చూస్తున్నాను — ఏమైనా అడగండి.",
+    "mr-IN": "मी कुतुब मिनार. आठशे वर्षांपासून दिल्ली पाहतो आहे — काहीही विचारा."
+  }
+}

@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bol-bg: #0a0908;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--bol-bg);
+  color: #f8e6d4;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-indic), 'Noto Sans', system-ui, sans-serif;
+  /* The photograph fills the viewport; nothing should scroll behind it. */
+  overflow: hidden;
+}
+
+/* Prompt 2: honour prefers-reduced-motion everywhere, not just in the shader. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@layer components {
+  /* Glass chrome that sits over the photograph without competing with it. */
+  .bol-glass {
+    @apply rounded-2xl border border-white/10 bg-black/35 backdrop-blur-md;
+  }
+
+  .bol-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-sandstone-200/25 bg-black/40 px-3 py-1
+           text-xs font-medium tracking-wide text-sandstone-100 backdrop-blur-md;
+  }
+
+  .bol-shimmer {
+    background-image: linear-gradient(90deg, rgba(248, 230, 212, 0.04) 25%, rgba(248, 230, 212, 0.14) 50%, rgba(248, 230, 212, 0.04) 75%);
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+}
+
+/* Indic scripts need a little more line height than Latin to avoid clipped matras. */
+.indic-text {
+  line-height: 1.7;
+  text-wrap: pretty;
+}
