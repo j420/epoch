@@ -52,7 +52,21 @@ loader._resolveFilename = function patched(this: unknown, request: string, ...re
   return resolveOriginal.call(this, request, ...rest);
 };
 
-const STUB_PORT = Number(process.env.BOL_STUB_PORT ?? 3312);
+/**
+ * A per-process port, not a fixed one.
+ *
+ * A hard-coded 3312 made this suite flaky: a stub left listening by an interrupted
+ * run, or the socket still in TIME_WAIT, and the next run's assertions fire against
+ * a stale server. Observed once as a spurious 265/8 that passed 273/273 immediately
+ * afterwards — the worst kind of failure, because it teaches you to distrust a real
+ * one.
+ *
+ * Derived from the pid so two runs never collide and a stale listener from an
+ * earlier run is never reused. Port 0 would be tidier, but resolving it needs
+ * top-level await, and this file is transformed as CJS. The pid is also what
+ * DATA_DIR uses, so a run's port and its store stay associated.
+ */
+const STUB_PORT = Number(process.env.BOL_STUB_PORT ?? 20000 + (process.pid % 30000));
 const DATA_DIR = path.join(os.tmpdir(), `bol-verify-${process.pid}`);
 
 // lib/sarvam reads SARVAM_BASE_URL at module load, so this must precede the
@@ -459,8 +473,13 @@ async function turn(opts: {
 }
 
 async function readEvents(): Promise<{ kind: string; payload: Record<string, unknown> }[]> {
-  // persist() is queued, not awaited by the routes; give it a tick to land.
-  await new Promise((r) => setTimeout(r, 120));
+  // persist() is queued and deliberately not awaited by the routes — analytics must
+  // not sit in a voice turn's latency budget. Waiting a fixed 120ms was a guess, and
+  // it lost roughly one run in eight: all eight event assertions failing together
+  // with "0 lang_switch events", then passing on a re-run. Await the actual write
+  // queue instead of hoping.
+  const db = await import('../lib/db');
+  await db.flushStore();
   try {
     const raw = await fs.readFile(path.join(DATA_DIR, 'store.json'), 'utf8');
     return (JSON.parse(raw).events ?? []) as { kind: string; payload: Record<string, unknown> }[];
