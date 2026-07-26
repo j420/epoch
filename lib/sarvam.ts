@@ -505,16 +505,61 @@ export async function translate(
 // readDocument() — Sarvam Vision / Akshar. Indic OCR for plaques and signboards.
 // ---------------------------------------------------------------------------
 
+/**
+ * Sarvam's parse endpoint has returned its extracted text base64-encoded in some
+ * versions and as plain text in others. Handing base64 straight to the rewrite
+ * model would produce confident nonsense from what looks like a successful OCR —
+ * a silent failure, and the worst kind, because the side-by-side "proof" panel
+ * would be showing the judge a wall of gibberish.
+ *
+ * So decode only when the string is unambiguously base64 AND the decoded bytes are
+ * valid UTF-8 containing letters. Indic scripts are multi-byte, so a mis-decode
+ * reliably produces replacement characters, which is the check that catches it.
+ */
+function maybeDecodeBase64(value: string): string {
+  const compact = value.replace(/\s+/g, '');
+  // Real OCR output contains spaces and punctuation; base64 does not.
+  if (compact.length < 32 || compact.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(compact)) return value;
+  try {
+    const decoded = Buffer.from(compact, 'base64').toString('utf8');
+    if (!decoded || decoded.includes('�')) return value;
+    // Must look like language, not binary that happened to decode.
+    if (!/\p{L}/u.test(decoded)) return value;
+    return decoded.trim();
+  } catch {
+    return value;
+  }
+}
+
 export async function readDocument(
   file: Blob | Buffer | Uint8Array,
   prompt?: string,
-  opts: { filename?: string; signal?: AbortSignal } = {},
+  opts: {
+    filename?: string;
+    signal?: AbortSignal;
+    /** Single-page by default — a plaque photo is one page. */
+    pageNumber?: number;
+    /** 'large' is the accurate Sarvam Vision model; 'small' is faster and weaker. */
+    mode?: 'large' | 'small';
+  } = {},
 ): Promise<string> {
   const blob = toBlob(file, 'image/jpeg');
 
   const form = new FormData();
   form.append('file', blob, opts.filename ?? 'plaque.jpg');
   if (prompt) form.append('prompt', prompt);
+
+  // Confirmed against Sarvam's published examples: /parse/parsepdf takes these three
+  // alongside the file. Despite the endpoint name it accepts JPEG and PNG as well as
+  // PDF, which is what makes the phone-photo plaque path viable at all.
+  //   page_number    — a plaque photo is always a single page
+  //   sarvam_mode    — "large" is the accurate model; "small" trades accuracy for speed
+  //   prompt_caching — pointless here, every plaque photo is different
+  // Sending them is the safer bet than omitting them: an unknown field is normally
+  // ignored, whereas a missing required field is a 400.
+  form.append('page_number', String(opts.pageNumber ?? 1));
+  form.append('sarvam_mode', opts.mode ?? process.env.SARVAM_VISION_MODE ?? 'large');
+  form.append('prompt_caching', 'false');
 
   // Sarvam has shipped this under a couple of paths across versions. Try in order.
   const candidates = (process.env.SARVAM_VISION_PATHS ?? '/parse/parsepdf,/v1/document/parse,/document-parse')
@@ -528,7 +573,7 @@ export async function readDocument(
       const body = await sarvamFetch<any>(path, { form, attempts: 2, signal: opts.signal, timeoutMs: 90_000 });
       const out =
         pick(body, 'output', 'text', 'content', 'markdown', 'parsed_text', 'data.output', 'data.text') ?? '';
-      if (typeof out === 'string' && out.trim()) return out.trim();
+      if (typeof out === 'string' && out.trim()) return maybeDecodeBase64(out.trim());
       if (Array.isArray(out)) return out.map((p: any) => (typeof p === 'string' ? p : pick(p, 'text', 'content') ?? '')).join('\n\n').trim();
       lastErr = new SarvamBadResponse(`Vision at ${path} returned no text`, { endpoint: path, body: Object.keys(body ?? {}) });
     } catch (err) {
