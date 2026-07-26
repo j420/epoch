@@ -18,7 +18,15 @@ body {
 
 body {
   font-family: var(--font-indic), 'Noto Sans', system-ui, sans-serif;
-  /* The photograph fills the viewport; nothing should scroll behind it. */
+}
+
+/*
+ * The Stage is full-bleed and must not scroll behind the photograph — but this
+ * started life on `body`, which silently trapped every ordinary page in the app
+ * (the monument index, /live, /admin) at one viewport tall with no way to reach
+ * the rest. Scoped to the pages that actually want it.
+ */
+body:has(> main[data-bol-stage]) {
   overflow: hidden;
 }
 

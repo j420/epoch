@@ -1,0 +1,238 @@
+{
+  "id": "sanchi-stupa",
+  "city": "Sanchi",
+  "aspect": 0.75,
+  "hero": "/monuments/sanchi-stupa/hero.png",
+  "depth": "/monuments/sanchi-stupa/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Sanchi Stupa",
+    "hi-IN": "साँची स्तूप",
+    "mr-IN": "सांची स्तूप",
+    "bn-IN": "সাঁচি স্তূপ",
+    "ta-IN": "சாஞ்சி ஸ்தூபி",
+    "te-IN": "సాంచీ స్తూపం",
+    "kn-IN": "ಸಾಂಚಿ ಸ್ತೂಪ",
+    "ml-IN": "സാഞ്ചി സ്തൂപം",
+    "gu-IN": "સાંચી સ્તૂપ",
+    "pa-IN": "ਸਾਂਚੀ ਸਤੂਪ",
+    "od-IN": "ସାଞ୍ଚୀ ସ୍ତୂପ",
+    "ur-IN": "سانچی اسٹوپا"
+  },
+  "regions": [
+    {
+      "id": "torana",
+      "x": 0.245,
+      "y": 0.55,
+      "z": 0.95,
+      "label": {
+        "en-IN": "my carved gateway",
+        "hi-IN": "मेरा उकेरा हुआ तोरण",
+        "mr-IN": "माझे कोरीव तोरण",
+        "bn-IN": "আমার খোদাই করা তোরণ",
+        "ta-IN": "என் செதுக்கிய நுழைவாயில்",
+        "te-IN": "నా చెక్కిన తోరణం",
+        "kn-IN": "ನನ್ನ ಕೆತ್ತನೆಯ ತೋರಣ"
+      }
+    },
+    {
+      "id": "dome",
+      "x": 0.5,
+      "y": 0.6,
+      "z": 0.62,
+      "label": {
+        "en-IN": "my great dome",
+        "hi-IN": "मेरा बड़ा अंड",
+        "mr-IN": "माझा मोठा अंड",
+        "bn-IN": "আমার বড় অণ্ড",
+        "ta-IN": "என் பெரிய அரைக்கோள மேடு",
+        "te-IN": "నా పెద్ద అండం",
+        "kn-IN": "ನನ್ನ ದೊಡ್ಡ ಅಂಡ"
+      }
+    },
+    {
+      "id": "harmika",
+      "x": 0.5,
+      "y": 0.465,
+      "z": 0.5,
+      "label": {
+        "en-IN": "the little railed enclosure on my crown",
+        "hi-IN": "मेरे शिखर की हर्मिका",
+        "mr-IN": "माझ्या शिखरावरील हर्मिका",
+        "bn-IN": "আমার চূড়ার হর্মিকা",
+        "ta-IN": "என் உச்சியிலுள்ள ஹர்மிகா",
+        "te-IN": "నా శిఖరంపై హర్మిక",
+        "kn-IN": "ನನ್ನ ಶಿಖರದ ಹರ್ಮಿಕಾ"
+      }
+    },
+    {
+      "id": "chhatra",
+      "x": 0.5,
+      "y": 0.4,
+      "z": 0.45,
+      "label": {
+        "en-IN": "the stone umbrella above me",
+        "hi-IN": "मेरे ऊपर का पत्थर का छत्र",
+        "mr-IN": "माझ्यावरचे दगडी छत्र",
+        "bn-IN": "আমার উপরের পাথরের ছত্র",
+        "ta-IN": "என் மேலுள்ள கல் குடை",
+        "te-IN": "నా పైనున్న రాతి ఛత్రం",
+        "kn-IN": "ನನ್ನ ಮೇಲಿನ ಕಲ್ಲಿನ ಛತ್ರ"
+      }
+    },
+    {
+      "id": "medhi",
+      "x": 0.64,
+      "y": 0.745,
+      "z": 0.75,
+      "label": {
+        "en-IN": "the raised walkway round my waist",
+        "hi-IN": "मेरी कमर के गिर्द की मेधी",
+        "mr-IN": "माझ्या कमरेभोवतीची मेधी",
+        "bn-IN": "আমার কোমর ঘিরে উঁচু পথ",
+        "ta-IN": "என் இடையைச் சுற்றிய உயர்ந்த வலம் வரும் பாதை",
+        "te-IN": "నా నడుము చుట్టూ ఎత్తైన ప్రదక్షిణ మార్గం",
+        "kn-IN": "ನನ್ನ ಸೊಂಟದ ಸುತ್ತಿನ ಎತ್ತರದ ಪ್ರದಕ್ಷಿಣ ಪಥ"
+      }
+    },
+    {
+      "id": "vedika",
+      "x": 0.78,
+      "y": 0.82,
+      "z": 0.88,
+      "label": {
+        "en-IN": "the stone railing at my feet",
+        "hi-IN": "मेरे पैरों की पत्थर की वेदिका",
+        "mr-IN": "माझ्या पायाशीची दगडी वेदिका",
+        "bn-IN": "আমার পায়ের পাথরের বেড়া",
+        "ta-IN": "என் காலடியிலுள்ள கல் வேலி",
+        "te-IN": "నా పాదాల వద్ద రాతి కంచె",
+        "kn-IN": "ನನ್ನ ಪಾದಗಳ ಬಳಿಯ ಕಲ್ಲಿನ ಬೇಲಿ"
+      }
+    },
+    {
+      "id": "hill",
+      "x": 0.5,
+      "y": 0.94,
+      "z": 0.9,
+      "label": {
+        "en-IN": "the hilltop I stand on",
+        "hi-IN": "जिस पहाड़ी पर मैं खड़ा हूँ",
+        "mr-IN": "ज्या टेकडीवर मी उभा आहे",
+        "bn-IN": "যে পাহাড়ের চূড়ায় আমি দাঁড়িয়ে",
+        "ta-IN": "நான் நிற்கும் குன்றின் உச்சி",
+        "te-IN": "నేను నిలిచిన కొండ శిఖరం",
+        "kn-IN": "ನಾನು ನಿಂತಿರುವ ಬೆಟ್ಟದ ತುದಿ"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.85,
+      "y": 0.15,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the sky above me",
+        "hi-IN": "मेरे ऊपर का आसमान",
+        "mr-IN": "माझ्यावरचे आकाश",
+        "bn-IN": "আমার উপরের আকাশ",
+        "ta-IN": "என் மேலே வானம்",
+        "te-IN": "నా పైన ఆకాశం",
+        "kn-IN": "ನನ್ನ ಮೇಲಿನ ಆಕಾಶ"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/sanchi-stupa/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me before the great restoration.",
+        "hi-IN": "जैसे बड़ी मरम्मत से पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "The Great Stupa stands on a hilltop at Sanchi in Madhya Pradesh, about 40 kilometres from Bhopal and close to the ancient city of Vidisha. It is the oldest Buddhist sanctuary in existence, and this hill was a major Buddhist centre until about the twelfth century CE.",
+      "citation": "UNESCO World Heritage Centre, Buddhist Monuments at Sanchi (ref. 524)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "It was first raised in the third century BCE, in the reign of the Mauryan emperor Ashoka, as a simple hemispherical mound of large bricks, roughly half the diameter it has today.",
+      "citation": "Archaeological Survey of India, Sanchi site record; UNESCO World Heritage Centre, Buddhist Monuments at Sanchi",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "In the second century BCE, under the Shunga dynasty, it was roughly doubled in size and encased in dressed stone, its top flattened, and its terraces and railings given their present form.",
+      "citation": "Archaeological Survey of India, Sanchi site record; UNESCO World Heritage Centre, Buddhist Monuments at Sanchi",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The dome measures 36.6 metres — 120 feet — across, and stands 16.46 metres, or 54 feet, high.",
+      "citation": "Archaeological Survey of India, Sanchi site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s5",
+      "text": "A plain stone railing, the vedika, encloses the stupa, leaving a processional path between it and the body of the mound. A second, raised walkway runs around the stupa at the level of its drum, reached by a double staircase. Both are for pradakshina, walking clockwise in reverence.",
+      "citation": "Archaeological Survey of India, Sanchi site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s6",
+      "text": "Four carved stone gateways, toranas, stand at the cardinal points, each about 10.4 metres high: two square pillars carrying three curved architraves with spirally rolled ends, every surface crowded with Jataka scenes and processions. They are usually dated to around the first century BCE, in the Satavahana period. In this early art the Buddha is never shown in human form, only by symbols — the wheel, the empty throne, the footprints, the Bodhi tree.",
+      "citation": "Archaeological Survey of India, Sanchi site record; UNESCO World Heritage Centre, Buddhist Monuments at Sanchi",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "An inscription on the southern gateway records that its carving was the gift of the guild of ivory workers of Vidisha, the city nearby; another names Ananda, son of Vasithi, foreman of the artisans of King Siri Satakarni. These were craftsmen whose usual medium was ivory, working here at monumental scale in stone.",
+      "citation": "Archaeological Survey of India, Sanchi site record (donative inscriptions, Stupa 1 southern gateway)",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s8",
+      "text": "At the summit sits the harmika, a square stone railing enclosing a sacred space, and rising from it the chhatravali, a tiered stone umbrella — an emblem of honour, its tiers taken to represent the Three Jewels: the Buddha, the Dharma and the Sangha.",
+      "citation": "Archaeological Survey of India, Sanchi site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s9",
+      "text": "Beside the southern gateway stands a pillar of Ashoka's time, cut from polished sandstone quarried at Chunar hundreds of miles away and once crowned by a capital of four lions set back to back. Its shaft, now broken, carries one of Ashoka's Schism Edicts in early Brahmi, warning against any act that would split the Buddhist community; the lion capital is sheltered in the site museum.",
+      "citation": "Archaeological Survey of India, Sanchi site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s10",
+      "text": "The site fell out of use and out of memory and was overgrown when General Henry Taylor came upon it in 1818. In 1822 Herbert Maddock, political agent at Bhopal, and his assistant Captain Johnson cut into the stupa from top to bottom hunting for treasure; they found nothing and left a breach that brought down the western gateway and part of the railing. Between 1912 and 1919 Sir John Marshall, Director-General of the Archaeological Survey of India, restored it and founded the museum here.",
+      "citation": "Archaeological Survey of India, Sanchi site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s11",
+      "text": "The Great Stupa holds no relics of the Buddha; excavations into its body found no relic casket. It was in Stupa 3 beside it that Alexander Cunningham found two stone caskets in 1851, inscribed in old Brahmi Sariputasa and Mahamogalanasa — the bone relics of Sariputta and Mahamoggallana, the Buddha's two chief disciples. Those relics were later carried to Britain, returned to India, and enshrined here in the Chetiyagiri Vihara on 30 November 1952.",
+      "citation": "Archaeological Survey of India, Sanchi site record; Alexander Cunningham, excavation report, 1851",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s12",
+      "text": "Sanchi was inscribed on the UNESCO World Heritage List in 1989 as Buddhist Monuments at Sanchi, under cultural criteria (i), (ii), (iii), (iv) and (vi). The site is owned by the Government of India and conserved and maintained by the Archaeological Survey of India, under its Bhopal Circle.",
+      "citation": "UNESCO World Heritage Centre, Buddhist Monuments at Sanchi (ref. 524); Archaeological Survey of India, Bhopal Circle",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am the Great Stupa at Sanchi. I have stood on this hill for over two thousand years — sit a while, and ask.",
+    "hi-IN": "मैं साँची का महास्तूप हूँ। दो हज़ार बरस से इस पहाड़ी पर खड़ा हूँ — ज़रा बैठो, और पूछो।",
+    "mr-IN": "मी सांचीचा महास्तूप. दोन हजार वर्षांहून अधिक काळ या टेकडीवर उभा आहे — जरा बसा, आणि विचारा.",
+    "bn-IN": "আমি সাঁচির মহাস্তূপ। দু'হাজার বছরেরও বেশি সময় ধরে এই পাহাড়ে দাঁড়িয়ে আছি — একটু বসো, জিজ্ঞেস করো।",
+    "ta-IN": "நான் சாஞ்சியின் மகா ஸ்தூபி. இரண்டாயிரம் ஆண்டுகளுக்கும் மேலாக இக்குன்றில் நிற்கிறேன் — சற்று அமருங்கள், கேளுங்கள்.",
+    "te-IN": "నేను సాంచీ మహాస్తూపం. రెండు వేల ఏళ్లకు పైగా ఈ కొండపై నిలిచి ఉన్నాను — కాసేపు కూర్చుని అడగండి.",
+    "kn-IN": "ನಾನು ಸಾಂಚಿಯ ಮಹಾಸ್ತೂಪ. ಎರಡು ಸಾವಿರ ವರ್ಷಗಳಿಗೂ ಹೆಚ್ಚು ಕಾಲ ಈ ಬೆಟ್ಟದ ಮೇಲೆ ನಿಂತಿದ್ದೇನೆ — ಸ್ವಲ್ಪ ಕುಳಿತು ಕೇಳಿ.",
+    "pa-IN": "ਮੈਂ ਸਾਂਚੀ ਦਾ ਮਹਾਸਤੂਪ ਹਾਂ। ਦੋ ਹਜ਼ਾਰ ਸਾਲਾਂ ਤੋਂ ਇਸ ਪਹਾੜੀ ਉੱਤੇ ਖੜ੍ਹਾ ਹਾਂ — ਥੋੜ੍ਹਾ ਬੈਠੋ, ਤੇ ਪੁੱਛੋ।"
+  }
+}

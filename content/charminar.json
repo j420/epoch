@@ -1,0 +1,235 @@
+{
+  "id": "charminar",
+  "city": "Hyderabad",
+  "aspect": 0.5,
+  "hero": "/monuments/charminar/hero.png",
+  "depth": "/monuments/charminar/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Charminar",
+    "te-IN": "చార్మినార్",
+    "ur-IN": "چار مینار",
+    "hi-IN": "चारमीनार",
+    "kn-IN": "ಚಾರ್ಮಿನಾರ್",
+    "ta-IN": "சார்மினார்",
+    "ml-IN": "ചാർമിനാർ",
+    "bn-IN": "চারমিনার",
+    "mr-IN": "चारमिनार",
+    "gu-IN": "ચારમિનાર",
+    "pa-IN": "ਚਾਰਮੀਨਾਰ",
+    "od-IN": "ଚାରମିନାର"
+  },
+  "regions": [
+    {
+      "id": "arch",
+      "x": 0.5,
+      "y": 0.78,
+      "z": 0.62,
+      "label": {
+        "en-IN": "the great arch on this side of me",
+        "te-IN": "నా ఈ వైపు పెద్ద తోరణం",
+        "ur-IN": "میری اس طرف کا بڑا محراب",
+        "hi-IN": "मेरी इस तरफ़ का बड़ा मेहराब",
+        "kn-IN": "ನನ್ನ ಈ ಕಡೆಯ ದೊಡ್ಡ ಕಮಾನು",
+        "ta-IN": "என் இப்பக்கத்தின் பெரிய வளைவு",
+        "bn-IN": "আমার এই দিকের বড় খিলান",
+        "mr-IN": "माझ्या या बाजूची मोठी कमान"
+      }
+    },
+    {
+      "id": "minaret",
+      "x": 0.258,
+      "y": 0.5,
+      "z": 0.52,
+      "label": {
+        "en-IN": "my four minarets",
+        "te-IN": "నా నాలుగు మినార్లు",
+        "ur-IN": "میری چار مینار",
+        "hi-IN": "मेरी चार मीनारें",
+        "kn-IN": "ನನ್ನ ನಾಲ್ಕು ಮಿನಾರುಗಳು",
+        "ta-IN": "என் நான்கு மினாரங்கள்",
+        "bn-IN": "আমার চারটি মিনার",
+        "mr-IN": "माझे चार मिनार"
+      }
+    },
+    {
+      "id": "balcony",
+      "x": 0.742,
+      "y": 0.4,
+      "z": 0.46,
+      "label": {
+        "en-IN": "the balconies up my minarets",
+        "te-IN": "మినార్ల మీది బాల్కనీలు",
+        "ur-IN": "میناروں کے چھجے",
+        "hi-IN": "मीनारों के छज्जे",
+        "kn-IN": "ಮಿನಾರುಗಳ ಉಪ್ಪರಿಗೆಗಳು",
+        "ta-IN": "மினாரங்களின் மாடங்கள்",
+        "bn-IN": "মিনারের বারান্দা",
+        "mr-IN": "मिनारांचे सज्जे"
+      }
+    },
+    {
+      "id": "mosque",
+      "x": 0.5,
+      "y": 0.47,
+      "z": 0.4,
+      "label": {
+        "en-IN": "the mosque on my roof",
+        "te-IN": "నా పైకప్పు మీది మసీదు",
+        "ur-IN": "میری چھت پر کی مسجد",
+        "hi-IN": "मेरी छत की मस्जिद",
+        "kn-IN": "ನನ್ನ ಮೇಲ್ಛಾವಣಿಯ ಮಸೀದಿ",
+        "ta-IN": "என் மேற்கூரையின் பள்ளிவாசல்",
+        "bn-IN": "আমার ছাদের মসজিদ",
+        "mr-IN": "माझ्या छतावरील मशीद"
+      }
+    },
+    {
+      "id": "clock",
+      "x": 0.5,
+      "y": 0.574,
+      "z": 0.6,
+      "label": {
+        "en-IN": "the clock on my face",
+        "te-IN": "నా ముఖం మీది గడియారం",
+        "ur-IN": "میرے چہرے کی گھڑی",
+        "hi-IN": "मेरे मुख की घड़ी",
+        "kn-IN": "ನನ್ನ ಮುಖದ ಗಡಿಯಾರ",
+        "ta-IN": "என் முகத்தின் கடிகாரம்",
+        "bn-IN": "আমার মুখের ঘড়ি",
+        "mr-IN": "माझ्या दर्शनी भागावरचे घड्याळ"
+      }
+    },
+    {
+      "id": "parapet",
+      "x": 0.34,
+      "y": 0.51,
+      "z": 0.5,
+      "label": {
+        "en-IN": "the parapet round my terrace",
+        "te-IN": "నా మిద్దె చుట్టూ గోడ",
+        "ur-IN": "میری چھت کی منڈیر",
+        "hi-IN": "मेरी छत की मुंडेर",
+        "kn-IN": "ನನ್ನ ಮಾಳಿಗೆಯ ಸುತ್ತಿನ ಗೋಡೆ",
+        "ta-IN": "என் மொட்டைமாடியின் தடுப்புச்சுவர்",
+        "bn-IN": "আমার ছাদের পাঁচিল",
+        "mr-IN": "माझ्या गच्चीचा कठडा"
+      }
+    },
+    {
+      "id": "street",
+      "x": 0.5,
+      "y": 0.95,
+      "z": 0.9,
+      "label": {
+        "en-IN": "the four streets that meet at my feet",
+        "te-IN": "నా పాదాల వద్ద కలిసే నాలుగు వీధులు",
+        "ur-IN": "میرے قدموں پر ملنے والی چار سڑکیں",
+        "hi-IN": "मेरे पैरों पर मिलती चार सड़कें",
+        "kn-IN": "ನನ್ನ ಪಾದಗಳಲ್ಲಿ ಸೇರುವ ನಾಲ್ಕು ಬೀದಿಗಳು",
+        "ta-IN": "என் காலடியில் சந்திக்கும் நான்கு தெருக்கள்",
+        "bn-IN": "আমার পায়ের কাছে মেলা চারটি রাস্তা",
+        "mr-IN": "माझ्या पायाशी मिळणारे चार रस्ते"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.2,
+      "y": 0.14,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the sky above me",
+        "te-IN": "నా పైన ఆకాశం",
+        "ur-IN": "میرے اوپر کا آسمان",
+        "hi-IN": "मेरे ऊपर का आसमान",
+        "kn-IN": "ನನ್ನ ಮೇಲಿನ ಆಕಾಶ",
+        "ta-IN": "என் மேலே வானம்",
+        "bn-IN": "আমার উপরের আকাশ",
+        "mr-IN": "माझ्यावरचे आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/charminar/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me a little over a century ago.",
+        "te-IN": "వందేళ్ల కిందట కెమెరా నన్ను చూసినట్టు.",
+        "hi-IN": "जैसे सौ बरस पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "Charminar was raised in 1591 by Muhammad Quli Qutb Shah, fifth sultan of the Qutb Shahi dynasty, as he moved his capital from Golconda to his new city of Hyderabad.",
+      "citation": "Archaeological Survey of India, Charminar site record; Department of Archaeology and Museums, Government of Telangana",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s2",
+      "text": "Why it was built has never been settled. Three accounts compete: that it marks the ending of a plague, that it is a ceremonial gateway celebrating the founding of Hyderabad, and that it commemorates the beginning of the second Islamic millennium — the last recorded by the French traveller Jean de Thevenot in the seventeenth century. No contemporary document proves any one of them.",
+      "citation": "Archaeological Survey of India, Charminar site record; UNESCO World Heritage Centre, The Qutb Shahi Monuments of Hyderabad (Tentative List)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "A foundation prayer is recorded from the laying of the building: Fill this my city with people as You have filled the river with fishes, O Lord.",
+      "citation": "Archaeological Survey of India, Charminar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s4",
+      "text": "The building is square, each side about 20 metres, with four grand arches, one opening onto each of the cardinal streets. Each arch spans about 11 metres.",
+      "citation": "Archaeological Survey of India, Charminar site record; Encyclopaedia Britannica, Charminar",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "Its four fluted minarets are built into the body of the building rather than standing apart, and each is crowned by a bulbous dome with petal-like ornament at its base. Published measurements of their height differ between sources and no single figure is settled.",
+      "citation": "Archaeological Survey of India, Charminar site record; Encyclopaedia Britannica, Charminar",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "A spiral staircase of 149 winding steps and 12 landings climbs to the upper floor. Only one of the four minaret stairs is open to visitors.",
+      "citation": "Archaeological Survey of India, Charminar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s7",
+      "text": "Charminar is built of granite and limestone, bound with mortar and pulverised marble — the stucco skin that carries all its ornament.",
+      "citation": "Archaeological Survey of India, Charminar site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s8",
+      "text": "A mosque sits at the western end of the upper floor and is believed to be the oldest in Hyderabad. Its main gallery holds 45 musallah, marked prayer spaces, with open ground beside it for larger Friday and festival congregations, and a cistern in the middle for ablution.",
+      "citation": "Archaeological Survey of India, Charminar site record; Department of Archaeology and Museums, Government of Telangana",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "Four clocks were fixed to the building's faces in 1889, one to each cardinal direction, in the reign of the sixth Nizam, Mir Mahbub Ali Khan.",
+      "citation": "Archaeological Survey of India, Charminar site record; Department of Archaeology and Museums, Government of Telangana",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "Charminar has been hurt and mended more than once: the south-western minaret was brought down by a lightning strike and rebuilt, stucco flaked away in heavy rain in 2010, and in 2019 a slab of lime plaster with floral work fell from the same minaret. It has been a centrally protected monument in the care of the Archaeological Survey of India since 1951, and since 10 September 2010 it has stood on India's UNESCO Tentative List, grouped with Golconda Fort and the Qutb Shahi Tombs — it is not an inscribed World Heritage Site.",
+      "citation": "Archaeological Survey of India, Charminar conservation record; UNESCO World Heritage Centre, The Qutb Shahi Monuments of Hyderabad (Tentative List, ref. 5573)",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am Charminar. Four streets meet at my feet and I have watched Hyderabad grow around me — ask me anything.",
+    "te-IN": "నేను చార్మినార్. నా పాదాల వద్ద నాలుగు వీధులు కలుస్తాయి; హైదరాబాద్ నా చుట్టూ పెరగడం చూశాను — ఏమైనా అడగండి.",
+    "ur-IN": "میں چار مینار ہوں۔ میرے قدموں پر چار سڑکیں ملتی ہیں اور میں نے حیدرآباد کو اپنے گرد بڑھتے دیکھا ہے — جو پوچھنا ہے پوچھو۔",
+    "hi-IN": "मैं चारमीनार हूँ। मेरे पैरों पर चार सड़कें मिलती हैं, और मैंने हैदराबाद को अपने चारों ओर बढ़ते देखा है — जो पूछना है, पूछो।",
+    "kn-IN": "ನಾನು ಚಾರ್ಮಿನಾರ್. ನನ್ನ ಪಾದಗಳಲ್ಲಿ ನಾಲ್ಕು ಬೀದಿಗಳು ಸೇರುತ್ತವೆ; ಹೈದರಾಬಾದ್ ನನ್ನ ಸುತ್ತ ಬೆಳೆದದ್ದನ್ನು ನೋಡಿದ್ದೇನೆ — ಏನಾದರೂ ಕೇಳಿ.",
+    "ta-IN": "நான் சார்மினார். என் காலடியில் நான்கு தெருக்கள் சந்திக்கின்றன; ஹைதராபாத் என்னைச் சுற்றி வளர்ந்ததைக் கண்டேன் — கேளுங்கள்.",
+    "bn-IN": "আমি চারমিনার। আমার পায়ের কাছে চারটি রাস্তা মিলেছে, আর হায়দরাবাদকে আমি চারপাশে বেড়ে উঠতে দেখেছি — যা জানতে চাও, জিজ্ঞেস করো।",
+    "mr-IN": "मी चारमिनार. माझ्या पायाशी चार रस्ते मिळतात आणि हैदराबाद माझ्याभोवती वाढताना मी पाहिले आहे — काहीही विचारा."
+  }
+}

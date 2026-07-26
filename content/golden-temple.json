@@ -1,0 +1,241 @@
+{
+  "id": "golden-temple",
+  "city": "Amritsar",
+  "aspect": 0.75,
+  "hero": "/monuments/golden-temple/hero.png",
+  "depth": "/monuments/golden-temple/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Golden Temple, Sri Harmandir Sahib",
+    "pa-IN": "ਸ੍ਰੀ ਹਰਿਮੰਦਰ ਸਾਹਿਬ",
+    "hi-IN": "श्री हरमंदिर साहिब",
+    "ur-IN": "سری ہرمندر صاحب",
+    "bn-IN": "স্বর্ণমন্দির",
+    "ta-IN": "பொற்கோயில்",
+    "te-IN": "స్వర్ణ దేవాలయం",
+    "kn-IN": "ಸ್ವರ್ಣ ಮಂದಿರ",
+    "ml-IN": "സുവർണ ക്ഷേത്രം",
+    "mr-IN": "सुवर्ण मंदिर",
+    "gu-IN": "સુવર્ણ મંદિર",
+    "od-IN": "ସ୍ୱର୍ଣ ମନ୍ଦିର"
+  },
+  "regions": [
+    {
+      "id": "dome",
+      "x": 0.5,
+      "y": 0.3,
+      "z": 0.4,
+      "label": {
+        "en-IN": "my golden dome",
+        "pa-IN": "ਮੇਰਾ ਸੁਨਹਿਰੀ ਗੁੰਬਦ",
+        "hi-IN": "मेरा सुनहरा गुंबद",
+        "ur-IN": "میرا سنہری گنبد",
+        "ta-IN": "என் பொன் குவிமாடம்",
+        "bn-IN": "আমার সোনালি গম্বুজ",
+        "te-IN": "నా బంగారు గోపురం",
+        "mr-IN": "माझा सोनेरी घुमट"
+      }
+    },
+    {
+      "id": "kiosks",
+      "x": 0.379,
+      "y": 0.34,
+      "z": 0.45,
+      "label": {
+        "en-IN": "the small domes around me",
+        "pa-IN": "ਮੇਰੇ ਆਲੇ-ਦੁਆਲੇ ਦੇ ਛੋਟੇ ਗੁੰਬਦ",
+        "hi-IN": "मेरे चारों ओर के छोटे गुंबद",
+        "ur-IN": "میرے گرد کے چھوٹے گنبد",
+        "ta-IN": "என்னைச் சுற்றியுள்ள சிறு குவிமாடங்கள்",
+        "bn-IN": "আমার চারপাশের ছোট গম্বুজ",
+        "te-IN": "నా చుట్టూ ఉన్న చిన్న గోపురాలు",
+        "mr-IN": "माझ्याभोवतीचे छोटे घुमट"
+      }
+    },
+    {
+      "id": "doorway",
+      "x": 0.5,
+      "y": 0.57,
+      "z": 0.6,
+      "label": {
+        "en-IN": "my doors, one to every direction",
+        "pa-IN": "ਮੇਰੇ ਦਰਵਾਜ਼ੇ, ਹਰ ਦਿਸ਼ਾ ਵੱਲ ਇੱਕ",
+        "hi-IN": "मेरे दरवाज़े, हर दिशा में एक",
+        "ur-IN": "میرے دروازے، ہر سمت میں ایک",
+        "ta-IN": "என் கதவுகள், ஒவ்வொரு திசைக்கும் ஒன்று",
+        "bn-IN": "আমার দরজা, প্রতিটি দিকে একটি",
+        "te-IN": "నా ద్వారాలు, ప్రతి దిక్కుకూ ఒకటి",
+        "mr-IN": "माझी दारे, प्रत्येक दिशेला एक"
+      }
+    },
+    {
+      "id": "sanctum",
+      "x": 0.5,
+      "y": 0.52,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the sanctum where the Guru Granth Sahib rests",
+        "pa-IN": "ਜਿੱਥੇ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਦਾ ਪ੍ਰਕਾਸ਼ ਹੁੰਦਾ ਹੈ",
+        "hi-IN": "वह गर्भगृह जहाँ गुरु ग्रंथ साहिब विराजते हैं",
+        "ur-IN": "وہ حرم جہاں گرو گرنتھ صاحب کا پرکاش ہوتا ہے",
+        "ta-IN": "குரு கிரந்த் சாஹிப் அமர்ந்திருக்கும் கருவறை",
+        "bn-IN": "যেখানে গুরু গ্রন্থ সাহিব বিরাজেন",
+        "te-IN": "గురు గ్రంథ్ సాహిబ్ కొలువైన గర్భగుడి",
+        "mr-IN": "जिथे गुरु ग्रंथ साहिब विराजतात ते गर्भगृह"
+      }
+    },
+    {
+      "id": "causeway",
+      "x": 0.5,
+      "y": 0.78,
+      "z": 0.85,
+      "label": {
+        "en-IN": "the causeway that brings you to me",
+        "pa-IN": "ਉਹ ਪੁਲ ਜੋ ਤੁਹਾਨੂੰ ਮੇਰੇ ਕੋਲ ਲਿਆਉਂਦਾ ਹੈ",
+        "hi-IN": "वह पुल जो तुम्हें मुझ तक लाता है",
+        "ur-IN": "وہ پل جو تمہیں میرے پاس لاتا ہے",
+        "ta-IN": "உங்களை என்னிடம் கொண்டுவரும் பாலம்",
+        "bn-IN": "যে সেতু তোমাকে আমার কাছে আনে",
+        "te-IN": "మిమ్మల్ని నా దగ్గరకు తెచ్చే వంతెన",
+        "mr-IN": "जो पूल तुम्हाला माझ्याजवळ आणतो"
+      }
+    },
+    {
+      "id": "sarovar",
+      "x": 0.2,
+      "y": 0.82,
+      "z": 0.8,
+      "label": {
+        "en-IN": "the sarovar, the pool of nectar",
+        "pa-IN": "ਅੰਮ੍ਰਿਤ ਸਰੋਵਰ",
+        "hi-IN": "अमृत सरोवर",
+        "ur-IN": "امرت سروور",
+        "ta-IN": "அமிர்த சரோவரம்",
+        "bn-IN": "অমৃত সরোবর",
+        "te-IN": "అమృత సరోవరం",
+        "mr-IN": "अमृत सरोवर"
+      }
+    },
+    {
+      "id": "parikrama",
+      "x": 0.15,
+      "y": 0.51,
+      "z": 0.35,
+      "label": {
+        "en-IN": "the marble walk around the pool",
+        "pa-IN": "ਸਰੋਵਰ ਦੇ ਦੁਆਲੇ ਦੀ ਪਰਿਕਰਮਾ",
+        "hi-IN": "सरोवर के चारों ओर की परिक्रमा",
+        "ur-IN": "سروور کے گرد کی پریکرما",
+        "ta-IN": "குளத்தைச் சுற்றியுள்ள பளிங்குப் பாதை",
+        "bn-IN": "সরোবরের চারপাশের মর্মর পথ",
+        "te-IN": "సరోవరం చుట్టూ పాలరాతి నడక",
+        "mr-IN": "सरोवराभोवतीची संगमरवरी परिक्रमा"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.82,
+      "y": 0.12,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the sky above me",
+        "pa-IN": "ਮੇਰੇ ਉੱਤੇ ਦਾ ਅਸਮਾਨ",
+        "hi-IN": "मेरे ऊपर का आसमान",
+        "ur-IN": "میرے اوپر کا آسمان",
+        "ta-IN": "என் மேலே வானம்",
+        "bn-IN": "আমার উপরের আকাশ",
+        "te-IN": "నా పైన ఆకాశం",
+        "mr-IN": "माझ्यावरचे आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/golden-temple/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me a little over a century ago.",
+        "pa-IN": "ਜਿਵੇਂ ਸੌ ਕੁ ਸਾਲ ਪਹਿਲਾਂ ਕੈਮਰੇ ਨੇ ਮੈਨੂੰ ਵੇਖਿਆ ਸੀ।",
+        "hi-IN": "जैसे सौ बरस पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "The shrine's name is Sri Harmandir Sahib, the abode of God; it is also called Sri Darbar Sahib. The English name Golden Temple comes from the gold that covers its upper storeys and domes.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), Sri Harmandir Sahib",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "Before the shrine there was water. The excavation of the holy tank — the Amrit Sarovar, the pool of nectar — was conceived by Guru Amar Das, the third Nanak, and carried out by Guru Ram Das, the fourth Nanak, from 1577, under the supervision of Baba Buddha ji. The city of Amritsar takes its name from that pool.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), History of Sachkhand Sri Harmandir Sahib",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s3",
+      "text": "Guru Arjan Sahib, the fifth Nanak, conceived the idea of a central place of worship for the Sikhs and himself designed its architecture. The foundation was laid in 1588. The SGPC's own account records that the foundation stone was laid by the Sufi saint Hazrat Mian Mir ji of Lahore, a close friend of Guru Arjan Sahib; some Sikh scholars hold instead that Guru Arjan Sahib laid it himself.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), History of Sachkhand Sri Harmandir Sahib",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The building was completed in 1601. On 16 August 1604 Guru Arjan Sahib installed the newly compiled Adi Granth within it and appointed Baba Buddha ji as its first Granthi, the reader of the scripture.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), History of Sachkhand Sri Harmandir Sahib",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s5",
+      "text": "The shrine has four doors, one to each of the four directions, so that no direction is privileged and no one is turned away. A person of any caste, creed, race or religion may enter from whichever side their path brings them.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), Sri Harmandir Sahib",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "Unlike temples raised on high plinths, it stands at a level below the surrounding land, so that a visitor must go down steps to reach it — an architecture of humility, that one lowers oneself in approaching the Divine.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC); Punjab Department of Tourism and Cultural Affairs",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s7",
+      "text": "The shrine stands on a platform 67 feet square at the centre of the sarovar, and the building itself is about 40.5 feet square. The causeway that carries visitors to it is 202 feet long and 21 feet wide, entered through the Darshani Deori.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), Sri Harmandir Sahib",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s8",
+      "text": "In 1762 Ahmad Shah Abdali had the shrine blown up with gunpowder and the sarovar filled with debris. The Sikhs returned: from 1764 Baba Jassa Singh Ahluwalia gathered the offerings to rebuild it, and the sanctum, causeway and Darshani Deori were finished within about a decade.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC); Punjab Department of Tourism and Cultural Affairs",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "Maharaja Ranjit Singh clad the shrine in white marble and covered its upper storeys and domes in gilded copper sheet in the early nineteenth century, work usually dated as complete by 1830. Between 1995 and 1999 the gold plating and marble were renewed in kar seva, voluntary service, largely resourced by the Birmingham-based Guru Nanak Nishkam Sewak Jatha, completing before the Baisakhi of 1999 that marked three hundred years of the Khalsa.",
+      "citation": "Punjab Department of Tourism and Cultural Affairs; Shiromani Gurdwara Parbandhak Committee (SGPC)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "Guru ka Langar, the free community kitchen, serves anyone who comes — of any religion, caste, nationality or standing — seated together on the floor as equals. On an ordinary day around a hundred thousand people eat there, and on festival days that can nearly double.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), Guru Ka Langar",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s11",
+      "text": "The shrine is managed by the Shiromani Gurdwara Parbandhak Committee, elected by Sikhs in a general assembly near the Akal Takht on 15 November 1920 and given statutory form by the Sikh Gurdwaras Act of 1925, working under the directives of Sri Akal Takht Sahib. It is on India's UNESCO Tentative List, added on 5 January 2004, and is not an inscribed World Heritage Site.",
+      "citation": "Shiromani Gurdwara Parbandhak Committee (SGPC), About SGPC; Sikh Gurdwaras Act, 1925; UNESCO World Heritage Centre, Tentative List ref. 1858",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am Sri Harmandir Sahib. My four doors stand open to every direction and to everyone — come, and ask.",
+    "pa-IN": "ਮੈਂ ਸ੍ਰੀ ਹਰਿਮੰਦਰ ਸਾਹਿਬ ਹਾਂ। ਮੇਰੇ ਚਾਰੇ ਦਰਵਾਜ਼ੇ ਹਰ ਦਿਸ਼ਾ ਤੇ ਹਰ ਕਿਸੇ ਲਈ ਖੁੱਲ੍ਹੇ ਹਨ — ਆਓ, ਪੁੱਛੋ।",
+    "hi-IN": "मैं श्री हरमंदिर साहिब हूँ। मेरे चारों दरवाज़े हर दिशा और हर किसी के लिए खुले हैं — आओ, पूछो।",
+    "ur-IN": "میں سری ہرمندر صاحب ہوں۔ میرے چاروں دروازے ہر سمت اور ہر کسی کے لیے کھلے ہیں — آؤ، پوچھو۔",
+    "bn-IN": "আমি শ্রী হরমন্দির সাহিব। আমার চারটি দরজা সব দিকে, সবার জন্য খোলা — এসো, জিজ্ঞেস করো।",
+    "ta-IN": "நான் ஸ்ரீ ஹரிமந்திர் சாஹிப். என் நான்கு கதவுகளும் எல்லாத் திசைகளுக்கும் எல்லோருக்கும் திறந்தே இருக்கின்றன — வாருங்கள், கேளுங்கள்.",
+    "te-IN": "నేను శ్రీ హరిమందిర్ సాహిబ్. నా నాలుగు ద్వారాలూ అన్ని దిక్కులకూ, అందరికీ తెరిచే ఉన్నాయి — రండి, అడగండి.",
+    "mr-IN": "मी श्री हरमंदिर साहिब. माझी चारही दारे प्रत्येक दिशेला आणि प्रत्येकासाठी उघडी आहेत — या, विचारा."
+  }
+}

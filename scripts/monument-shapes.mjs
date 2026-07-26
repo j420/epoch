@@ -622,9 +622,9 @@ const gatewayOfIndia = {
 // Tiers run top to bottom in increasing v: [v, halfWidth]. Each pair of rows is one
 // storey, and every boundary between storeys throws a projecting cornice flange.
 const HM_TIERS = [
-  [0.286, 0.128], [0.347, 0.128], [0.352, 0.213], [0.419, 0.213],
-  [0.424, 0.292], [0.495, 0.292], [0.5, 0.354], [0.573, 0.354],
-  [0.578, 0.402], [0.655, 0.402], [0.66, 0.428], [0.9, 0.428],
+  [0.3, 0.19], [0.359, 0.19], [0.364, 0.259], [0.427, 0.259],
+  [0.432, 0.319], [0.5, 0.319], [0.505, 0.367], [0.577, 0.367],
+  [0.582, 0.404], [0.658, 0.404], [0.663, 0.428], [0.9, 0.428],
 ];
 
 const hawaMahal = {
@@ -638,10 +638,10 @@ const hawaMahal = {
     const WHITE = [236, 230, 222];
 
     // Crowning kiosks along the top ridge.
-    if (v < 0.288) {
-      for (const cx of [0.5, 0.418, 0.582]) {
-        const rx = cx === 0.5 ? 0.03 : 0.023;
-        if (dome(out, u, v, { cx, yBase: 0.286, rx, ry: rx * 1.35, z: 0.8, col: P, profile: 'onion', ribs: 6 })) return true;
+    if (v < 0.302) {
+      for (const cx of [0.5, 0.41, 0.59]) {
+        const rx = cx === 0.5 ? 0.032 : 0.024;
+        if (dome(out, u, v, { cx, yBase: 0.3, rx, ry: rx * 1.35, z: 0.8, col: P, profile: 'onion', ribs: 6 })) return true;
       }
       return false;
     }
@@ -670,24 +670,25 @@ const hawaMahal = {
 
     // ---- the ground storey: a plain arcade over a stone plinth ----
     // The five screen storeys above it are the lattice proper.
-    if (v > 0.858) {
-      const base = 0.9 + 0.14 * smoothstep(0.858, 0.868, v);
-      return put(out, z + 0.04, nx, nz, P, base * (v > 0.9 ? 0.9 : 1));
+    if (v > 0.852) {
+      const base = 0.9 + 0.14 * smoothstep(0.852, 0.862, v);
+      return put(out, z + 0.04, nx, nz, P, base * (v > 0.895 ? 0.9 : 1));
     }
-    if (v > 0.663) {
-      const p = phase(u, 0.0585);
+    if (v > 0.666) {
+      const p = phase(u, 0.098);
       const d = Math.abs(p - 0.5) * 2;
-      const head = 0.756 - 0.048 * (1 - d * d * (1.5 - 0.5 * d));
-      if (d < 0.58 && v > head && v < 0.852) {
-        const rec = smoothstep(0.58, 0.1, d);
-        return put(out, z - 0.09 * rec, nx, nz, MAT.shadow, 0.34 + 0.3 * (1 - rec));
+      const head = 0.8 - 0.036 * (1 - d * d * (1.5 - 0.5 * d));
+      if (d < 0.66 && v > head && v < 0.845) {
+        const rec = smoothstep(0.66, 0.12, d);
+        return put(out, z - 0.09 * rec, nx, nz, MAT.shadow, 0.36 + 0.3 * (1 - rec));
       }
-      if (Math.abs(v - 0.672) < 0.005) return put(out, z + 0.02, nx, nz, WHITE, 1.1);
+      if (Math.abs(v - 0.676) < 0.005) return put(out, z + 0.02, nx, nz, WHITE, 1.1);
+      if (Math.abs(v - 0.762) < 0.004) return put(out, z + 0.01, nx, nz, WHITE, 1.06);
       return put(out, z, nx, nz, P, 1 + (Math.abs(p - 0.5) < 0.06 ? 0.06 : 0));
     }
 
     const cu = 0.0326;
-    const cv = 0.0378;
+    const cv = 0.028;
     const pu = phase(u + cu * 0.5, cu);
     const pv = phase(v + 0.0031, cv);
     const du = Math.abs(pu - 0.5) * 2;

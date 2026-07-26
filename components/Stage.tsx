@@ -163,7 +163,7 @@ export default function Stage({ monument }: StageProps) {
   const current = invitations[invitationIndex];
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-night-950">
+    <main data-bol-stage className="relative h-dvh w-full overflow-hidden bg-night-950">
       {/* ---- the photograph ---- */}
       <LivingPhoto
         ref={photoRef}

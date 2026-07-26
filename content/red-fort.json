@@ -1,0 +1,233 @@
+{
+  "id": "red-fort",
+  "city": "Delhi",
+  "aspect": 0.75,
+  "hero": "/monuments/red-fort/hero.png",
+  "depth": "/monuments/red-fort/depth.png",
+  "credit": "Placeholder render (scripts/gen-assets.mjs); depth map generated from the same geometry. Replace with a licensed photograph before release.",
+  "displayName": {
+    "en-IN": "Red Fort",
+    "hi-IN": "लाल क़िला",
+    "ur-IN": "لال قلعہ",
+    "bn-IN": "লাল কেল্লা",
+    "ta-IN": "செங்கோட்டை",
+    "te-IN": "ఎర్రకోట",
+    "kn-IN": "ಕೆಂಪು ಕೋಟೆ",
+    "ml-IN": "ചെങ്കോട്ട",
+    "mr-IN": "लाल किल्ला",
+    "gu-IN": "લાલ કિલ્લો",
+    "pa-IN": "ਲਾਲ ਕਿਲਾ",
+    "od-IN": "ଲାଲ କିଲ୍ଲା",
+    "as-IN": "লাল কিল্লা"
+  },
+  "regions": [
+    {
+      "id": "gate",
+      "x": 0.5,
+      "y": 0.73,
+      "z": 0.62,
+      "label": {
+        "en-IN": "the Lahori Gate, my mouth",
+        "hi-IN": "लाहौरी दरवाज़ा, मेरा मुँह",
+        "ur-IN": "لاہوری دروازہ، میرا منہ",
+        "ta-IN": "லாஹோரி வாயில், என் வாய்",
+        "bn-IN": "লাহোরি দরজা, আমার মুখ",
+        "te-IN": "లాహోరీ ద్వారం, నా నోరు",
+        "mr-IN": "लाहोरी दरवाजा, माझे तोंड"
+      }
+    },
+    {
+      "id": "towers",
+      "x": 0.372,
+      "y": 0.4,
+      "z": 0.55,
+      "label": {
+        "en-IN": "the towers that flank my gate",
+        "hi-IN": "मेरे दरवाज़े के दोनों बुर्ज",
+        "ur-IN": "میرے دروازے کے دونوں برج",
+        "ta-IN": "என் வாயிலின் இரு கோபுரங்கள்",
+        "bn-IN": "আমার দরজার দুই বুরুজ",
+        "te-IN": "నా ద్వారానికి ఇరువైపుల బురుజులు",
+        "mr-IN": "माझ्या दरवाज्याचे दोन बुरूज"
+      }
+    },
+    {
+      "id": "cupola",
+      "x": 0.628,
+      "y": 0.24,
+      "z": 0.42,
+      "label": {
+        "en-IN": "the marble cupolas on top",
+        "hi-IN": "ऊपर की संगमरमरी छतरियाँ",
+        "ur-IN": "اوپر کی سنگِ مرمر چھتریاں",
+        "ta-IN": "மேலுள்ள பளிங்குக் குவிமாடங்கள்",
+        "bn-IN": "উপরের মর্মর ছত্রি",
+        "te-IN": "పైనున్న పాలరాతి ఛత్రులు",
+        "mr-IN": "वरच्या संगमरवरी छत्र्या"
+      }
+    },
+    {
+      "id": "battlements",
+      "x": 0.16,
+      "y": 0.43,
+      "z": 0.48,
+      "label": {
+        "en-IN": "my battlements",
+        "hi-IN": "मेरे कंगूरे",
+        "ur-IN": "میرے کنگرے",
+        "ta-IN": "என் மதில் முகடுகள்",
+        "bn-IN": "আমার কাঁধের কাঁটা-প্রাচীর",
+        "te-IN": "నా కోట కొమ్ములు",
+        "mr-IN": "माझे कंगोरे"
+      }
+    },
+    {
+      "id": "wall",
+      "x": 0.84,
+      "y": 0.66,
+      "z": 0.55,
+      "label": {
+        "en-IN": "my long red wall",
+        "hi-IN": "मेरी लंबी लाल दीवार",
+        "ur-IN": "میری لمبی لال دیوار",
+        "ta-IN": "என் நீண்ட செம்மதில்",
+        "bn-IN": "আমার লম্বা লাল প্রাচীর",
+        "te-IN": "నా పొడవాటి ఎర్ర గోడ",
+        "mr-IN": "माझी लांब लाल भिंत"
+      }
+    },
+    {
+      "id": "rampart",
+      "x": 0.5,
+      "y": 0.34,
+      "z": 0.5,
+      "label": {
+        "en-IN": "the rampart where the flag is raised",
+        "hi-IN": "वह प्राचीर जहाँ झंडा फहराया जाता है",
+        "ur-IN": "وہ فصیل جہاں پرچم لہرایا جاتا ہے",
+        "ta-IN": "கொடி ஏற்றப்படும் மதில் மேடை",
+        "bn-IN": "যেখানে পতাকা ওড়ে সেই প্রাকার",
+        "te-IN": "జెండా ఎగరవేసే ప్రాకారం",
+        "mr-IN": "जिथे ध्वज फडकतो ती तटबंदी"
+      }
+    },
+    {
+      "id": "road",
+      "x": 0.5,
+      "y": 0.94,
+      "z": 0.9,
+      "label": {
+        "en-IN": "the road at my feet",
+        "hi-IN": "मेरे पैरों की सड़क",
+        "ur-IN": "میرے قدموں کی سڑک",
+        "ta-IN": "என் காலடிச் சாலை",
+        "bn-IN": "আমার পায়ের কাছের রাস্তা",
+        "te-IN": "నా పాదాల వద్ద రహదారి",
+        "mr-IN": "माझ्या पायाशीचा रस्ता"
+      }
+    },
+    {
+      "id": "sky",
+      "x": 0.18,
+      "y": 0.12,
+      "z": 0.12,
+      "label": {
+        "en-IN": "the Delhi sky above me",
+        "hi-IN": "मेरे ऊपर दिल्ली का आसमान",
+        "ur-IN": "میرے اوپر دلی کا آسمان",
+        "ta-IN": "என் மேலே டெல்லி வானம்",
+        "bn-IN": "আমার উপরে দিল্লির আকাশ",
+        "te-IN": "నా పైన ఢిల్లీ ఆకాశం",
+        "mr-IN": "माझ्यावरचे दिल्लीचे आकाश"
+      }
+    }
+  ],
+  "eras": [
+    {
+      "year": "1900",
+      "image": "/monuments/red-fort/era-1900.png",
+      "caption": {
+        "en-IN": "As a camera found me a little over a century ago.",
+        "hi-IN": "जैसे सौ बरस पहले कैमरे ने मुझे देखा था।"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "text": "Shah Jahan built the fort as the palace-citadel of Shahjahanabad, his new capital, when he moved the Mughal court from Agra to Delhi. Its original name was Qila-i-Mubarak, the Blessed Fort; the names Lal Qila and Red Fort come from the red sandstone of its walls.",
+      "citation": "UNESCO World Heritage Centre, Red Fort Complex (ref. 231); Archaeological Survey of India, Red Fort site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s2",
+      "text": "Construction ran for ten years, from 1638 to 6 April 1648, and the court moved into the completed fort that same year.",
+      "citation": "Archaeological Survey of India, Red Fort site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s3",
+      "text": "The fort encloses 254.67 acres, about 103 hectares, within 2.41 kilometres of defensive wall set with turrets and bastions. The plan is octagonal, and the walls rise about 18 metres on the river side and about 33 metres on the city side.",
+      "citation": "Archaeological Survey of India, Red Fort site record; UNESCO World Heritage Centre, Red Fort Complex (ref. 231)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s4",
+      "text": "The two public gates are the Lahori Gate on the west and the Delhi Gate on the south. Aurangzeb added an outer barbican, about 10.5 metres high, in front of them; Shah Jahan, then imprisoned at Agra, is recorded as writing to his son that he had made the fort a bride and set a veil on it. Two life-size stone elephants flank the Delhi Gate, renewed by Lord Curzon in 1903.",
+      "citation": "Archaeological Survey of India, Red Fort site record",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s5",
+      "text": "A continuous water channel called the Nahr-i-Behisht, the Stream of Paradise, ran through the row of private marble pavilions along the riverfront and linked them. It flowed through the centre of the Rang Mahal, the Palace of Colours, into a carved marble basin set in the floor.",
+      "citation": "UNESCO World Heritage Centre, Red Fort Complex (ref. 231); Archaeological Survey of India, Red Fort site record",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s6",
+      "text": "Inscribed over the corner arches of the Diwan-i-Khas, the Hall of Private Audience, is the Persian couplet: Agar firdaus bar ru-ye zamin ast, hamin ast-o hamin ast-o hamin ast — If there is a paradise on earth, it is this, it is this, it is this. It is long attributed to Amir Khusrau, though the lines appear in none of his surviving collected works.",
+      "citation": "Archaeological Survey of India, Red Fort site record (Diwan-i-Khas inscription)",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s7",
+      "text": "The Diwan-i-Khas housed Shah Jahan's jewelled Peacock Throne. In 1739 the Persian ruler Nadir Shah defeated Muhammad Shah at Karnal, occupied Delhi, and carried the throne away, dismantled for transport, together with the Koh-i-Noor diamond.",
+      "citation": "Archaeological Survey of India, Red Fort site record; Encyclopaedia Britannica, Peacock Throne",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s8",
+      "text": "Behind the emperor's seat in the Diwan-i-Am are inlaid pietra dura panels, one of which shows Orpheus with his lute. After 1857 twelve of these panels were prised out and taken to London for the Victoria and Albert Museum; the recess was restored under Lord Curzon.",
+      "citation": "Archaeological Survey of India, Red Fort site record (Diwan-i-Am); Victoria and Albert Museum collection records",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s9",
+      "text": "After the uprising of 1857 the fort was looted and much of the palace complex was demolished to make way for British army barracks. The last Mughal emperor, Bahadur Shah Zafar, was tried inside the fort between 27 January and 9 March 1858 and exiled to Rangoon, where he died on 7 November 1862.",
+      "citation": "Archaeological Survey of India, Red Fort site record; UNESCO World Heritage Centre, Red Fort Complex (ref. 231)",
+      "license": "public domain summary"
+    },
+    {
+      "id": "s10",
+      "text": "Between November 1945 and May 1946 the fort was the setting for the courts-martial of Indian National Army officers, known as the Red Fort trials. The first and most famous, of Prem Sahgal, Gurbaksh Singh Dhillon and Shah Nawaz Khan, opened on 5 November 1945 and became a national political cause.",
+      "citation": "National Archives of India, Indian National Army trial records",
+      "license": "public domain (government of India)"
+    },
+    {
+      "id": "s11",
+      "text": "Since independence the Prime Minister of India has hoisted the national flag and addressed the nation from the ramparts above the Lahori Gate each 15 August. The Red Fort Complex, which also takes in the older Salimgarh Fort built in 1546, was inscribed on the UNESCO World Heritage List in 2007 under criteria (ii), (iii) and (vi). The Indian Army vacated the fort in 2003 and it is a centrally protected monument in the care of the Archaeological Survey of India.",
+      "citation": "UNESCO World Heritage Centre, Red Fort Complex (ref. 231); Archaeological Survey of India, Red Fort site record",
+      "license": "public domain summary"
+    }
+  ],
+  "intro": {
+    "en-IN": "I am the Red Fort. Emperors, soldiers and a free nation have all stood at my gate — ask me what I remember.",
+    "hi-IN": "मैं लाल क़िला हूँ। बादशाह, सिपाही और एक आज़ाद मुल्क — सब मेरे दरवाज़े पर खड़े हुए हैं, तो पूछो कि मुझे क्या याद है।",
+    "ur-IN": "میں لال قلعہ ہوں۔ بادشاہ، سپاہی اور ایک آزاد ملک — سب میرے دروازے پر کھڑے ہوئے ہیں، تو پوچھو کہ مجھے کیا یاد ہے۔",
+    "bn-IN": "আমি লাল কেল্লা। সম্রাট, সৈনিক আর একটা স্বাধীন দেশ — সবাই আমার দরজায় দাঁড়িয়েছে, তাই জিজ্ঞেস করো আমি কী মনে রেখেছি।",
+    "ta-IN": "நான் செங்கோட்டை. மன்னர்களும் வீரர்களும் விடுதலை பெற்ற ஒரு நாடும் என் வாயிலில் நின்றுள்ளனர் — நான் நினைவில் வைத்திருப்பதைக் கேளுங்கள்.",
+    "te-IN": "నేను ఎర్రకోట. చక్రవర్తులు, సైనికులు, స్వతంత్ర దేశం — అందరూ నా ద్వారం ముందు నిలిచారు, నాకు గుర్తున్నది అడగండి.",
+    "mr-IN": "मी लाल किल्ला. बादशहा, शिपाई आणि एक स्वतंत्र देश — सारे माझ्या दरवाज्यात उभे राहिले आहेत, तेव्हा काय आठवते ते विचारा.",
+    "pa-IN": "ਮੈਂ ਲਾਲ ਕਿਲਾ ਹਾਂ। ਬਾਦਸ਼ਾਹ, ਸਿਪਾਹੀ ਤੇ ਇੱਕ ਆਜ਼ਾਦ ਮੁਲਕ — ਸਭ ਮੇਰੇ ਦਰਵਾਜ਼ੇ ਅੱਗੇ ਖੜ੍ਹੇ ਹੋਏ ਹਨ, ਤਾਂ ਪੁੱਛੋ ਕਿ ਮੈਨੂੰ ਕੀ ਯਾਦ ਹੈ।"
+  }
+}
