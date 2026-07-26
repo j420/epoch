@@ -45,6 +45,10 @@ const config: Config = {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(226,162,113,0.45)' },
           '70%': { boxShadow: '0 0 0 22px rgba(226,162,113,0)' },
         },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },

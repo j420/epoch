@@ -1,17 +1,16 @@
+import Stage from '@/components/Stage';
+import { getMonument, DEFAULT_MONUMENT_ID } from '@/lib/monuments';
+
+export const dynamic = 'force-static';
+
 /**
- * Placeholder. The integration lane replaces this with the real Stage once the
- * visual and voice lanes land. Kept minimal so `next build` passes from hour one.
+ * The one URL a QR code points at.
+ *
+ * The monument is resolved on the server so the photograph, its regions and its
+ * greetings are in the first HTML payload — a visitor on 4G should see the image
+ * begin to load before any JavaScript has run.
  */
 export default function Home() {
-  return (
-    <main className="flex min-h-dvh items-center justify-center p-8 text-center">
-      <div className="bol-glass max-w-md p-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-sandstone-100">Bol</h1>
-        <p className="mt-3 text-sm leading-relaxed text-sandstone-200/70">
-          Speak to a monument in your own language. No app. No language picker.
-        </p>
-        <p className="mt-6 text-xs text-sandstone-200/40">Scaffold live. Building.</p>
-      </div>
-    </main>
-  );
+  const monument = getMonument(DEFAULT_MONUMENT_ID);
+  return <Stage monument={monument} />;
 }
