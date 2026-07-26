@@ -87,6 +87,8 @@ export default function Stage({ monument }: StageProps) {
   const [sheet, setSheet] = useState<Sheet | null>(null);
   /** Purely presentational: the ⋯ disclosure that holds the secondary actions. */
   const [toolsOpen, setToolsOpen] = useState(false);
+  /** The photograph's caption, collapsed to one line until asked for. */
+  const [creditOpen, setCreditOpen] = useState(false);
   const toolsRef = useRef<HTMLDivElement | null>(null);
 
   const voice = useVoiceLoop({ monumentId: monument.id });
@@ -274,7 +276,7 @@ export default function Stage({ monument }: StageProps) {
             <p
               key={current.lang}
               lang={current.lang}
-              className="bol-legible indic-text animate-rise relative mx-auto max-w-[22rem] text-balance text-[1.35rem]
+              className="bol-legible indic-text animate-fade-in relative mx-auto max-w-[22rem] text-balance text-[1.35rem]
                          font-medium leading-snug text-sandstone-50"
             >
               {current.text}
@@ -442,10 +444,40 @@ export default function Stage({ monument }: StageProps) {
             </a>
           )}
         </div>
+
+        {/* ---- the photograph's caption ----
+            Five of the ten monuments now carry real Wikimedia photographs under
+            CC BY-SA 3.0 and the Free Art License, both of which require the
+            credit to be VISIBLE with the work — a CREDITS.md in the repo does
+            not discharge that. So it is here, always on screen, set the way a
+            gallery sets a caption: one line, small, low contrast, directly
+            under the picture. Tapping opens the full line, which for the five
+            procedural placeholders reads differently and quite deliberately
+            still says so rather than pretending to be a photo credit.
+
+            `monument.credit` is the only source. Nothing is hardcoded here. */}
+        <button
+          type="button"
+          onClick={() => setCreditOpen((v) => !v)}
+          aria-expanded={creditOpen}
+          aria-label="About this photograph"
+          className="group flex min-h-[44px] w-full max-w-md items-center justify-center gap-1.5 px-2 text-center"
+        >
+          <span aria-hidden className="shrink-0 text-sandstone-100/35 transition-colors duration-fast ease-bol group-hover:text-sandstone-100/70">
+            <IconInfo size={11} />
+          </span>
+          <span
+            className={`bol-legible-soft text-[10px] leading-relaxed text-sandstone-100/45 transition-colors duration-fast ease-bol group-hover:text-sandstone-100/80 ${
+              creditOpen ? '' : 'line-clamp-1'
+            }`}
+          >
+            {monument.credit}
+          </span>
+        </button>
       </div>
 
       {photoFailed && (
-        <p className="bol-legible-soft pointer-events-none absolute inset-x-0 top-14 text-center text-[11px] tracking-wide text-sandstone-200/45">
+        <p className="bol-legible-soft pointer-events-none absolute inset-x-0 top-16 px-8 text-center text-[10px] leading-relaxed tracking-wide text-sandstone-200/40">
           showing a still photograph — depth is unavailable on this device
         </p>
       )}
@@ -474,12 +506,12 @@ export default function Stage({ monument }: StageProps) {
             role="dialog"
             aria-modal="true"
             aria-label={SHEET_TITLE[sheet]}
-            className="animate-sheet relative mt-auto flex max-h-[93dvh] min-h-0 w-full flex-col overflow-hidden
-                       rounded-t-[1.75rem] border-t border-white/[0.14] bg-night-950/97 backdrop-blur-2xl
-                       shadow-[0_-24px_60px_-30px_rgba(0,0,0,1)]"
+            className="animate-sheet relative mx-auto mt-auto flex max-h-[93dvh] min-h-0 w-full max-w-2xl flex-col
+                       overflow-hidden rounded-t-[1.75rem] border border-b-0 border-white/[0.14] bg-night-950/97
+                       backdrop-blur-2xl shadow-[0_-24px_60px_-30px_rgba(0,0,0,1)]"
           >
             <span aria-hidden className="mx-auto mt-2.5 h-1 w-10 shrink-0 rounded-full bg-sandstone-100/25" />
-            <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-1 pt-2">
+            <div className="mx-auto flex w-full max-w-lg shrink-0 items-center justify-between gap-3 px-4 pb-1 pt-2">
               <h2 className="text-sm font-medium tracking-wide text-sandstone-100/90">{SHEET_TITLE[sheet]}</h2>
               <button
                 type="button"

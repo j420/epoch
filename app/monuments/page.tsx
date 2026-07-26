@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { IconViewfinder } from '@/components/ui/icons';
 import { allMonuments, displayName } from '@/lib/monuments';
 
 /**
@@ -66,6 +67,19 @@ export default function MonumentsIndex() {
             Each one listens in twenty-two languages and answers in yours. Pick one, then just speak — you are never
             asked which language you want.
           </p>
+
+          {/* Somebody browsing ten thumbnails is exactly the person who would
+              rather just hold their phone up. Offered, not pushed: it sits
+              under the intro at chip weight, not as a hero call to action. */}
+          <Link
+            href="/scan"
+            className="bol-chip bol-tap mt-5 gap-2 border-sandstone-200/25 bg-white/[0.04] px-4 text-[0.8rem]
+                       text-sandstone-100 transition-colors duration-fast ease-bol
+                       hover:border-sandstone-200/50 hover:bg-white/[0.08]"
+          >
+            <IconViewfinder size={16} className="text-sandstone-300" />
+            Or point your camera at one
+          </Link>
         </header>
 
         {/* One wide plate per row on a phone so the native name can be set at
@@ -81,7 +95,7 @@ export default function MonumentsIndex() {
               <li key={m.id}>
                 <Link
                   href={`/m/${m.id}`}
-                  className="group relative block aspect-[3/2] overflow-hidden rounded-2xl bg-night-900
+                  className="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-night-900
                              ring-1 ring-white/[0.08] transition-[transform,box-shadow] duration-base ease-bol
                              hover:-translate-y-1 hover:shadow-[0_26px_50px_-28px_rgba(0,0,0,1)]
                              hover:ring-sandstone-200/40
@@ -94,7 +108,7 @@ export default function MonumentsIndex() {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    className="absolute inset-0 h-full w-full scale-[1.02] object-cover object-[center_38%]
+                    className="absolute inset-0 h-full w-full scale-[1.02] object-cover object-[center_42%]
                                transition-transform duration-slow ease-bol group-hover:scale-[1.07]"
                   />
 
