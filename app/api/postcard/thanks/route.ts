@@ -5,6 +5,7 @@ import { toErrorPayload } from '@/lib/errors';
 import { info, normalizeLang, voiceGapNotice } from '@/lib/langs';
 import { displayName, getMonument } from '@/lib/monuments';
 import { MODELS, chat, isConfigured, speak } from '@/lib/sarvam';
+import { monumentId as monumentIdOf, sessionId as sessionIdOf } from '@/lib/params';
 
 import { cleanSpoken, limitSentences } from '../_shared';
 
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
     const q = req.nextUrl.searchParams;
     const lang = normalizeLang(q.get('lang'));
     const langInfo = info(lang);
-    const monument = getMonument(q.get('monument_id') ?? undefined);
+    const monument = getMonument(monumentIdOf(q) ?? undefined);
     const sessionId = q.get('session_id');
 
     const paise = Number(q.get('amount_paise'));

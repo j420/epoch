@@ -7,6 +7,7 @@ import { toErrorPayload } from '@/lib/errors';
 import { normalizeLang } from '@/lib/langs';
 import { displayName, getMonument } from '@/lib/monuments';
 import { qrSvg } from '@/lib/qr';
+import { monumentId as monumentIdOf, sessionId as sessionIdOf } from '@/lib/params';
 
 import { askLine, basicAuth, notConfigured, publicBase, razorpayKeys } from '../_shared';
 
@@ -38,9 +39,9 @@ export async function POST(req: NextRequest) {
   const started = Date.now();
   try {
     const body = (await req.json().catch(() => ({}))) as LinkBody;
-    const monument = getMonument(body.monument_id ?? undefined);
+    const monument = getMonument(monumentIdOf(body) ?? undefined);
     const lang = normalizeLang(body.lang);
-    const sessionId = typeof body.session_id === 'string' && body.session_id ? body.session_id : null;
+    const sessionId = sessionIdOf(body);
     const ask = askLine(monument.id);
 
     const requested = Number(body.amount);

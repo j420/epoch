@@ -22,8 +22,10 @@ import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const W = 1024;
-const H = 1365; // aspect 0.75, portrait — a tower wants a portrait frame
+const W = 896;
+const H = 1792; // aspect 0.50 — a phone viewport, so `contain` framing fills it
+                // rather than letterboxing. A tower must never be cropped top or
+                // bottom, so the frame is matched to the phone instead.
 const OUT = path.join(process.cwd(), 'public', 'monuments', 'qutub-minar');
 
 // ---------------------------------------------------------------------------
@@ -134,8 +136,8 @@ const smoothstep = (e0, e1, x) => {
 
 const TOP = 0.11;    // v of the crown
 const BASE = 0.93;   // v where the tower meets the ground
-const W_TOP = 0.052; // half-width at the crown
-const W_BASE = 0.150;// half-width at the base
+const W_TOP = 0.062; // half-width at the crown
+const W_BASE = 0.178;// half-width at the base
 
 /** Five storeys, each ending in a projecting balcony. */
 const STOREYS = [0.11, 0.30, 0.475, 0.625, 0.775, 0.93];

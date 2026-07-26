@@ -4,6 +4,7 @@ import { toErrorPayload } from '@/lib/errors';
 import { info, normalizeLang, voiceGapNotice } from '@/lib/langs';
 import { getMonument } from '@/lib/monuments';
 import { MODELS, isConfigured, speak, translate } from '@/lib/sarvam';
+import { monumentId as monumentIdOf, sessionId as sessionIdOf } from '@/lib/params';
 
 import { askLine } from '../_shared';
 
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
   try {
     const q = req.nextUrl.searchParams;
     const lang = normalizeLang(q.get('lang'));
-    const monument = getMonument(q.get('monument_id') ?? undefined);
+    const monument = getMonument(monumentIdOf(q) ?? undefined);
     const ask = askLine(monument.id);
 
     if (!isConfigured()) {
