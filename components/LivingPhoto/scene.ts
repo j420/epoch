@@ -56,6 +56,8 @@ export interface SceneOptions {
   onReady?: () => void;
   onError?: (e: Error) => void;
   onPhase?: (p: DepthPhase | 'loading') => void;
+  /** The GL path cannot produce a picture at all — put up the static fallback. */
+  onFatal?: () => void;
 }
 
 interface GradeState {
@@ -280,9 +282,7 @@ export class PhotoScene {
         planeHeight: this.planeHeight,
         pixelRatio: this.pixelRatio,
       });
-      this.moteCount =
-        (this.atmosphere.group.children[0] as THREE.Points).geometry.getAttribute('position')
-          .count ?? 0;
+      this.moteCount = this.atmosphere.count;
       this.scene.add(this.atmosphere.group);
       this.applyAtmosphereGrade();
     }
@@ -331,10 +331,11 @@ export class PhotoScene {
       }, 'easeOutCubic');
       this.opts.onReady?.();
     } catch (err) {
-      // No photograph means no visual lane at all. Say so honestly and let the
-      // React shell put up the static fallback.
-      this.webglOk = false;
+      // No photograph means there is nothing to render. Say so honestly and let
+      // the React shell put up the static fallback rather than a black canvas.
       this.fail(err, `could not load ${this.monument.hero}`);
+      this.opts.onFatal?.();
+      this.stop();
       return;
     }
 
@@ -619,12 +620,12 @@ export class PhotoScene {
     // none; midday gets the full cloud.
     const lum = clamp(gradeLuminance(this.currentGrade), 0, 1.3);
     this.atmosphere.setOpacity(clamp(lum * 0.9, 0.05, 1));
+    // Motes are lit by the same light as the stone, biased warm: what you see
+    // is sunlight scattering off them, not the particles' own colour.
     this.atmosphere.setTint(
-      new THREE.Color(
-        clamp(this.gradeNow.tint.x, 0, 2),
-        clamp(this.gradeNow.tint.y * 0.93, 0, 2),
-        clamp(this.gradeNow.tint.z * 0.82, 0, 2),
-      ),
+      clamp(this.gradeNow.tint.x, 0, 2),
+      clamp(this.gradeNow.tint.y * 0.93, 0, 2),
+      clamp(this.gradeNow.tint.z * 0.82, 0, 2),
     );
   }
 
@@ -732,10 +733,12 @@ export class PhotoScene {
     // back; without it the canvas is dead forever.
     e.preventDefault();
     this.stop();
-    this.fail(new Error('WebGL context lost'), 'WebGL context lost');
+    this.webglOk = false;
+    this.fail(new Error('the browser reclaimed the GL context'), 'WebGL context lost');
   };
 
   private onContextRestored = (): void => {
+    this.webglOk = true;
     this.syncRunning();
   };
 
@@ -772,8 +775,11 @@ export class PhotoScene {
     this.fps = this.fps * 0.92 + (1 / Math.max(dt, 0.001)) * 0.08;
     this.maybeDegrade();
 
-    for (const [id, tick] of this.tickers) {
-      if (!tick(dt)) this.tickers.delete(id);
+    // Snapshot first: a finishing tween may install a *new* ticker under the
+    // same id from its completion callback (era does exactly this when swapping
+    // layers), and deleting blindly would throw that replacement away.
+    for (const [id, tick] of Array.from(this.tickers)) {
+      if (!tick(dt) && this.tickers.get(id) === tick) this.tickers.delete(id);
     }
 
     const p = this.parallax.update(dt);

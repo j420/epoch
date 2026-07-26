@@ -104,6 +104,9 @@ export class Atmosphere {
   private reducedMotion = false;
   private elapsed = 0;
 
+  /** Number of motes actually allocated, after the device-class trim. */
+  readonly count: number;
+
   private readonly planeWidth: number;
   private readonly planeHeight: number;
 
@@ -196,8 +199,9 @@ export class Atmosphere {
     this.dustMaterial.uniforms.uOpacity.value = this.opacity * 0.34;
   }
 
-  setTint(color: THREE.Color): void {
-    (this.dustMaterial.uniforms.uColor.value as THREE.Color).copy(color);
+  /** Takes raw components rather than a Color so the caller allocates nothing. */
+  setTint(r: number, g: number, b: number): void {
+    (this.dustMaterial.uniforms.uColor.value as THREE.Color).setRGB(r, g, b);
   }
 
   setReducedMotion(on: boolean): void {
