@@ -25,10 +25,13 @@
  *   out.k   local brightness multiplier for carved detail: flutes, string courses,
  *           balcony undersides, window recesses.
  *
- * PAINTER'S ORDER. Parts inside a `hit` are evaluated strictly back-to-front and a
- * later part simply overwrites an earlier one. Primitives never touch `out` when they
- * miss, so this is safe — but it means the order of the calls inside each `hit` is
- * load-bearing. Draw what is far away first.
+ * ORDERING. Parts inside a `hit` are tested front-to-back and the FIRST one that
+ * matches wins — each returns immediately. Primitives never touch `out` when they
+ * miss, so this is safe, but it means the order of the calls inside each `hit` is
+ * load-bearing: whatever is nearest the camera must be tested first. Where a part
+ * genuinely has a hole in it (the gap between the pillars of a chhatri, the sky seen
+ * through a torana) it returns false and the sky renders through, which is also what
+ * the depth map then says.
  *
  * SWAP THESE BEFORE THE DEMO. Drop a real photo at hero.png and a Depth Anything V2
  * map at depth.png for any monument and nothing in the app changes: the filenames and
@@ -360,11 +363,10 @@ const tajMahal = {
     for (const cx of [0.362, 0.638]) {
       if (finial(out, u, v, { cx, y0: 0.318, y1: 0.344, hw: 0.0026, z: 0.83, col: W2 })) return true;
       if (dome(out, u, v, { cx, yBase: 0.394, rx: 0.036, ry: 0.05, z: 0.76, col: M, profile: 'onion', ribs: 7 })) return true;
-      // Kiosk pillars, with the shaded space between them.
+      // Kiosk pillars — you see the sky between them, and so does the depth map.
       if (v > 0.394 && v < 0.428 && Math.abs(u - cx) < 0.033) {
         const p = phase(u - cx + 0.033, 0.022);
-        const solid = Math.abs(p - 0.5) > 0.26;
-        return put(out, 0.76, 0, 1, solid ? M : W2, solid ? 1.02 : 0.6);
+        if (Math.abs(p - 0.5) > 0.26) return put(out, 0.76, 0, 1, M, 1.02);
       }
     }
 
@@ -377,9 +379,9 @@ const tajMahal = {
         return put(out, 0.72 - 0.1 * d, 0.2, 0.94, MAT.shadow, 0.52 + 0.46 * (1 - d));
       }
       // Two tiers of smaller arched niches either side of the iwan.
-      for (const cx of [0.348, 0.394, 0.606, 0.652]) {
-        for (const yb of [0.524, 0.618]) {
-          const a = { x0: cx - 0.0165, x1: cx + 0.0165, ySpring: yb - 0.05, yBottom: yb, rise: 0.026 };
+      for (const cx of [0.352, 0.412, 0.588, 0.648]) {
+        for (const yb of [0.518, 0.602]) {
+          const a = { x0: cx - 0.024, x1: cx + 0.024, ySpring: yb - 0.03, yBottom: yb, rise: 0.022 };
           if (inArch(u, v, a)) {
             const d = archDepth(u, v, a);
             return put(out, 0.8 - 0.06 * d, 0.18, 0.95, MAT.shadow, 0.56 + 0.42 * (1 - d));
@@ -483,11 +485,10 @@ const redFort = {
     for (const cx of [0.372, 0.628]) {
       if (finial(out, u, v, { cx, y0: 0.146, y1: 0.176, hw: 0.0038, z: 0.88, col: MAT.whiteMarble })) return true;
       if (dome(out, u, v, { cx, yBase: 0.232, rx: 0.034, ry: 0.058, z: 0.84, col: MAT.whiteMarble, profile: 'onion', ribs: 7 })) return true;
-      // Open chhatri pillars beneath the cupola.
+      // Open chhatri pillars beneath the cupola — sky shows between them.
       if (v > 0.232 && v < 0.268 && Math.abs(u - cx) < 0.034) {
         const pp = phase(u - cx + 0.034, 0.0227);
-        const solid = Math.abs(pp - 0.5) > 0.26;
-        return put(out, 0.84, 0, 1, solid ? MAT.whiteMarble : MAT.shadow, solid ? 1 : 0.5);
+        if (Math.abs(pp - 0.5) > 0.26) return put(out, 0.84, 0, 1, MAT.whiteMarble, 1);
       }
       const towerTop = merlonTop(u, 0.268, 0.0165, 0.016);
       if (v >= towerTop && v <= 0.87 && Math.abs(u - cx) < 0.041) {
@@ -544,75 +545,72 @@ const gatewayOfIndia = {
     const B = MAT.basaltYellow;
     const BD = [166, 144, 100];
 
-    // ---- the shallow central dome behind the arch ----
-    if (finial(out, u, v, { cx: 0.5, y0: 0.222, y1: 0.256, hw: 0.0042, z: 0.72, col: BD })) return true;
-    if (dome(out, u, v, { cx: 0.5, yBase: 0.322, rx: 0.098, ry: 0.07, z: 0.62, col: BD, profile: 'shallow', ribs: 12 })) return true;
-
-    // ---- four corner turrets with their small ribbed cupolas ----
-    for (const cx of [0.257, 0.743]) {
-      if (finial(out, u, v, { cx, y0: 0.222, y1: 0.244, hw: 0.003, z: 0.86, col: B })) return true;
-      if (dome(out, u, v, { cx, yBase: 0.29, rx: 0.032, ry: 0.048, z: 0.8, col: B, profile: 'onion', ribs: 8 })) return true;
-      const t = merlonTop(u, 0.29, 0.0132, 0.012);
-      if (v >= t && v <= 0.44 && Math.abs(u - cx) < 0.038) {
+    // ---- four corner turrets with their small ribbed cupolas (nearest, so first) ----
+    for (const cx of [0.312, 0.688]) {
+      if (finial(out, u, v, { cx, y0: 0.29, y1: 0.312, hw: 0.003, z: 0.9, col: B })) return true;
+      if (dome(out, u, v, { cx, yBase: 0.356, rx: 0.03, ry: 0.046, z: 0.86, col: B, profile: 'onion', ribs: 8 })) return true;
+      const t = merlonTop(u, 0.356, 0.0124, 0.011);
+      if (v >= t && v <= 0.5 && Math.abs(u - cx) < 0.036) {
         let k = 1;
-        if (Math.abs(v - 0.35) < 0.005) k *= 0.78;
-        return column(out, u, v, { cx, y0: t, y1: 0.44, hw: 0.038, z: 0.84, col: B, k, bulge: 0.12 });
+        if (Math.abs(v - 0.41) < 0.005) k *= 0.78;
+        // A tiny balcony where the turret meets the parapet.
+        if (Math.abs(v - 0.462) < 0.006) k *= 1.16;
+        return column(out, u, v, { cx, y0: t, y1: 0.5, hw: 0.036, z: 0.9, col: B, k, bulge: 0.12 });
       }
     }
 
-    // ---- side halls, lower than the central mass ----
-    for (const [x0, x1] of [[0.208, 0.34], [0.66, 0.792]]) {
-      if (v >= 0.408 && v <= 0.786 && u >= x0 && u <= x1) {
+    // ---- the central mass with the great arch cut through it ----
+    if (v >= 0.386 && v <= 0.786 && u >= 0.276 && u <= 0.724) {
+      const g = { x0: 0.396, x1: 0.604, ySpring: 0.56, yBottom: 0.786, rise: 0.108 };
+      if (inArch(u, v, g)) {
+        // You look right through the Gateway to the harbour beyond, so the far wall
+        // of the arch sits a long way back and the coffered vault catches a little
+        // light near the crown.
+        const d = archDepth(u, v, g);
+        const vault = smoothstep(0.56, 0.46, v) * 0.42;
+        return put(out, 0.58 - 0.14 * d, 0.12, 0.96, MAT.deepShadow, 0.3 + 0.34 * (1 - d) + vault);
+      }
+      let k = 1;
+      // The moulded archivolt, then the cornice and the plinth band.
+      const rr = Math.hypot((u - 0.5) / 0.126, (0.56 - v) / 0.132);
+      if (v < 0.57 && rr > 1 && rr < 1.12) k *= 0.86;
+      if (Math.abs(v - 0.404) < 0.007) k *= 0.78;
+      if (Math.abs(v - 0.432) < 0.005) k *= 0.9;
+      if (Math.abs(v - 0.756) < 0.006) k *= 0.82;
+      // Perforated stone screens in the spandrels above the arch.
+      if (v > 0.446 && v < 0.53 && (u < 0.386 || u > 0.614)) {
+        const j = phase(u, 0.0116) - 0.5;
+        const jv = phase(v, 0.0116) - 0.5;
+        k *= Math.abs(j) < 0.28 && Math.abs(jv) < 0.28 ? 0.58 : 1.06;
+      }
+      return slab(out, u, v, { x0: 0.276, x1: 0.724, y0: 0.386, y1: 0.786, z: 0.88, col: B, k });
+    }
+
+    // ---- the shallow central dome, standing behind the arch block ----
+    if (finial(out, u, v, { cx: 0.5, y0: 0.256, y1: 0.294, hw: 0.0042, z: 0.72, col: BD })) return true;
+    if (dome(out, u, v, { cx: 0.5, yBase: 0.386, rx: 0.112, ry: 0.078, z: 0.62, col: BD, profile: 'shallow', ribs: 14 })) return true;
+
+    // ---- side halls, lower and set back from the central mass ----
+    for (const [x0, x1] of [[0.132, 0.278], [0.722, 0.868]]) {
+      if (v >= 0.5 && v <= 0.786 && u >= x0 && u <= x1) {
         const cx = (x0 + x1) * 0.5;
         // A pair of arched openings in each hall.
-        for (const ax of [cx - 0.032, cx + 0.032]) {
-          const a = { x0: ax - 0.021, x1: ax + 0.021, ySpring: 0.62, yBottom: 0.786, rise: 0.042 };
+        for (const ax of [cx - 0.034, cx + 0.034]) {
+          const a = { x0: ax - 0.023, x1: ax + 0.023, ySpring: 0.664, yBottom: 0.786, rise: 0.04 };
           if (inArch(u, v, a)) {
             const d = archDepth(u, v, a);
             return put(out, 0.76 - 0.08 * d, 0.16, 0.96, MAT.shadow, 0.42 + 0.45 * (1 - d));
           }
         }
-        let k = 1;
-        // Perforated stone screen band.
-        if (v > 0.43 && v < 0.49) {
-          const j = phase(u, 0.0125) - 0.5;
-          const jv = phase(v, 0.0125) - 0.5;
-          k *= Math.abs(j) < 0.28 && Math.abs(jv) < 0.28 ? 0.6 : 1.05;
-        }
-        if (Math.abs(v - 0.418) < 0.006) k *= 0.8;
-        return slab(out, u, v, { x0, x1, y0: 0.408, y1: 0.786, z: 0.84, col: B, k });
+        let k = 0.96;
+        if (Math.abs(v - 0.512) < 0.006) k *= 0.8;
+        if (Math.abs(v - 0.62) < 0.005) k *= 1.1;
+        return slab(out, u, v, { x0, x1, y0: 0.5, y1: 0.786, z: 0.82, col: B, k });
       }
-    }
-
-    // ---- the central mass with the great arch cut through it ----
-    if (v >= 0.312 && v <= 0.786 && u >= 0.218 && u <= 0.782) {
-      const g = { x0: 0.393, x1: 0.607, ySpring: 0.52, yBottom: 0.786, rise: 0.115 };
-      if (inArch(u, v, g)) {
-        // You look right through the Gateway to the harbour beyond, so the far
-        // wall of the arch sits a long way back and the coffered vault catches
-        // a little light near the crown.
-        const d = archDepth(u, v, g);
-        const vault = smoothstep(0.52, 0.4, v) * 0.5;
-        return put(out, 0.58 - 0.14 * d, 0.12, 0.96, MAT.deepShadow, 0.3 + 0.34 * (1 - d) + vault);
-      }
-      let k = 1;
-      // The moulded archivolt, then the cornice and the plinth band.
-      const cx = 0.5;
-      const rr = Math.hypot((u - cx) / 0.128, (0.52 - v) / 0.138);
-      if (v < 0.53 && rr > 1 && rr < 1.13) k *= 0.86;
-      if (Math.abs(v - 0.336) < 0.007) k *= 0.78;
-      if (Math.abs(v - 0.372) < 0.005) k *= 0.9;
-      if (Math.abs(v - 0.756) < 0.006) k *= 0.82;
-      // Small niches flanking the arch.
-      for (const nx2 of [0.302, 0.698]) {
-        const a = { x0: nx2 - 0.024, x1: nx2 + 0.024, ySpring: 0.5, yBottom: 0.6, rise: 0.036 };
-        if (inArch(u, v, a)) return put(out, 0.8, 0.14, 0.96, MAT.shadow, 0.48);
-      }
-      return slab(out, u, v, { x0: 0.218, x1: 0.782, y0: 0.312, y1: 0.786, z: 0.88, col: B, k });
     }
 
     // ---- the quay the Gateway stands on ----
-    if (slab(out, u, v, { x0: 0.14, x1: 0.86, y0: 0.786, y1: 0.815, z: 0.94, col: MAT.greyGranite, k: 0.85 })) return true;
+    if (slab(out, u, v, { x0: 0.1, x1: 0.9, y0: 0.786, y1: 0.815, z: 0.94, col: MAT.greyGranite, k: 0.85 })) return true;
     return false;
   },
 };
@@ -621,11 +619,12 @@ const gatewayOfIndia = {
 // 5. HAWA MAHAL — five-storey honeycomb facade of jharokhas
 // ---------------------------------------------------------------------------
 
-// Tiers run bottom to top: [v, halfWidth]. Each boundary throws a cornice flange.
+// Tiers run top to bottom in increasing v: [v, halfWidth]. Each pair of rows is one
+// storey, and every boundary between storeys throws a projecting cornice flange.
 const HM_TIERS = [
-  [0.9, 0.428], [0.66, 0.428], [0.655, 0.402], [0.578, 0.402],
-  [0.573, 0.354], [0.5, 0.354], [0.495, 0.292], [0.424, 0.292],
-  [0.419, 0.213], [0.352, 0.213], [0.347, 0.128], [0.286, 0.128],
+  [0.286, 0.128], [0.347, 0.128], [0.352, 0.213], [0.419, 0.213],
+  [0.424, 0.292], [0.495, 0.292], [0.5, 0.354], [0.573, 0.354],
+  [0.578, 0.402], [0.655, 0.402], [0.66, 0.428], [0.9, 0.428],
 ];
 
 const hawaMahal = {
@@ -661,27 +660,29 @@ const hawaMahal = {
     // Cornice flange at every tier boundary: a bright lip with a shadow beneath.
     let k = 1;
     let col = P;
-    for (let i = 1; i < HM_TIERS.length - 1; i += 2) {
+    for (let i = 1; i < HM_TIERS.length - 2; i += 2) {
       const by = HM_TIERS[i][0];
       const d = v - by;
-      if (d > -0.008 && d < 0.002) { k = 1.25; col = WHITE; }
-      else if (d >= 0.002 && d < 0.014) k = 0.5 + 0.5 * ((d - 0.002) / 0.012);
+      if (d > -0.006 && d < 0.0015) { k = 1.12; col = WHITE; }
+      else if (d >= 0.0015 && d < 0.011) k = 0.56 + 0.44 * ((d - 0.0015) / 0.0095);
     }
     if (k !== 1) return put(out, z + 0.03, nx, nz, col, k);
 
-    // ---- the honeycomb: a grid of arched jharokha windows ----
-    // Ground storey is a plain arcade; the five screen storeys above are the lattice.
-    if (v > 0.68) {
-      const cell = 0.0585;
-      const p = phase(u, cell);
-      const a = { x0: 0, x1: 1, ySpring: 0.79, yBottom: 0.898, rise: 0.052 };
-      void a;
+    // ---- the ground storey: a plain arcade over a stone plinth ----
+    // The five screen storeys above it are the lattice proper.
+    if (v > 0.858) {
+      const base = 0.9 + 0.14 * smoothstep(0.858, 0.868, v);
+      return put(out, z + 0.04, nx, nz, P, base * (v > 0.9 ? 0.9 : 1));
+    }
+    if (v > 0.663) {
+      const p = phase(u, 0.0585);
       const d = Math.abs(p - 0.5) * 2;
-      const head = 0.79 - 0.05 * (1 - d * d * (1.5 - 0.5 * d));
-      if (d < 0.6 && v > head && v < 0.898) {
-        const rec = smoothstep(0.6, 0.1, d);
+      const head = 0.756 - 0.048 * (1 - d * d * (1.5 - 0.5 * d));
+      if (d < 0.58 && v > head && v < 0.852) {
+        const rec = smoothstep(0.58, 0.1, d);
         return put(out, z - 0.09 * rec, nx, nz, MAT.shadow, 0.34 + 0.3 * (1 - rec));
       }
+      if (Math.abs(v - 0.672) < 0.005) return put(out, z + 0.02, nx, nz, WHITE, 1.1);
       return put(out, z, nx, nz, P, 1 + (Math.abs(p - 0.5) < 0.06 ? 0.06 : 0));
     }
 
@@ -725,19 +726,18 @@ const charminar = {
     const S = MAT.limeStucco;
     const SD = [190, 176, 150];
 
-    // ---- the rear pair of minarets, only their tops clear the roofline ----
+    // ---- the front pair of minarets, full height, nearest the camera ----
+    for (const cx of [0.258, 0.742]) {
+      if (charMinaret(out, u, v, cx, 0.905, 0.043, 0.9, S, 0)) return true;
+    }
+    // ---- the rear pair, further off and so shorter and softer ----
     for (const cx of [0.352, 0.648]) {
-      if (charMinaret(out, u, v, cx, 0.5, 0.0335, 0.66, SD)) return true;
+      if (charMinaret(out, u, v, cx, 0.52, 0.031, 0.66, SD, 0.062)) return true;
     }
     // ---- the mosque on the terrace ----
     if (dome(out, u, v, { cx: 0.5, yBase: 0.474, rx: 0.044, ry: 0.05, z: 0.7, col: SD, profile: 'onion', ribs: 8 })) return true;
     for (const cx of [0.418, 0.582]) {
       if (dome(out, u, v, { cx, yBase: 0.482, rx: 0.024, ry: 0.028, z: 0.7, col: SD, profile: 'onion' })) return true;
-    }
-
-    // ---- the front pair of minarets, full height ----
-    for (const cx of [0.258, 0.742]) {
-      if (charMinaret(out, u, v, cx, 0.905, 0.043, 0.9, S)) return true;
     }
 
     // ---- the terrace parapet ----
@@ -765,12 +765,15 @@ const charminar = {
       if (v < 0.73 && rr > 1 && rr < 1.1) k *= 0.84;
       if (Math.abs(v - 0.556) < 0.006) k *= 0.78;
       if (Math.abs(v - 0.64) < 0.005) k *= 0.88;
-      // The clock faces added in the nineteenth century.
-      const cl = Math.hypot((u - 0.5) / 0.03, (v - 0.6) / 0.03);
-      if (cl < 1) k *= cl > 0.86 ? 0.7 : 1.24;
-      // Small balustraded balconies over the arch.
-      for (const bx of [0.318, 0.682]) {
-        if (Math.abs(u - bx) < 0.03 && v > 0.66 && v < 0.7) k *= phase(u, 0.0075) < 0.5 ? 1.1 : 0.72;
+      // The clock face added in the nineteenth century, one to each of my four sides.
+      // Note the radii differ because the frame is 1:2 — this circle is round in pixels.
+      const cl = Math.hypot((u - 0.5) / 0.028, (v - 0.574) / 0.014);
+      if (cl < 1) k *= cl > 0.82 ? 0.72 : 1.18;
+      // Small balustraded balconies flanking the arch.
+      for (const bx of [0.306, 0.694]) {
+        if (Math.abs(u - bx) < 0.032 && v > 0.664 && v < 0.686) {
+          k *= phase(u, 0.008) < 0.46 ? 1.12 : 0.78;
+        }
       }
       return slab(out, u, v, { x0: 0.232, x1: 0.768, y0: 0.53, y1: 0.905, z: 0.86, col: S, k });
     }
@@ -778,13 +781,16 @@ const charminar = {
   },
 };
 
-/** A Charminar minaret: four storeys of balconies under a petalled onion dome. */
-function charMinaret(out, u, v, cx, yBottom, hw, z, col) {
-  const top = 0.148;
-  const domeBase = 0.238;
+/**
+ * A Charminar minaret: four storeys of balconies under a petalled onion dome.
+ * `dy` lowers the whole tower, which is how the further pair reads as further.
+ */
+function charMinaret(out, u, v, cx, yBottom, hw, z, col, dy = 0) {
+  const top = 0.148 + dy;
+  const domeBase = 0.238 + dy;
   if (finial(out, u, v, { cx, y0: top - 0.026, y1: top, hw: hw * 0.11, z: z + 0.02, col })) return true;
   if (dome(out, u, v, { cx, yBase: domeBase, rx: hw * 0.86, ry: 0.09, z, col, profile: 'onion', ribs: 9 })) return true;
-  const balconies = [0.318, 0.404, 0.5, 0.62, 0.75];
+  const balconies = [0.318, 0.404, 0.5, 0.62, 0.75].map((b) => b + dy);
   const shaft = (vv) => {
     let w = hw * lerp(0.62, 1.0, clamp((vv - domeBase) / (yBottom - domeBase)));
     for (const b of balconies) {
@@ -809,8 +815,8 @@ function charMinaret(out, u, v, cx, yBottom, hw, z, col) {
 // ---------------------------------------------------------------------------
 
 const K_TIERS = [
-  [0.735, 0.268], [0.505, 0.268], [0.5, 0.252], [0.41, 0.196],
-  [0.405, 0.182], [0.335, 0.134], [0.33, 0.122], [0.282, 0.076],
+  [0.362, 0.086], [0.418, 0.148], [0.423, 0.162], [0.492, 0.216],
+  [0.497, 0.232], [0.575, 0.274], [0.58, 0.29], [0.735, 0.298],
 ];
 
 const konarkSunTemple = {
@@ -823,46 +829,46 @@ const konarkSunTemple = {
     const K = MAT.khondalite;
 
     // ---- kalasha and amalaka crowning the roof ----
-    if (finial(out, u, v, { cx: 0.5, y0: 0.212, y1: 0.248, hw: 0.008, z: 0.78, col: K })) return true;
-    if (dome(out, u, v, { cx: 0.5, yBase: 0.282, rx: 0.062, ry: 0.036, z: 0.76, col: K, profile: 'shallow', ribs: 14 })) return true;
+    if (finial(out, u, v, { cx: 0.5, y0: 0.296, y1: 0.334, hw: 0.009, z: 0.78, col: K })) return true;
+    if (dome(out, u, v, { cx: 0.5, yBase: 0.362, rx: 0.076, ry: 0.032, z: 0.76, col: K, profile: 'shallow', ribs: 16 })) return true;
 
     // ---- the pidha roof: three tiers of receding horizontal courses ----
-    if (v >= 0.282 && v <= 0.735) {
+    if (v >= 0.362 && v <= 0.735) {
       const hw = stepped(v, K_TIERS);
       const dx = (u - 0.5) / hw;
       if (dx >= -1 && dx <= 1) {
         const nz = Math.sqrt(clamp(1 - dx * dx * 0.55));
         const z = 0.74 + 0.12 * nz;
         // Each course is a flat step with a shadowed underside — the pidha rhythm.
-        const course = 0.0182;
-        const p = phase(v, course);
-        let k = p < 0.24 ? 1.22 : p < 0.42 ? 0.56 + 0.4 * ((p - 0.24) / 0.18) : 1;
+        const p = phase(v, 0.0146);
+        let k = p < 0.24 ? 1.2 : p < 0.42 ? 0.58 + 0.38 * ((p - 0.24) / 0.18) : 1;
         // Recessed vertical channel up the centre of each face.
-        if (Math.abs(dx) < 0.09) k *= 0.9;
+        if (Math.abs(dx) < 0.07) k *= 0.95;
         // Tier boundaries carry a heavy moulded band.
-        for (const b of [0.5, 0.405, 0.33]) {
-          if (Math.abs(v - b) < 0.008) k *= 0.72;
+        for (const b of [0.575, 0.492, 0.418]) {
+          if (Math.abs(v - b) < 0.007) k *= 0.74;
         }
         return put(out, z, dx * 0.7, nz, K, k);
       }
     }
 
     // ---- the cubic sanctum wall, heavily carved ----
-    if (v > 0.735 && v <= 0.815 && u >= 0.212 && u <= 0.788) {
+    if (v > 0.735 && v <= 0.815 && u >= 0.202 && u <= 0.798) {
       // Register of niches with standing figures.
-      const p = phase(u, 0.0722);
+      const p = phase(u, 0.0746);
       const d = Math.abs(p - 0.5) * 2;
       let k = 1;
       if (d < 0.5 && v > 0.752 && v < 0.805) k = 0.62 + 0.34 * d;
       if (Math.abs(v - 0.742) < 0.005) k *= 1.14;
-      return slab(out, u, v, { x0: 0.212, x1: 0.788, y0: 0.735, y1: 0.815, z: 0.84, col: K, k });
+      return slab(out, u, v, { x0: 0.202, x1: 0.798, y0: 0.735, y1: 0.815, z: 0.84, col: K, k });
     }
 
     // ---- the chariot plinth and its wheels ----
-    if (v > 0.815 && v <= 0.9 && u >= 0.16 && u <= 0.84) {
-      for (const wx of [0.268, 0.5, 0.732]) {
-        const dx = (u - wx) / 0.06;
-        const dy = (v - 0.858) / 0.06;
+    if (v > 0.815 && v <= 0.9 && u >= 0.145 && u <= 0.855) {
+      for (const wx of [0.27, 0.5, 0.73]) {
+        // The frame is 1:2, so a round wheel needs half the radius in v that it has in u.
+        const dx = (u - wx) / 0.062;
+        const dy = (v - 0.857) / 0.031;
         const rr = Math.hypot(dx, dy);
         if (rr <= 1) {
           // A wheel in relief: raised rim, sixteen spokes, a carved hub.
@@ -878,7 +884,7 @@ const konarkSunTemple = {
       }
       const p = phase(u, 0.0181);
       const k = 0.86 + 0.24 * Math.abs(p - 0.5) * 2;
-      return slab(out, u, v, { x0: 0.16, x1: 0.84, y0: 0.815, y1: 0.9, z: 0.9, col: MAT.laterite, k });
+      return slab(out, u, v, { x0: 0.145, x1: 0.855, y0: 0.815, y1: 0.9, z: 0.9, col: MAT.laterite, k });
     }
     return false;
   },
@@ -902,11 +908,11 @@ const mysorePalace = {
     // ---- the five-storey central tower and its gilded dome ----
     if (finial(out, u, v, { cx: 0.5, y0: 0.108, y1: 0.15, hw: 0.005, z: 0.74, col: MAT.gold })) return true;
     if (dome(out, u, v, { cx: 0.5, yBase: 0.256, rx: 0.062, ry: 0.108, z: 0.68, col: PM, profile: 'onion', ribs: 10 })) return true;
-    // Open kiosk stage under the dome.
+    // Open kiosk stage under the dome — you see sky between its pillars.
     if (v > 0.256 && v <= 0.304 && Math.abs(u - 0.5) < 0.062) {
       const p = phase(u + 0.031, 0.031);
-      const solid = Math.abs(p - 0.5) > 0.28;
-      return put(out, 0.7, 0, 1, solid ? PM : MAT.shadow, solid ? 1.05 : 0.5);
+      if (Math.abs(p - 0.5) > 0.3) return put(out, 0.7, 0, 1, PM, 1.05);
+      if (v > 0.294) return put(out, 0.7, 0, 1, PM, 0.92);
     }
     if (v > 0.304 && v <= 0.47 && Math.abs(u - 0.5) < 0.058) {
       let k = 1;
@@ -994,19 +1000,26 @@ const goldenTemple = {
     const BG = MAT.brightGold;
 
     // ---- the far parikrama: the white arcaded walk on the other side of the tank ----
-    if (v >= 0.452 && v <= 0.512 && (u < 0.318 || u > 0.682)) {
+    if (v >= 0.478 && v <= 0.556 && (u < 0.33 || u > 0.67)) {
       const p = phase(u, 0.021);
-      const k = Math.abs(p - 0.5) < 0.26 ? 0.68 : 1.06;
-      return slab(out, u, v, { x0: 0, x1: 1, y0: 0.452, y1: 0.512, z: 0.4, col: M, k, barrel: 0.02 });
+      // Far enough away that the arcade is only a rhythm, not a pattern.
+      let k = 0.97;
+      if (v > 0.506 && Math.abs(p - 0.5) < 0.24) k = 0.86;
+      if (Math.abs(v - 0.482) < 0.004) k = 1.06;
+      return slab(out, u, v, { x0: 0, x1: 1, y0: 0.478, y1: 0.556, z: 0.4, col: M, k, barrel: 0.02 });
     }
 
     // ---- the sanctum: gilded dome, chhatris, two storeys, marble plinth ----
     if (finial(out, u, v, { cx: 0.5, y0: 0.166, y1: 0.212, hw: 0.0048, z: 0.78, col: BG })) return true;
     if (dome(out, u, v, { cx: 0.5, yBase: 0.318, rx: 0.062, ry: 0.106, z: 0.72, col: G, profile: 'lotus', ribs: 11 })) return true;
 
-    // Corner and intermediate kiosks on the parapet.
-    for (const [cx, rx] of [[0.383, 0.03], [0.617, 0.03], [0.432, 0.019], [0.568, 0.019]]) {
-      if (dome(out, u, v, { cx, yBase: 0.372, rx, ry: rx * 1.5, z: 0.76, col: G, profile: 'lotus', ribs: 7 })) return true;
+    // Corner and intermediate kiosks on the parapet, each on its own little drum.
+    for (const [cx, rx] of [[0.379, 0.03], [0.621, 0.03], [0.434, 0.019], [0.566, 0.019]]) {
+      if (dome(out, u, v, { cx, yBase: 0.35, rx, ry: rx * 1.45, z: 0.76, col: G, profile: 'lotus', ribs: 7 })) return true;
+      if (v > 0.35 && v <= 0.372 && Math.abs(u - cx) < rx * 0.82) {
+        const p = phase(u - cx + rx, rx * 0.55);
+        if (Math.abs(p - 0.5) > 0.28) return put(out, 0.76, 0, 1, G, 1.04);
+      }
     }
 
     // Upper storey.
@@ -1017,7 +1030,7 @@ const goldenTemple = {
       let k = 1;
       // Repoussé gold panelling catches the light in vertical strips.
       const p = phase(u, 0.0106);
-      k *= 0.92 + 0.22 * Math.abs(p - 0.5) * 2;
+      k *= 0.96 + 0.11 * Math.abs(p - 0.5) * 2;
       if (Math.abs(v - 0.386) < 0.006) k *= 1.2;
       return slab(out, u, v, { x0: 0.394, x1: 0.606, y0: parTop, y1: 0.478, z: 0.8, col: G, k });
     }
@@ -1052,21 +1065,20 @@ const goldenTemple = {
     // The marble edge where the building meets the water.
     if (slab(out, u, v, { x0: 0.34, x1: 0.66, y0: 0.594, y1: 0.6, z: 0.88, col: M, k: 1.1 })) return true;
 
-    // ---- the causeway running toward the viewer, with its railing lamps ----
-    if (v > 0.6 && v <= 0.9) {
-      const t = (v - 0.6) / 0.3;
-      const hwC = lerp(0.036, 0.108, t * t * 0.9 + t * 0.1);
+    // ---- the causeway running toward the viewer, with its railing posts ----
+    if (v > 0.6 && v <= 0.93) {
+      const t = (v - 0.6) / 0.33;
+      const hwC = lerp(0.026, 0.078, t * t * 0.85 + t * 0.15);
       const dxC = (u - 0.5) / hwC;
       if (dxC >= -1 && dxC <= 1) {
         const z = lerp(0.72, 0.99, t);
         // Railing posts along both edges.
-        const edge = Math.abs(dxC) > 0.82;
-        if (edge) {
-          const p = phase(v, lerp(0.012, 0.03, t));
-          return put(out, z + 0.02, dxC * 0.3, 0.95, M, p < 0.42 ? 1.2 : 0.72);
+        if (Math.abs(dxC) > 0.84) {
+          const p = phase(v, lerp(0.01, 0.024, t));
+          return put(out, z + 0.02, dxC * 0.3, 0.95, M, p < 0.44 ? 1.14 : 0.82);
         }
-        const p = phase(v, lerp(0.01, 0.028, t));
-        return put(out, z, 0, 1, M, 0.96 + 0.12 * (p < 0.1 ? 1 : 0));
+        const p = phase(v, lerp(0.009, 0.022, t));
+        return put(out, z, 0, 1, M, 0.94 + 0.08 * (p < 0.12 ? 1 : 0));
       }
     }
     return false;
@@ -1087,27 +1099,58 @@ const sanchiStupa = {
     const B = MAT.buffSandstone;
     const BD = [172, 130, 92];
 
-    // ---- chhatra: the triple stone parasol on its mast ----
-    if (v >= 0.3 && v <= 0.472 && Math.abs(u - 0.5) < 0.006) {
-      return put(out, 0.72, 0, 1, B, 1.06);
-    }
-    for (const [dy, rx] of [[0.402, 0.05], [0.372, 0.037], [0.344, 0.025]]) {
-      if (Math.abs(v - dy) < 0.008 && Math.abs(u - 0.5) < rx) {
-        const k = v > dy ? 0.62 : 1.18;
-        return put(out, 0.73, 0, 1, B, k);
+    // ---- the torana: the carved gateway, standing clear in front and off to the
+    //      left, so it is tested FIRST — it occludes everything behind it ----
+    if (u > 0.108 && u < 0.392) {
+      // Three curved architraves with volute ends, stacked on two square pillars.
+      for (const [ay, sag] of [[0.502, 0.018], [0.552, 0.017], [0.602, 0.016]]) {
+        const bow = ay - sag * (1 - Math.pow((u - 0.245) / 0.137, 2));
+        if (v > bow && v < bow + 0.023) {
+          const t = (v - bow) / 0.023;
+          return put(out, 0.99, 0, 1, BD, 1.18 - 0.4 * t);
+        }
+        // The volute scrolls that finish each architrave.
+        for (const ex of [0.121, 0.369]) {
+          const d = Math.hypot((u - ex) / 0.019, (v - (ay + 0.011)) / 0.019);
+          if (d < 1) return put(out, 0.99, 0, 1, BD, d > 0.52 ? 1.16 : 0.68);
+        }
+      }
+      // Small carved blocks standing between the architraves.
+      for (const bx of [0.184, 0.245, 0.306]) {
+        if (Math.abs(u - bx) < 0.014 && ((v > 0.523 && v < 0.552) || (v > 0.573 && v < 0.602))) {
+          return put(out, 0.99, 0, 1, BD, 0.88);
+        }
+      }
+      // The two pillars, carved on all four faces, with bracket capitals.
+      for (const px of [0.168, 0.322]) {
+        if (Math.abs(u - px) < 0.024 && v > 0.602 && v < 0.875) {
+          const dxp = (u - px) / 0.024;
+          const nz = Math.sqrt(clamp(1 - dxp * dxp * 0.6));
+          let k = Math.abs(dxp) < 0.4 ? 1.08 : 0.84;
+          k *= 0.92 + 0.14 * (phase(v, 0.0335) < 0.5 ? 1 : 0);
+          if (v < 0.632) k *= 1.16;
+          return put(out, 1.0, dxp * 0.6, nz, BD, k);
+        }
       }
     }
+
+    // ---- chhatra: the triple stone parasol, an emblem of honour ----
+    for (const [yb, rx] of [[0.376, 0.03], [0.404, 0.044], [0.432, 0.058]]) {
+      if (dome(out, u, v, { cx: 0.5, yBase: yb, rx, ry: 0.013, z: 0.73, col: B, profile: 'shallow', bulge: 0.04 })) return true;
+    }
+    if (v >= 0.352 && v <= 0.47 && Math.abs(u - 0.5) < 0.0058) {
+      return put(out, 0.72, 0, 1, B, 1.06);
+    }
     // ---- harmika: the square railed enclosure crowning the dome ----
-    if (v >= 0.44 && v <= 0.492 && Math.abs(u - 0.5) < 0.044) {
-      const p = phase(v, 0.017);
-      return put(out, 0.76, 0, 1, B, p < 0.6 ? 1.08 : 0.68);
+    if (v >= 0.44 && v <= 0.494 && Math.abs(u - 0.5) < 0.046) {
+      const p = phase(v, 0.018);
+      return put(out, 0.76, 0, 1, B, p < 0.66 ? 1.08 : 0.74);
     }
 
     // ---- the anda: the great hemispherical dome ----
     if (dome(out, u, v, { cx: 0.5, yBase: 0.735, rx: 0.288, ry: 0.245, z: 0.66, col: B, profile: 'stupa', bulge: 0.24 })) {
       // Weathered brick-and-dressed-stone courses wrapping the dome.
-      const p = phase(v, 0.0138);
-      out.k *= 0.94 + 0.12 * (p < 0.5 ? 1 : 0);
+      out.k *= 0.95 + 0.1 * (phase(v, 0.0138) < 0.5 ? 1 : 0);
       return true;
     }
 
@@ -1115,60 +1158,19 @@ const sanchiStupa = {
     if (v > 0.7 && v <= 0.79 && Math.abs(u - 0.5) < 0.3) {
       const dx = (u - 0.5) / 0.3;
       const nz = Math.sqrt(clamp(1 - dx * dx * 0.8));
-      // Railing: three horizontal rails threaded through upright posts.
-      const p = phase(u, 0.0223);
-      const post = Math.abs(p - 0.5) < 0.2;
-      const railV = phase(v - 0.7, 0.0225);
-      const rail = railV < 0.56;
+      // Railing: three heavy horizontal rails threaded through upright posts.
+      const post = Math.abs(phase(u, 0.0273) - 0.5) < 0.3;
+      const rail = phase(v - 0.7, 0.0225) < 0.72;
       const solid = post || rail;
-      return put(out, 0.76 + 0.14 * nz, dx * 0.6, nz, solid ? B : MAT.shadow, solid ? (post ? 1.1 : 0.98) : 0.4);
+      return put(out, 0.76 + 0.14 * nz, dx * 0.6, nz, solid ? B : MAT.shadow, solid ? (post ? 1.08 : 0.96) : 0.5);
     }
 
     // ---- the ground-level railing (vedika) running across the front ----
     if (v > 0.79 && v <= 0.86) {
-      const p = phase(u, 0.0268);
-      const post = Math.abs(p - 0.5) < 0.19;
-      const railV = phase(v - 0.79, 0.0234);
-      const rail = railV < 0.58;
-      const solid = post || rail;
-      if (!solid) return false;
-      return put(out, 0.9, 0, 1, B, post ? 1.12 : 0.96);
-    }
-
-    // ---- the torana: the carved gateway standing clear in front, off to the left ----
-    if (u > 0.115 && u < 0.385) {
-      // Three curved architraves with volute ends, stacked on two square pillars.
-      for (const [ay, sag] of [[0.485, 0.016], [0.541, 0.015], [0.597, 0.014]]) {
-        const bow = ay - sag * (1 - Math.pow((u - 0.25) / 0.135, 2));
-        if (v > bow && v < bow + 0.024) {
-          const t = (v - bow) / 0.024;
-          return put(out, 0.99, 0, 1, BD, 1.16 - 0.42 * t);
-        }
-        // The volute scrolls that finish each architrave.
-        for (const ex of [0.128, 0.372]) {
-          const d = Math.hypot((u - ex) / 0.016, (v - (ay + 0.012)) / 0.016);
-          if (d < 1) return put(out, 0.99, 0, 1, BD, d > 0.55 ? 1.14 : 0.66);
-        }
-      }
-      // Small carved blocks between the architraves.
-      for (const bx of [0.185, 0.25, 0.315]) {
-        if (Math.abs(u - bx) < 0.013 && ((v > 0.509 && v < 0.541) || (v > 0.565 && v < 0.597))) {
-          return put(out, 0.99, 0, 1, BD, 0.86);
-        }
-      }
-      // The two pillars.
-      for (const px of [0.175, 0.325] ) {
-        if (Math.abs(u - px) < 0.023 && v > 0.597 && v < 0.86) {
-          const dxp = (u - px) / 0.023;
-          const nz = Math.sqrt(clamp(1 - dxp * dxp * 0.6));
-          // Four carved faces to each shaft, with a bracket capital at the top.
-          let k = Math.abs(dxp) < 0.4 ? 1.08 : 0.84;
-          const pv2 = phase(v, 0.0335);
-          k *= 0.9 + 0.16 * (pv2 < 0.5 ? 1 : 0);
-          if (v < 0.628) k *= 1.16;
-          return put(out, 1.0, dxp * 0.6, nz, BD, k);
-        }
-      }
+      const post = Math.abs(phase(u, 0.0312) - 0.5) < 0.3;
+      const rail = phase(v - 0.79, 0.0234) < 0.74;
+      if (!post && !rail) return false;
+      return put(out, 0.9, 0, 1, B, post ? 1.1 : 0.96);
     }
     return false;
   },

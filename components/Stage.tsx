@@ -193,6 +193,17 @@ export default function Stage({ monument }: StageProps) {
       </div>
 
       {/* ---- the conversation ---- */}
+      {/* A refusal is honest in the words, but it should also LOOK different from an
+          answer — otherwise "I do not remember that" reads as just another reply and
+          the one behaviour we most want a judge to notice goes by unmarked. */}
+      {started && voice.admittedIgnorance && voice.state !== 'listening' && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-[19rem] flex justify-center px-4">
+          <span className="bol-chip border-sandstone-200/30 text-sandstone-200/80">
+            I do not remember this — I will not invent it
+          </span>
+        </div>
+      )}
+
       {started && showRail && turnCount > 0 && (
         <div className="pointer-events-none absolute inset-x-0 bottom-44 px-4">
           <TranscriptRail

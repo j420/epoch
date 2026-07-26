@@ -66,11 +66,23 @@ function toGrid(image: HTMLImageElement | HTMLCanvasElement, width: number, heig
  */
 export async function computeDepthAndRegions(
   heroUrl: string,
-  looksLike: string[] = [],
+  /**
+   * Accepts a promise so the Sarvam Vision call and the depth inference can run
+   * concurrently — the names are only needed at the very end, and inference is
+   * the slow half by an order of magnitude.
+   */
+  looksLike: string[] | Promise<string[]> = [],
   onPhase?: (phase: DepthPhase) => void,
   signal?: AbortSignal,
 ): Promise<DepthOutcome> {
   const webgpu = await hasWebGPU().catch(() => false);
+  const names = async () => {
+    try {
+      return (await looksLike) ?? [];
+    } catch {
+      return [];
+    }
+  };
 
   let map;
   try {
@@ -85,7 +97,7 @@ export async function computeDepthAndRegions(
   } catch (err) {
     return {
       depthSource: 'none',
-      regions: fallbackRegions(looksLike),
+      regions: fallbackRegions(await names()),
       webgpu,
       error: (err as Error)?.message ?? 'depth generation failed',
     };
@@ -97,24 +109,25 @@ export async function computeDepthAndRegions(
     // still real places on the frame for the camera to travel to.
     return {
       depthSource: map.source,
-      regions: fallbackRegions(looksLike),
+      regions: fallbackRegions(await names()),
       webgpu,
       error: map.error?.message ?? (webgpu ? null : 'This browser has no WebGPU, so no depth map could be made.'),
     };
   }
 
+  const seen = await names();
   try {
     const grid = toGrid(map.image, map.width, map.height);
     if (!grid) {
-      return { depthSource: map.source, regions: fallbackRegions(looksLike), webgpu, error: null };
+      return { depthSource: map.source, regions: fallbackRegions(seen), webgpu, error: null };
     }
-    return { depthSource: map.source, regions: deriveRegions(grid, looksLike), webgpu, error: null };
+    return { depthSource: map.source, regions: deriveRegions(grid, seen), webgpu, error: null };
   } catch (err) {
     // Canvas readback can fail on a tainted or oversized surface. We still have
     // a depth map for the renderer; only the region derivation falls back.
     return {
       depthSource: map.source,
-      regions: fallbackRegions(looksLike),
+      regions: fallbackRegions(seen),
       webgpu,
       error: (err as Error)?.message ?? null,
     };

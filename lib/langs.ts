@@ -86,7 +86,31 @@ export function normalizeLang(raw: string | null | undefined): LangCode {
   };
   if (iso3[base]) return iso3[base];
 
+  // Full English names, in case Saaras ever returns "Tamil" rather than "ta-IN".
+  const byName = Object.values(LANGS).find((l) => l.english.toLowerCase() === lower);
+  if (byName) return byName.code;
+
+  /**
+   * Falling through to Hindi silently is the dangerous path: if Saaras changes its
+   * response shape, EVERY visitor gets answered in Hindi and nothing anywhere says
+   * why. The value is still returned so the product degrades rather than crashes,
+   * but it is now loud, and `isRecognisedLang` lets callers tell a real detection
+   * from a fallback.
+   */
+  if (s && s.toLowerCase() !== 'unknown') {
+    console.warn(`[langs] unrecognised language "${s}" — falling back to ${DEFAULT_LANG}. ` + `If this fires in production, Saaras' response shape has changed; check /api/sarvam/selftest.`);
+  }
   return DEFAULT_LANG;
+}
+
+/** True when `raw` actually names a language we hold, rather than hitting the default. */
+export function isRecognisedLang(raw: string | null | undefined): boolean {
+  if (!raw?.trim()) return false;
+  const normalised = normalizeLang(raw);
+  if (normalised !== DEFAULT_LANG) return true;
+  // Distinguish a genuine Hindi detection from a fallback that merely landed there.
+  const lower = raw.trim().toLowerCase();
+  return lower === 'hi-in' || lower === 'hi' || lower === 'hin' || lower === 'hindi';
 }
 
 export function info(code: LangCode): LangInfo {

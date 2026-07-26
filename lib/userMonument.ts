@@ -367,6 +367,31 @@ const OPENING: Record<string, string> = {
 export const doNotKnowMyself = (lang: LangCode) => localized(DO_NOT_KNOW_MYSELF, lang);
 export const ungroundedOpening = (lang: LangCode) => localized(OPENING, lang);
 
+/**
+ * Every opening line, for the cycling invitation on the create page.
+ *
+ * Rule 2 forbids a language picker anywhere, which leaves the opening screen
+ * unable to tell the visitor what to do in words — we do not yet know which
+ * words they read. So the invitation cycles through the languages instead,
+ * exactly as the Stage does, and doubles as the promise that whichever line you
+ * can read is the language it will answer you in. The ordering puts the largest
+ * likely audiences first.
+ */
+export function ungroundedOpenings(): { lang: LangCode; text: string }[] {
+  const preferred = ['hi-IN', 'en-IN', 'ta-IN', 'bn-IN', 'te-IN', 'mr-IN'];
+  const ordered = [...preferred, ...Object.keys(OPENING).filter((c) => !preferred.includes(c))];
+  const seen = new Set<string>();
+  const out: { lang: LangCode; text: string }[] = [];
+  for (const lang of ordered) {
+    const text = OPENING[lang]?.trim();
+    if (text && !seen.has(text)) {
+      seen.add(text);
+      out.push({ lang, text });
+    }
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Regions without authored content
 // ---------------------------------------------------------------------------
@@ -483,12 +508,15 @@ function namedBands(
 
   order.forEach((band, i) => {
     const seen = nameForBand(band, looksLike);
-    let id = band;
-    let label = NEUTRAL_LABELS[band];
+    let id: string = band;
+    let label: string = NEUTRAL_LABELS[band];
     if (seen) {
       const candidate = slug(seen);
+      // Only take Vision's word for it when the slug is usable and unclaimed.
+      // A collision (two bands both offered "arch") keeps the neutral label,
+      // because two regions with the same id would make `focus` ambiguous.
       if (candidate && !used.has(candidate)) {
-        id = candidate as typeof band;
+        id = candidate;
         label = `the ${seen}`;
       }
     }

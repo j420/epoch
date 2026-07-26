@@ -364,7 +364,18 @@ export async function speak(
   const clean = text.trim();
   if (!clean) throw new SarvamBadResponse('speak() called with empty text');
 
-  const cacheKey = JSON.stringify([clean, target.voiceLang, target.speaker, opts.pace ?? 1]);
+  /**
+   * textLang is in the key even though it does not change a single byte of audio.
+   *
+   * The cached SpeakResult carries `requestedLang` and `degraded`, which describe
+   * THE VISITOR, not the waveform. Keying on voiceLang alone meant the first caller
+   * to miss set those fields for everyone afterwards: speak(line, 'sa-IN') then
+   * speak(the same line, 'hi-IN') told the Hindi visitor their language could not
+   * be spoken; in the other order it silently swallowed the Sanskrit speaker's
+   * voice-gap notice. Not hypothetical — didNotCatch('sa-IN') resolves to the exact
+   * same Hindi string, so a demo hits this by simply mishearing two visitors.
+   */
+  const cacheKey = JSON.stringify([clean, target.voiceLang, target.textLang, target.speaker, opts.pace ?? 1]);
   if (!opts.bypassCache) {
     const hit = ttsCache.get(cacheKey);
     if (hit) return { ...hit, cached: true, latencyMs: Date.now() - started };
